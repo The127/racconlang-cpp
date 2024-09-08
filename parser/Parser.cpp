@@ -3,7 +3,7 @@
 //
 
 #include "Parser.h"
-
+#include "sourceMap/Source.h"
 #include "InternalError.h"
 
 std::vector<ModuleDeclaration> Parser::parse() {
@@ -19,10 +19,13 @@ void Parser::addError(const CompilerError &error) {
 }
 
 void Parser::parseFile() {
-    COMPILER_ASSERT(tokenTree.left.type == TokenType::Bof, "Parse tree did not start with BOF.");
-    COMPILER_ASSERT(tokenTree.right.isToken(TokenType::Eof), "Parse tree did not end with an EOF.");
+    COMPILER_ASSERT(source->tokenTree, "Token tree was not set: " + source->fileName);
 
-    auto current = tokenTree.tokens.begin();
+    auto tokenTree = *source->tokenTree;
+    COMPILER_ASSERT(tokenTree.left.type == TokenType::Bof, "Token tree did not start with BOF: " + source->fileName);
+    COMPILER_ASSERT(tokenTree.right.isToken(TokenType::Eof), "Token tree did not end with an EOF: " + source->fileName);
+
+    treeIterator current = tokenTree.tokens.begin(); // NOLINT(*-use-auto)
     const auto end = tokenTree.tokens.end();
 
     while (current != end) {
@@ -149,7 +152,7 @@ std::optional<Identifier> Parser::identifierRule(treeIterator &start, const tree
     }
 
     start += 1;
-    return Identifier(current->getToken(), sources);
+    return Identifier(current->getToken(), *source);
 }
 
 std::vector<Identifier> Parser::identifierListRule(const TokenTreeNode &node, TokenType opener) {

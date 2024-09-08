@@ -4,7 +4,11 @@
 
 #include "Lexer.h"
 
+#include "InternalError.h"
+
 TokenTree Lexer::tokenize() {
+    COMPILER_ASSERT(!source->tokenTree, "Token tree was already set: " + source->fileName);
+
     std::vector<TokenTree> stack;
     stack.emplace_back(Token(TokenType::Bof, source->offset, source->offset));
 

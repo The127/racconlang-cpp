@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "Location.h"
+#include "lexer/TokenTree.h"
 
 
 class Source {
@@ -19,6 +20,8 @@ public:
     const std::string text;
     const uint64_t offset;
     std::vector<uint32_t> lineBreaks;
+
+    std::optional<TokenTree> tokenTree;
 
     explicit Source(std::string fileName, std::string text, const uint64_t offset)
         : fileName(std::move(fileName)),

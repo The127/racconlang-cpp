@@ -15,19 +15,18 @@ using treeIterator = std::vector<TokenTreeNode>::const_iterator;
 
 class Parser {
 public:
-    const SourceMap &sources;
+    const std::shared_ptr<Source> source;
     std::vector<CompilerError> errors;
 
-    Parser(const TokenTree &tokenTree, const SourceMap &sources)
-        : tokenTree(tokenTree),
-          sources(sources) {
+    explicit Parser(std::shared_ptr<Source> source)
+        : source(std::move(source)) {
         modules.emplace_back();
     }
 
     std::vector<ModuleDeclaration> parse();
 
 private:
-    const TokenTree &tokenTree;
+
     std::vector<UseNode> useNodes;
     std::vector<ModuleDeclaration> modules;
 

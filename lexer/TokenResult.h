@@ -7,6 +7,7 @@
 #include <expected>
 
 #include "LexerErr.h"
+#include "sourceMap/Location.h"
 
 
 class TokenResult {

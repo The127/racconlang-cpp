@@ -3,6 +3,7 @@
 //
 
 #include "TokenResult.h"
+#include "sourceMap/SourceMap.h"
 
 uint64_t TokenResult::getStart() const {
     if (isError())

@@ -6,7 +6,6 @@
 
 #include <vector>
 
-#include "sourceMap/SourceMap.h"
 #include "Token.h"
 #include "TokenResult.h"
 

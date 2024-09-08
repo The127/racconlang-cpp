@@ -3,6 +3,9 @@
 //
 
 #include "Token.h"
+#include "sourceMap/SourceMap.h"
+
+#include <stdexcept>
 
 bool Token::isComment() const {
     return type == TokenType::LineComment

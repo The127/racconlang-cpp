@@ -8,8 +8,8 @@
 #include <string>
 
 #include "TokenType.h"
-#include "sourceMap/SourceMap.h"
 
+class SourceMap;
 
 
 class Token {

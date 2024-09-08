@@ -10,14 +10,11 @@
 #include "lexer/Token.h"
 
 
+class Source;
+
 class Identifier final : public Node {
 public:
-    Identifier(const Token &identifier, const SourceMap &sources)
-        : identifier(identifier) {
-        name = sources.getText(identifier.start, identifier.end);
-        if (name.starts_with('@'))
-            name = name.substr(1, name.size());
-    }
+    Identifier(const Token &identifier, const Source &source);
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;

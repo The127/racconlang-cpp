@@ -13,13 +13,15 @@ int main() {
 
     Lexer lexer(source);
     const auto tt = lexer.tokenize();
-    std::cout << tt.toString(sources, 0);
+    source->tokenTree = std::move(tt);
+
+    std::cout << source->tokenTree->toString(sources, 0);
 
     std::cout << std::string(5, '\n');
     std::cout << std::string(10, '#');
     std::cout << std::string(5, '\n');
 
-    Parser parser(tt, sources);
+    Parser parser(source);
     const auto mods = parser.parse();
     for (const auto& mod : mods) {
         std::cout << std::string(5, '\n');

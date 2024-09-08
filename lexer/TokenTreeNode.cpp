@@ -3,6 +3,7 @@
 //
 
 #include "TokenTreeNode.h"
+#include "sourceMap/SourceMap.h"
 
 bool TokenTreeNode::isTokenTree() const {
     return std::holds_alternative<TokenTree>(value);

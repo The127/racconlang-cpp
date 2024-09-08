@@ -4,6 +4,8 @@
 
 
 #pragma once
+#include <variant>
+
 #include "TokenResult.h"
 #include "TokenTree.h"
 
