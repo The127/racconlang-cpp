@@ -82,7 +82,7 @@ lambdaBody
     ;
 
 aliasDeclaration
-    : 'pub'? 'alias' Identifier genericParams? constraintDeclaration* '=' type ';'
+    : 'pub'? 'alias' Identifier genericParams? '=' type constraintDeclaration* ';'
     ;
 
 moduleVariableDeclaration
@@ -90,7 +90,7 @@ moduleVariableDeclaration
     ;
 
 constraintDeclaration
-    : 'require' Identifier ':' genericConstraint (',' genericConstraint)* ','?
+    : 'where' Identifier ':' genericConstraint (',' genericConstraint)* ','?
     ;
 
 genericConstraint
