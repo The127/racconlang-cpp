@@ -13,13 +13,11 @@ class TokenResult {
 public:
     std::expected<Token, LexerErr> value;
 
-    // ReSharper disable CppNonExplicitConvertingConstructor
-    TokenResult(const Token &token)
+    explicit(false) TokenResult(const Token &token)
         : value(token) {
     }
 
-    // ReSharper disable CppNonExplicitConvertingConstructor
-    TokenResult(const LexerErr& err)
+    explicit(false) TokenResult(const LexerErr& err)
         : value(std::unexpected(err)) {
     }
 

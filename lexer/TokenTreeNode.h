@@ -11,13 +11,11 @@ class TokenTreeNode {
 public:
     std::variant<TokenTree, TokenResult> value;
 
-    // ReSharper disable CppNonExplicitConvertingConstructor
-    TokenTreeNode(const TokenTree& tree)
+    explicit(false) TokenTreeNode(const TokenTree& tree)
         : value(tree) {
     }
 
-    // ReSharper disable CppNonExplicitConvertingConstructor
-    TokenTreeNode(const TokenResult& result)
+    explicit(false) TokenTreeNode(const TokenResult& result)
         : value(result) {
     }
 
