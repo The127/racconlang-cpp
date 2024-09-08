@@ -24,6 +24,8 @@ enum ErrorCode {
     WrongCloser,
     UnexpectedToken,
     DuplicateModifier,
+    InvalidModifier,
+    MissingDeclarationName,
 };
 
 class ErrorLabel {

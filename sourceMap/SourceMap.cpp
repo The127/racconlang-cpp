@@ -21,7 +21,7 @@ std::shared_ptr<Source> SourceMap::addEntry(const std::string &fileName) {
 
 std::shared_ptr<Source> SourceMap::findEntryByPosition(const uint64_t position) const {
     const auto it = std::lower_bound(entries.begin(), entries.end(), position,
-        [](std::shared_ptr<Source> entry, uint64_t pos) {
+        [](const std::shared_ptr<Source> &entry, const uint64_t pos) {
             return entry->offset <= pos;
         });
     const auto index = std::distance(entries.begin(), it) - 1;

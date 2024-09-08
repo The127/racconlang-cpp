@@ -70,9 +70,9 @@ void Parser::useRule(treeIterator &start, const treeIterator &end) {
     }
 
     COMPILER_ASSERT(start->isToken(TokenType::Use), "useRule called with non-use starting token");
-    start += 1;
-
     auto use = UseNode();
+    use.startPos = start->getStart();
+    start += 1;
 
     auto path = pathRule(start, end, true);
     if (!path) {
@@ -92,6 +92,11 @@ void Parser::useRule(treeIterator &start, const treeIterator &end) {
             error.addLabel("trailing path separator", separatorToken);
             addError(error);
 
+            if (start == end) {
+                use.endPos = (start - 1)->getEnd();
+            } else {
+                use.endPos = start->getEnd();
+            }
             useNodes.push_back(use);
             return;
         }
@@ -102,7 +107,10 @@ void Parser::useRule(treeIterator &start, const treeIterator &end) {
     if (start == end || !start->isToken(TokenType::Semicolon)) {
         auto error = CompilerError(MissingSemicolon, start->getStart());
         addError(error);
+
+        use.endPos = (start - 1)->getEnd();
     } else {
+        use.endPos = start->getEnd();
         start += 1;
     }
 
@@ -137,9 +145,9 @@ std::vector<Token> Parser::modifierRule(treeIterator &start, const treeIterator 
     std::vector<Token> result;
     auto startPosition = start->getStart();
 
-    while(start->isToken()) {
+    while (start->isToken()) {
         auto token = start->getToken();
-        if(!token.isModifier()) {
+        if (!token.isModifier()) {
             break;
         }
 
@@ -147,14 +155,14 @@ std::vector<Token> Parser::modifierRule(treeIterator &start, const treeIterator 
             return t.type == token.type;
         });
 
-        if(alreadyContained != result.end()) {
+        if (alreadyContained != result.end()) {
             auto error = CompilerError(DuplicateModifier, startPosition);
             error.addLabel("duplicate use of", *start);
             error.addLabel("is already present here", *alreadyContained);
             error.setNote("a modifier is only allowed once per declaration");
             addError(error);
             recoverTopLevel(start, end);
-        }else {
+        } else {
             result.emplace_back(start->getToken());
         }
 
@@ -164,27 +172,208 @@ std::vector<Token> Parser::modifierRule(treeIterator &start, const treeIterator 
     return result;
 }
 
-void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+void Parser::validateModifiers(std::vector<Token> &modifiers, const std::vector<TokenType> &validTokenTypes) {
+    std::vector<Token> result;
+    std::string note = "valid modifiers are: ";
+    for(int i{}; i < validTokenTypes.size(); ++i) {
+        note += TokenTypeStringQuoted(validTokenTypes[i]);
+        if(i < validTokenTypes.size() - 2) {
+            note += ", ";
+        }else if (i < validTokenTypes.size() - 1) {
+            note += " and ";
+        }
+    }
 
+    for (auto modifier: modifiers) {
+        const auto index = std::ranges::find_if(validTokenTypes.begin(), validTokenTypes.end(), [&modifier](auto &t) {
+            return modifier.type == t.type;
+        });
+        if (index == validTokenTypes.end()) {
+            result.emplace_back(modifier);
+        }else {
+            auto error = CompilerError(InvalidModifier, modifiers[0]);
+            error.addLabel("not a valid modifier here", modifier);
+            error.setNote(note);
+            addError(error);
+        }
+    }
+
+    modifiers = std::move(result);
+}
+
+inline bool containsModifier(const std::vector<Token> &modifiers, const TokenType type) {
+    for (const auto modifier : modifiers) {
+        if (modifier.type == type) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+    COMPILER_ASSERT(start->isToken() && start->isToken(TokenType::Enum),
+                    "enumRule called with non-enum starting token");
+
+    auto decl = EnumDeclaration();
+    if(!modifiers.empty()) {
+        decl.startPos = modifiers[0].start;
+    }else {
+        decl.startPos = start->getStart();
+    }
+    start += 1;
+
+    validateModifiers(modifiers, {TokenType::Pub});
+    decl.isPublic = containsModifier(modifiers, TokenType::Pub);
+
+    decl.name = identifierRule(start, end);
+    if (!decl.name) {
+        auto error = CompilerError(MissingDeclarationName, decl.startPos);
+        error.addLabel("expected enum name", *start);
+        addError(error);
+    }
+
+    if(start->isTokenTree(TokenType::OpenAngle)) {
+        decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
+    }
+
+    while(auto constraint = genericConstraintRule(start, end)) {
+        decl.genericConstraints.emplace_back(std::move(*constraint));
+    }
 }
 
 void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+    COMPILER_ASSERT(start->isToken() && start->isToken(TokenType::Interface),
+                    "interfaceRule called with non-interface starting token");
+
+    auto decl = InterfaceDeclaration();
+    if(!modifiers.empty()) {
+        decl.startPos = modifiers[0].start;
+    }else {
+        decl.startPos = start->getStart();
+    }
+    start += 1;
+
+    validateModifiers(modifiers, {TokenType::Pub});
+    decl.isPublic = containsModifier(modifiers, TokenType::Pub);
+
+    decl.name = identifierRule(start, end);
+    if (!decl.name) {
+        auto error = CompilerError(MissingDeclarationName, decl.startPos);
+        error.addLabel("expected enum name", *start);
+        addError(error);
+    }
+
+    if(start->isTokenTree(TokenType::OpenAngle)) {
+        decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
+    }
 }
 
 void Parser::structRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+    COMPILER_ASSERT(start->isToken() && start->isToken(TokenType::Struct),
+                    "structRule called with non-struct starting token");
+
+    auto decl = StructDeclaration();
+    if(!modifiers.empty()) {
+        decl.startPos = modifiers[0].start;
+    }else {
+        decl.startPos = start->getStart();
+    }
+    start += 1;
+
+    validateModifiers(modifiers, {TokenType::Pub});
+    decl.isPublic = containsModifier(modifiers, TokenType::Pub);
+
+    decl.name = identifierRule(start, end);
+    if (!decl.name) {
+        auto error = CompilerError(MissingDeclarationName, decl.startPos);
+        error.addLabel("expected enum name", *start);
+        addError(error);
+    }
+
+    if(start->isTokenTree(TokenType::OpenAngle)) {
+        decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
+    }
 }
 
 void Parser::functionRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+    COMPILER_ASSERT(start->isToken() && start->isToken(TokenType::Fn),
+                    "functionRule called with non-fn starting token");
+
+    auto decl = FunctionDeclaration();
+    if(!modifiers.empty()) {
+        decl.startPos = modifiers[0].start;
+    }else {
+        decl.startPos = start->getStart();
+    }
+    start += 1;
+
+    validateModifiers(modifiers, {TokenType::Pub});
+    decl.isPublic = containsModifier(modifiers, TokenType::Pub);
+
+    decl.name = identifierRule(start, end);
+    if (!decl.name) {
+        auto error = CompilerError(MissingDeclarationName, decl.startPos);
+        error.addLabel("expected enum name", *start);
+        addError(error);
+    }
+
+    if(start->isTokenTree(TokenType::OpenAngle)) {
+        decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
+    }
 }
 
 void Parser::aliasRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+    COMPILER_ASSERT(start->isToken() && start->isToken(TokenType::Alias),
+                    "aliasRule called with non-alias starting token");
+
+    auto decl = AliasDeclaration();
+    if(!modifiers.empty()) {
+        decl.startPos = modifiers[0].start;
+    }else {
+        decl.startPos = start->getStart();
+    }
+    start += 1;
+
+    validateModifiers(modifiers, {TokenType::Pub});
+    decl.isPublic = containsModifier(modifiers, TokenType::Pub);
+
+    decl.name = identifierRule(start, end);
+    if (!decl.name) {
+        auto error = CompilerError(MissingDeclarationName, decl.startPos);
+        error.addLabel("expected enum name", *start);
+        addError(error);
+    }
+
+    if(start->isTokenTree(TokenType::OpenAngle)) {
+        decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
+    }
 }
 
 void Parser::moduleVariableRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+    COMPILER_ASSERT(start->isToken() && start->isToken(TokenType::Let),
+                    "moduleVariableRule called with non-let starting token");
+
+    auto decl = ModuleVariableDeclaration();
+    if(!modifiers.empty()) {
+        decl.startPos = modifiers[0].start;
+    }else {
+        decl.startPos = start->getStart();
+    }
+    start += 1;
+
+    validateModifiers(modifiers, {TokenType::Pub});
+    decl.isPublic = containsModifier(modifiers, TokenType::Pub);
+
+    decl.name = identifierRule(start, end);
+    if (!decl.name) {
+        auto error = CompilerError(MissingDeclarationName, decl.startPos);
+        error.addLabel("expected enum name", *start);
+        addError(error);
+    }
 }
 
 void Parser::declarationRule(treeIterator &start, const treeIterator &end) {
-    COMPILER_ASSERT(start->isToken() && (start->isToken(TokenType::Pub) || start->getToken().isDeclaratorKeyword()),
+    COMPILER_ASSERT(start->isToken() && (start->getToken().isModifier() || start->getToken().isDeclaratorKeyword()),
                     "declarationRule called with non-declaration starting token");
 
     auto modifiers = modifierRule(start, end);
@@ -204,7 +393,7 @@ void Parser::declarationRule(treeIterator &start, const treeIterator &end) {
         if (token.type == TokenType::Enum) {
             enumRule(start, end, std::move(modifiers));
         } else if (token.type == TokenType::Interface) {
-            interfaceRule(start, end,std::move(modifiers));
+            interfaceRule(start, end, std::move(modifiers));
         } else if (token.type == TokenType::Struct) {
             structRule(start, end, std::move(modifiers));
         } else if (token.type == TokenType::Fn) {
@@ -268,6 +457,43 @@ std::optional<Path> Parser::pathRule(treeIterator &start, const treeIterator &en
 
     start = current;
     return path;
+}
+
+std::optional<ConstraintDeclaration> Parser::genericConstraintRule(treeIterator &start, const treeIterator &end) {
+    if (start == end) {
+        return std::nullopt;
+    }
+
+    auto decl = ConstraintDeclaration();
+    auto current = start;
+
+    if (current->isToken(TokenType::Require)) {
+        decl.startPos = current->getStart();
+        current += 1;
+    }else {
+        return std::nullopt;
+    }
+
+    decl.name = std::move(identifierRule(start, end));
+    if (!decl.name) {
+        auto error = CompilerError(UnexpectedToken, decl.startPos);
+        error.addLabel("expected generic parameter name", *current);
+        addError(error);
+    }
+
+    if (!current->isToken(TokenType::Colon)) {
+        auto error = CompilerError(UnexpectedToken, decl.startPos);
+        error.addLabel("expected: `:`", *current);
+        addError(error);
+    }else {
+        current += 1;
+    }
+
+
+
+    decl.endPos = current->getEnd();
+    start = current;
+    return decl;
 }
 
 std::optional<Identifier> Parser::identifierRule(treeIterator &start, const treeIterator &end) const {

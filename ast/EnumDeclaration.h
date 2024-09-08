@@ -8,20 +8,24 @@
 #include <vector>
 #include <memory>
 
+#include "ConstraintDeclaration.h"
 #include "EnumMemberDeclaration.h"
 #include "Node.h"
 #include "GenericConstraintBase.h"
+#include "Identifier.h"
 
 
 class EnumDeclaration final :public Node {
 public:
+    uint64_t startPos;
+    uint64_t endPos;
     bool isPublic = false;
-    std::string name;
-    std::vector<std::string> genericParams;
-    std::vector<std::unique_ptr<GenericConstraintBase>> genericConstraints;
+    std::optional<Identifier> name;
+    std::vector<Identifier> genericParams;
+    std::vector<ConstraintDeclaration> genericConstraints;
     std::vector<EnumMemberDeclaration> memberDeclarations;
 
 
-    [[nodiscard]] uint64_t start() const override {}
-    [[nodiscard]] uint64_t end() const override {}
+    [[nodiscard]] uint64_t start() const override;
+    [[nodiscard]] uint64_t end() const override;
 };

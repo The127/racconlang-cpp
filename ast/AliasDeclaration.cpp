@@ -3,3 +3,11 @@
 //
 
 #include "AliasDeclaration.h"
+
+uint64_t AliasDeclaration::start() const {
+    return startPos;
+}
+
+uint64_t AliasDeclaration::end() const {
+    return endPos;
+}

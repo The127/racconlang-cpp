@@ -3,3 +3,11 @@
 //
 
 #include "ModuleVariableDeclaration.h"
+
+uint64_t ModuleVariableDeclaration::start() const {
+    return startPos;
+}
+
+uint64_t ModuleVariableDeclaration::end() const {
+    return endPost;
+}

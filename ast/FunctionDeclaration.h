@@ -9,18 +9,21 @@
 
 #include "SignatureBase.h"
 #include "ConstraintDeclaration.h"
+#include "Identifier.h"
 #include "Node.h"
 
 class FunctionDeclaration final : public Node{
 public:
+    uint64_t startPos;
+    uint64_t endPos;
     bool isPublic = false;
-    std::string name;
-    std::vector<std::string> genericParams;
+    std::optional<Identifier> name;
+    std::vector<Identifier> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
     std::vector<std::unique_ptr<SignatureBase>> parameters;
     std::unique_ptr<SignatureBase> returnType;
     //TODO: body as expression
 
-    [[nodiscard]] uint64_t start() const override {};
-    [[nodiscard]] uint64_t end() const override {};
+    [[nodiscard]] uint64_t start() const override;
+    [[nodiscard]] uint64_t end() const override;
 };

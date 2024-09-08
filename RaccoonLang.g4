@@ -34,7 +34,7 @@ topLevelDeclaration
     ;
 
 enumDeclaration
-    : 'pub'? 'enum' Identifier genericParams constraintDeclaration* '{' enumMemberDeclaration* '}'
+    : 'pub'? 'enum' Identifier genericParams? constraintDeclaration* '{' enumMemberDeclaration* '}'
     ;
 
 enumMemberDeclaration
@@ -42,15 +42,15 @@ enumMemberDeclaration
     ;
 
 interfaceDeclaration
-    : 'pub'? 'interface' Identifier genericParams ('require' typeNameList)? constraintDeclaration* (';' | '{' interfaceMethodDeclaration '}')
+    : 'pub'? 'interface' Identifier genericParams? ('require' typeNameList)? constraintDeclaration* (';' | '{' interfaceMethodDeclaration '}')
     ;
 
 interfaceMethodDeclaration
-    : 'pub'? 'fn' Identifier genericParams '(' namedTypeList ')' ('->' type)? constraintDeclaration* ';'
+    : 'pub'? 'fn' Identifier genericParams? '(' namedTypeList ')' ('->' type)? constraintDeclaration* ';'
     ;
 
 structDeclaration
-    : 'pub'? 'struct' Identifier genericParams (';' | shortStructBody | longStructBody)
+    : 'pub'? 'struct' Identifier genericParams? (';' | shortStructBody | longStructBody)
     ;
 
 shortStructBody
@@ -70,7 +70,7 @@ structDestructure
     ;
 
 functionDeclaration
-    : 'pub'? 'fn' Identifier '(' namedTypeList ')' ('->' type)? constraintDeclaration* (methodBody | lambdaBody)
+    : 'pub'? 'fn' Identifier genericParams? '(' namedTypeList ')' ('->' type)? constraintDeclaration* (methodBody | lambdaBody)
     ;
 
 methodBody
@@ -102,7 +102,7 @@ interfaceConstraint
     ;
 
 genericParams
-    : 'of' '(' identifierList ')'
+    :  '<' identifierList '>'
     ;
 
 identifierList

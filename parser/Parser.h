@@ -38,6 +38,7 @@ private:
     void modRule(treeIterator &start, const treeIterator &end);
 
     std::vector<Token> modifierRule(treeIterator &start, const treeIterator &end);
+    void validateModifiers(std::vector<Token> &modifiers, const std::vector<TokenType> &validTokenTypes);
 
     void enumRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
 
@@ -54,6 +55,8 @@ private:
     void declarationRule(treeIterator &start, const treeIterator &end);
 
     std::optional<Path> pathRule(treeIterator &start, const treeIterator &end, bool allowTrailing);
+
+    std::optional<ConstraintDeclaration> genericConstraintRule(treeIterator &start, const treeIterator &end);
 
     [[nodiscard]] std::optional<Identifier> identifierRule(treeIterator &start, const treeIterator &end) const;
 
