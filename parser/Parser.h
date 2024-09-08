@@ -16,7 +16,6 @@ using treeIterator = std::vector<TokenTreeNode>::const_iterator;
 class Parser {
 public:
     const std::shared_ptr<Source> source;
-    std::vector<CompilerError> errors;
 
     explicit Parser(std::shared_ptr<Source> source)
         : source(std::move(source)) {

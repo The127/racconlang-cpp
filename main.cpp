@@ -22,7 +22,7 @@ int main() {
     std::cout << std::string(5, '\n');
 
     Parser parser(source);
-    for (auto error : parser.errors) {
+    for (auto error : source->errors) {
 
     }
 

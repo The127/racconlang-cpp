@@ -15,7 +15,7 @@ std::vector<ModuleDeclaration> Parser::parse() {
 }
 
 void Parser::addError(const CompilerError &error) {
-    errors.push_back(error);
+    source->errors.push_back(error);
 }
 
 void Parser::parseFile() {
@@ -204,15 +204,15 @@ void Parser::declarationRule(treeIterator &start, const treeIterator &end) {
         if (token.type == TokenType::Enum) {
             enumRule(start, end, std::move(modifiers));
         } else if (token.type == TokenType::Interface) {
-            interfaceRule(start, end);
+            interfaceRule(start, end,std::move(modifiers));
         } else if (token.type == TokenType::Struct) {
-            structRule(start, end);
+            structRule(start, end, std::move(modifiers));
         } else if (token.type == TokenType::Fn) {
-            functionRule(start, end);
+            functionRule(start, end, std::move(modifiers));
         } else if (token.type == TokenType::Alias) {
-            aliasRule(start, end);
+            aliasRule(start, end, std::move(modifiers));
         } else if (token.type == TokenType::Let) {
-            moduleVariableRule(start, end);
+            moduleVariableRule(start, end, std::move(modifiers));
         } else {
             auto error = CompilerError(UnexpectedToken, start->getStart());
             error.addLabel("expected a top level declaration", *start);

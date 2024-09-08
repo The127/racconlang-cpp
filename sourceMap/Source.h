@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>
 
+#include "CompilerError.h"
 #include "Location.h"
 #include "lexer/TokenTree.h"
 
@@ -22,6 +23,7 @@ public:
     std::vector<uint32_t> lineBreaks;
 
     std::optional<TokenTree> tokenTree;
+    std::vector<CompilerError> errors;
 
     explicit Source(std::string fileName, std::string text, const uint64_t offset)
         : fileName(std::move(fileName)),
