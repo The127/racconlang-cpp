@@ -38,7 +38,7 @@ public:
 
     [[nodiscard]] const Token &getOrErrorToken() const;
 
-    [[nodiscard]] Location getPosition(const SourceMap &sources) const;
+    [[nodiscard]] Location getLocation(const SourceMap &sources) const;
 
     [[nodiscard]] std::string toString(const SourceMap & sources) const;
 };

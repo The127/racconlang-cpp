@@ -3,10 +3,17 @@
 //
 
 #include "Source.h"
+#include "InternalError.h"
 
 void Source::addLineBreak(const uint32_t position) {
     lineBreaks.push_back(position - offset);
 }
+
+void Source::addLineComment(uint32_t line, const Token &comment) {
+    COMPILER_ASSERT(lineComments.contains(line), std::format("there already is a comment for line {}", line));
+    lineComments.emplace(line, comment);
+}
+
 
 Location Source::getLocation(uint32_t position) {
     const auto it = std::lower_bound(lineBreaks.begin(), lineBreaks.end(), position);

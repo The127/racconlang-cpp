@@ -10,6 +10,7 @@
 
 #include "Source.h"
 
+class Token;
 
 class SourceMap {
 public:
@@ -20,6 +21,7 @@ public:
 
     [[nodiscard]] Location getLocation(uint64_t position) const;
     [[nodiscard]] std::string_view getText(uint64_t start, uint64_t end) const;
+    [[nodiscard]] std::string_view getText(const Token& token) const;
 
 private:
     [[nodiscard]] std::shared_ptr<Source> findEntryByPosition(uint64_t position) const;

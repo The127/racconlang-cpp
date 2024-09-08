@@ -8,46 +8,64 @@
 
 TokenTree Lexer::tokenize() {
     COMPILER_ASSERT(!source->tokenTree, "Token tree was already set: " + source->fileName);
+    std::vector<TokenTree> stack{};
+    std::vector<std::vector<Token>> commentStack{};
 
-    std::vector<TokenTree> stack;
     stack.emplace_back(Token(TokenType::Bof, source->offset, source->offset));
+    commentStack.emplace_back();
+
+    std::vector<Token> pending_comments;
 
     while (true) {
         auto tokenResult = nextToken();
 
-        if (tokenResult.isError()) {
-            stack.back().tokens.emplace_back(tokenResult);
+        if (tokenResult.isToken(TokenType::MultiLineComment)) {
+            pending_comments.push_back(tokenResult.get());
+            continue;
+        } else if (tokenResult.isToken(TokenType::LineComment)) {
+            auto loc = source->getLocation(tokenResult.getStart() - source->offset);
+            source->addLineComment(loc.line, tokenResult.get());
             continue;
         }
 
-        auto token = tokenResult.get();
+        if (tokenResult.isError()) {
+            stack.back().tokens.emplace_back(std::move(tokenResult), std::move(pending_comments));
+            pending_comments = {};
+            continue;
+        }
+
+        auto& token = tokenResult.get();
 
         if (token.isOpening()) {
             stack.emplace_back(token);
+            commentStack.emplace_back(std::move(pending_comments));
+            pending_comments = {};
             continue;
         }
 
         if (token.type == stack.back().left.expectedClosing()) {
-            stack.back().right = tokenResult;
-            auto temp = stack.back();
+            stack.back().right = std::move(tokenResult);
+            auto temp = std::move(stack.back());
             stack.pop_back();
 
             if (stack.empty()) {
                 return temp;
             }
 
-            stack.back().tokens.emplace_back(temp);
+            stack.back().tokens.emplace_back(std::move(temp), std::move(commentStack.back()));
+            commentStack.pop_back();
+            pending_comments = {};
             continue;
         }
 
         if (token.isClosing()) {
             if (stack.back().left.expectedClosing() == TokenType::CloseAngle) {
-                auto temp = stack.back();
+                auto temp = std::move(stack.back());
                 stack.pop_back();
 
-                auto openToken = temp.left;
-                openToken.type = TokenType::LessThan;
-                stack.back().tokens.emplace_back(openToken);
+                temp.left.type = TokenType::LessThan;
+                stack.back().tokens.emplace_back(temp.left, std::move(commentStack.back()));
+                commentStack.pop_back();
 
                 auto &tokens = stack.back().tokens;
                 tokens.insert(tokens.end(), std::make_move_iterator(temp.tokens.begin()),
@@ -58,7 +76,8 @@ TokenTree Lexer::tokenize() {
 
             if (token.type == TokenType::CloseAngle) {
                 token.type = TokenType::GreaterThan;
-                stack.back().tokens.emplace_back(token);
+                stack.back().tokens.emplace_back(token, std::move(pending_comments));
+                pending_comments = {};
                 continue;
             }
 
@@ -67,72 +86,64 @@ TokenTree Lexer::tokenize() {
                 return t.left.expectedClosing() == token.type;
             }) != stack.end()) {
                 while (stack.back().left.expectedClosing() != token.type) {
-                    auto errorMsg = std::format(
-                        "unclosed token tree, found {}, expected {}",
-                        TokenTypeName(token.type),
-                        TokenTypeName(stack.back().left.expectedClosing())
-                    );
-                    stack.back().right = LexerErr(
-                        Token(TokenType::Error, token.start, token.start),
-                        errorMsg
-                    );
+                    stack.back().right = LexerErr::UnclosedTokenTree(token, TokenTypeStringQuoted(stack.back().left.expectedClosing()));
 
-                    auto temp = stack.back();
+                    auto temp = std::move(stack.back());
                     stack.pop_back();
-                    stack.back().tokens.emplace_back(temp);
+                    stack.back().tokens.emplace_back(std::move(temp), std::move(commentStack.back()));
+                    commentStack.pop_back();
                 }
 
                 stack.back().right = token;
-                auto temp = stack.back();
+                auto temp = std::move(stack.back());
                 stack.pop_back();
 
                 if (stack.empty()) {
                     return temp;
                 }
 
-                stack.back().tokens.emplace_back(temp);
+                stack.back().tokens.emplace_back(std::move(temp), std::move(commentStack.back()));
+                commentStack.pop_back();
             } else {
-                auto errorMsg = std::format(
-                    "unexpected {}, expected {}",
-                    TokenTypeName(token.type),
-                    TokenTypeName(stack.back().left.expectedClosing())
-                );
-                stack.back().tokens.emplace_back(LexerErr(token, errorMsg));
+                stack.back().tokens.emplace_back(LexerErr::UnexpectedInput(token, TokenTypeStringQuoted(stack.back().left.expectedClosing())), std::move(pending_comments));
             }
+            pending_comments = {};
             continue;
         }
 
         if (stack.back().left.type == TokenType::OpenAngle && !token.isAllowedInAngleBrackets()) {
-            auto temp = stack.back();
+            auto temp = std::move(stack.back());
             stack.pop_back();
 
-            auto openToken = temp.left;
-            openToken.type = TokenType::LessThan;
-            stack.back().tokens.emplace_back(openToken);
+            temp.left.type = TokenType::LessThan;
+            stack.back().tokens.emplace_back(temp.left, std::move(commentStack.back()));
+            commentStack.pop_back();
 
             auto &tokens = stack.back().tokens;
             tokens.insert(tokens.end(), std::make_move_iterator(temp.tokens.begin()),
                           std::make_move_iterator(temp.tokens.end()));
         }
 
-        stack.back().tokens.emplace_back(token);
+        stack.back().tokens.emplace_back(token, std::move(pending_comments));
+        pending_comments = {};
     }
 }
 
 TokenResult Lexer::nextToken() {
-    const auto result = peekToken();
-    position = result.getEnd() - source->offset;
+    peekToken(); // ensure that a token has been read and is available in `peeked`
+    position = peeked->getEnd() - source->offset;
+    auto token = std::move(*peeked);
     peeked = {};
-    return result;
+    return token;
 }
 
 void Lexer::consumeWhitespace() {
     const auto length = source->text.length();
     while (position < length) {
         if (
-            source->text[position] == ' '
-            || source->text[position] == '\t'
-        ) {
+                source->text[position] == ' '
+                || source->text[position] == '\t'
+                ) {
             position += 1;
         } else if (source->text[position] == '\n') {
             source->addLineBreak(position);
@@ -143,7 +154,7 @@ void Lexer::consumeWhitespace() {
     }
 }
 
-TokenResult Lexer::peekToken() {
+const TokenResult& Lexer::peekToken() {
     if (peeked.has_value()) {
         return *peeked;
     }
@@ -193,8 +204,8 @@ TokenResult Lexer::peekToken() {
             peeked = slashRule();
             return *peeked;
 
-        //        case '"':
-        //            return quotedStringRule();
+            //        case '"':
+            //            return quotedStringRule();
         default:
             break;
     }
@@ -208,16 +219,14 @@ TokenResult Lexer::colonRule() const {
     if (position + 1 < source->text.length() && source->text[position + 1] == ':') {
         return Token(TokenType::PathSeparator, source->offset + position, source->offset + position + 2);
     }
-    return Token(TokenType::Colon, source->offset + position + 1, source->offset + position + 1);
+    return Token(TokenType::Colon, source->offset + position, source->offset + position + 1);
 }
 
 TokenResult Lexer::dashRule() const {
     if (position + 1 < source->text.length() && source->text[position + 1] == '>') {
         return Token(TokenType::DashArrow, source->offset + position, source->offset + position + 2);
     }
-    return LexerErr(
-        Token(TokenType::Error, source->offset + position, source->offset + position + 1),
-        "Unexpected character, expected > after -");
+    return LexerErr::UnexpectedInput(source->offset + position, source->offset + position + 1);
 }
 
 TokenResult Lexer::equalsRule() const {
@@ -243,7 +252,7 @@ TokenResult Lexer::slashRule() const {
         if (source->text[position + 1] == '*') {
             while (offset < remaining) {
                 if (offset + 1 < remaining && source->text[position + offset] == '*' && source->text[
-                        position + offset + 1] == '/') {
+                                                                                                position + offset + 1] == '/') {
                     return Token(TokenType::MultiLineComment, source->offset + position,
                                  source->offset + position + offset + 2);
                 }
@@ -252,14 +261,10 @@ TokenResult Lexer::slashRule() const {
                 }
                 offset += 1;
             }
-            return LexerErr(
-                Token(TokenType::MultiLineComment, source->offset + position, source->offset + position + offset),
-                "Unexpected end of input in multiline comment.");
+            return LexerErr::UnexpectedEndOfInput(source->offset + position + offset, "*/");
         }
     }
-    return LexerErr(
-        Token(TokenType::Error, source->offset + position, source->offset + position + 1),
-        "Unexpected /");
+    return LexerErr::UnexpectedInput(source->offset + position, source->offset + position + 1);
 }
 
 TokenResult Lexer::identifierRule() const {
@@ -268,7 +273,7 @@ TokenResult Lexer::identifierRule() const {
         || ch >= 'A' && ch <= 'Z'
         || ch == '_'
         || ch == '@'
-    ) {
+            ) {
         uint32_t offset = 1;
         const uint32_t remaining = source->text.length() - position;
 
@@ -278,7 +283,7 @@ TokenResult Lexer::identifierRule() const {
                 || ch >= 'A' && ch <= 'Z'
                 || ch >= '0' && ch <= '9'
                 || ch == '_'
-            ) {
+                    ) {
                 offset = offset + 1;
             } else {
                 break;
@@ -291,9 +296,7 @@ TokenResult Lexer::identifierRule() const {
         if (text == "_") {
             tokenType = TokenType::Discard;
         } else if (text == "@") {
-            return LexerErr(
-                Token(TokenType::Error, source->offset + position, source->offset + position + 1),
-                "'@' is not a valid identifier or keyword.");
+            return LexerErr::InvalidIdentifier(source->offset + position, source->offset + position + 1);
         } else if (text == "use") {
             tokenType = TokenType::Use;
         } else if (text == "mod") {
@@ -322,9 +325,7 @@ TokenResult Lexer::identifierRule() const {
 
         return Token(tokenType, source->offset + position, source->offset + position + offset);
     }
-    return LexerErr(
-        Token(TokenType::Error, source->offset + position, source->offset + position + 1),
-        "Unexpected character, expected valid identifier or keyword.");
+    return LexerErr::UnexpectedInput(source->offset + position, source->offset + position + 1);
 }
 
 TokenResult Lexer::quotedStringRule() {

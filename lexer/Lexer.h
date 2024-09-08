@@ -28,7 +28,7 @@ private:
 
     void consumeWhitespace();
 
-    TokenResult peekToken();
+    const TokenResult& peekToken();
 
     [[nodiscard]] TokenResult colonRule() const;
     [[nodiscard]] TokenResult dashRule() const;

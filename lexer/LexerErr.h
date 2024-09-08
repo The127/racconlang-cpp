@@ -5,17 +5,63 @@
 #pragma once
 
 #include <utility>
+#include <vector>
+#include <map>
 
 #include "Token.h"
+#include "InternalError.h"
 
+enum class LexerErrReason {
+    UnclosedTokenTree,
+    UnexpectedInput,
+    UnexpectedEndOfInput,
+    InvalidIdentifier,
+};
 
 class LexerErr {
 public:
-    Token token;
-    std::string reason;
+    LexerErrReason reason;
+    Token got;
+    std::vector<std::string> expected;
 
-    LexerErr(const Token &token, std::string reason)
-        : token(token)
-          , reason(std::move(reason)) {
+    LexerErr(LexerErrReason reason, const Token &got, std::vector<std::string> expected)
+            : reason(reason), got(got), expected(std::move(expected)) {
     }
+
+    static LexerErr UnclosedTokenTree(const Token &got, std::string expected);
+
+    static LexerErr UnclosedTokenTree(u_int64_t start, u_int64_t end, std::string expected);
+
+    static LexerErr UnexpectedInput(const Token &got, std::vector<std::string> expected);
+
+    static LexerErr UnexpectedInput(u_int64_t start, u_int64_t end, std::vector<std::string> expected);
+
+    static LexerErr UnexpectedInput(const Token &got, std::string expected);
+
+    static LexerErr UnexpectedInput(u_int64_t start, u_int64_t end, std::string expected);
+
+    static LexerErr UnexpectedInput(const Token &got);
+
+    static LexerErr UnexpectedInput(u_int64_t start, u_int64_t end);
+
+    static LexerErr UnexpectedEndOfInput(const Token &got, std::vector<std::string> expected);
+
+    static LexerErr UnexpectedEndOfInput(u_int64_t pos, std::vector<std::string> expected);
+
+    static LexerErr UnexpectedEndOfInput(const Token &got, std::string expected);
+
+    static LexerErr UnexpectedEndOfInput(u_int64_t pos, std::string expected);
+
+    static LexerErr UnexpectedEndOfInput(const Token &got);
+
+    static LexerErr UnexpectedEndOfInput(u_int64_t pos);
+
+    static LexerErr InvalidIdentifier(const Token &got);
+
+    static LexerErr InvalidIdentifier(u_int64_t start, u_int64_t end);
+
+    [[nodiscard]] std::string toString(const SourceMap &sources) const;
+
+private:
+    [[nodiscard]] std::string expectedString() const;
 };

@@ -12,13 +12,14 @@
 class TokenTreeNode {
 public:
     std::variant<TokenTree, TokenResult> value;
+    std::vector<Token> precedingComments;
 
-    explicit(false) TokenTreeNode(const TokenTree& tree)
-        : value(tree) {
+    explicit(false) TokenTreeNode(const TokenTree& tree, std::vector<Token> comments)
+        : value(tree), precedingComments(std::move(comments)) {
     }
 
-    explicit(false) TokenTreeNode(const TokenResult& result)
-        : value(result) {
+    explicit(false) TokenTreeNode(const TokenResult& result, std::vector<Token> comments)
+        : value(result), precedingComments(std::move(comments)) {
     }
 
     [[nodiscard]] bool isTokenTree() const;

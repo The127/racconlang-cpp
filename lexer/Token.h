@@ -11,6 +11,7 @@
 
 class SourceMap;
 
+class SourceMap;
 
 class Token {
 public:

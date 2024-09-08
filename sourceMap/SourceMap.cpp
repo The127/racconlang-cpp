@@ -3,6 +3,7 @@
 //
 
 #include "SourceMap.h"
+#include "lexer/Token.h"
 
 std::shared_ptr<Source> SourceMap::addEntry(const std::string &fileName) {
     std::ifstream file(fileName);
@@ -35,4 +36,9 @@ Location SourceMap::getLocation(const uint64_t position) const {
 std::string_view SourceMap::getText(const uint64_t start, const uint64_t end) const {
     auto entry = findEntryByPosition(start);
     return entry->getText(start - entry->offset, end - entry->offset);
+}
+
+
+std::string_view SourceMap::getText(const Token& token) const {
+    return getText(token.start, token.end);
 }

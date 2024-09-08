@@ -7,13 +7,13 @@
 
 uint64_t TokenResult::getStart() const {
     if (isError())
-        return getError().token.start;
+        return getError().got.start;
     return get().start;
 }
 
 uint64_t TokenResult::getEnd() const {
     if (isError())
-        return getError().token.end;
+        return getError().got.end;
     return get().end;
 }
 
@@ -44,17 +44,17 @@ const LexerErr &TokenResult::getError() const {
 const Token & TokenResult::getOrErrorToken() const {
     if(isToken())
         return get();
-    return getError().token;
+    return getError().got;
 }
 
-Location TokenResult::getPosition(const SourceMap &sources) const {
+Location TokenResult::getLocation(const SourceMap &sources) const {
     return sources.getLocation(getStart());
 }
 
 std::string TokenResult::toString(const SourceMap &sources) const {
     if(isError()) {
         const auto& err = getError();
-        return err.token.toString(sources) + ": " + err.reason;
+        return err.toString(sources);
     }
     return get().toString(sources);
 }

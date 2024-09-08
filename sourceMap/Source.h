@@ -9,6 +9,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <map>
 
 #include "CompilerError.h"
 #include "Location.h"
@@ -21,6 +22,7 @@ public:
     const std::string text;
     const uint64_t offset;
     std::vector<uint32_t> lineBreaks;
+    std::map<uint32_t, Token> lineComments;
 
     std::optional<TokenTree> tokenTree;
     std::vector<CompilerError> errors;
@@ -32,6 +34,7 @@ public:
     }
 
     void addLineBreak(uint32_t position);
+    void addLineComment(uint32_t line, const Token& comment);
 
     Location getLocation(uint32_t position);
     [[nodiscard]] std::string_view getText(uint32_t start, uint32_t end) const;
