@@ -13,6 +13,7 @@
 #include "lexer/Token.h"
 #include "lexer/TokenResult.h"
 #include "lexer/TokenTree.h"
+#include "sourceMap/SourceMap.h"
 
 
 enum ErrorCode {
@@ -23,6 +24,7 @@ enum ErrorCode {
     WrongOpener,
     WrongCloser,
     UnexpectedToken,
+    DuplicateModifier,
 };
 
 class ErrorLabel {

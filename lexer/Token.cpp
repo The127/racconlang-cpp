@@ -51,6 +51,10 @@ bool Token::isTopLevelStarter() const {
            || type == TokenType::Use;
 }
 
+bool Token::isModifier() const {
+    return type == TokenType::Pub;
+}
+
 TokenType Token::expectedClosing() const {
     switch (type) {
         case TokenType::OpenCurly:

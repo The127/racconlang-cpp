@@ -29,11 +29,14 @@ void Parser::parseFile() {
     const auto end = tokenTree.tokens.end();
 
     while (current != end) {
-        const auto &tokenTree = *current;
-        if (tokenTree.isTokenResult()) {
-            const auto &tokenResult = tokenTree.getTokenResult();
+        const auto &currentTokenTree = *current;
+        if (currentTokenTree.isTokenResult()) {
+            const auto &tokenResult = currentTokenTree.getTokenResult();
             if (tokenResult.isError()) {
-                //TODO: error
+                auto error = CompilerError(UnexpectedToken, current->getStart());
+                error.addLabel("expected a top level declaration", *current);
+                addError(error);
+                recoverTopLevel(current, end);
                 continue;
             }
             auto &token = tokenResult.get();
@@ -42,7 +45,7 @@ void Parser::parseFile() {
                 useRule(current, end);
             } else if (token.type == TokenType::Mod) {
                 modRule(current, end);
-            } else if (token.type == TokenType::Pub || token.isDeclaratorKeyword()) {
+            } else if (token.isModifier() || token.isDeclaratorKeyword()) {
                 declarationRule(current, end);
             } else {
                 auto error = CompilerError(UnexpectedToken, current->getStart());
@@ -50,6 +53,11 @@ void Parser::parseFile() {
                 addError(error);
                 recoverTopLevel(current, end);
             }
+        } else {
+            auto error = CompilerError(UnexpectedToken, current->getStart());
+            error.addLabel("expected a top level declaration", *current);
+            addError(error);
+            recoverTopLevel(current, end);
         }
     }
 }
@@ -125,7 +133,98 @@ void Parser::modRule(treeIterator &start, const treeIterator &end) {
     modules.emplace_back(*path);
 }
 
+std::vector<Token> Parser::modifierRule(treeIterator &start, const treeIterator &end) {
+    std::vector<Token> result;
+    auto startPosition = start->getStart();
+
+    while(start->isToken()) {
+        auto token = start->getToken();
+        if(!token.isModifier()) {
+            break;
+        }
+
+        auto alreadyContained = std::ranges::find_if(result.begin(), result.end(), [&token](auto &t) {
+            return t.type == token.type;
+        });
+
+        if(alreadyContained != result.end()) {
+            auto error = CompilerError(DuplicateModifier, startPosition);
+            error.addLabel("duplicate use of", *start);
+            error.addLabel("is already present here", *alreadyContained);
+            error.setNote("a modifier is only allowed once per declaration");
+            addError(error);
+            recoverTopLevel(start, end);
+        }else {
+            result.emplace_back(start->getToken());
+        }
+
+        start += 1;
+    }
+
+    return result;
+}
+
+void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+
+}
+
+void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+}
+
+void Parser::structRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+}
+
+void Parser::functionRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+}
+
+void Parser::aliasRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+}
+
+void Parser::moduleVariableRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+}
+
 void Parser::declarationRule(treeIterator &start, const treeIterator &end) {
+    COMPILER_ASSERT(start->isToken() && (start->isToken(TokenType::Pub) || start->getToken().isDeclaratorKeyword()),
+                    "declarationRule called with non-declaration starting token");
+
+    auto modifiers = modifierRule(start, end);
+
+    const auto &currentTokenTree = *start;
+    if (currentTokenTree.isTokenResult()) {
+        const auto &tokenResult = currentTokenTree.getTokenResult();
+        if (tokenResult.isError()) {
+            auto error = CompilerError(UnexpectedToken, start->getStart());
+            error.addLabel("expected a top level declaration", *start);
+            addError(error);
+            recoverTopLevel(start, end);
+            return;
+        }
+        auto &token = tokenResult.get();
+
+        if (token.type == TokenType::Enum) {
+            enumRule(start, end, std::move(modifiers));
+        } else if (token.type == TokenType::Interface) {
+            interfaceRule(start, end);
+        } else if (token.type == TokenType::Struct) {
+            structRule(start, end);
+        } else if (token.type == TokenType::Fn) {
+            functionRule(start, end);
+        } else if (token.type == TokenType::Alias) {
+            aliasRule(start, end);
+        } else if (token.type == TokenType::Let) {
+            moduleVariableRule(start, end);
+        } else {
+            auto error = CompilerError(UnexpectedToken, start->getStart());
+            error.addLabel("expected a top level declaration", *start);
+            addError(error);
+            recoverTopLevel(start, end);
+        }
+    } else {
+        auto error = CompilerError(UnexpectedToken, start->getStart());
+        error.addLabel("expected a top level declaration", *start);
+        addError(error);
+        recoverTopLevel(start, end);
+    }
 }
 
 std::optional<Path> Parser::pathRule(treeIterator &start, const treeIterator &end, bool allowTrailing) {
@@ -182,7 +281,7 @@ std::optional<Identifier> Parser::identifierRule(treeIterator &start, const tree
 }
 
 std::vector<Identifier> Parser::identifierListRule(const TokenTreeNode &node, TokenType opener) {
-    if(!node.isTokenTree()) {
+    if (!node.isTokenTree()) {
         auto error = CompilerError(UnexpectedToken, node.getStart());
         error.addLabel("unexpected token", node);
         error.setNote("expected a " + TokenTypeStringQuoted(opener));

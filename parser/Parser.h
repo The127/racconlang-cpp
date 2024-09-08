@@ -38,6 +38,20 @@ private:
 
     void modRule(treeIterator &start, const treeIterator &end);
 
+    std::vector<Token> modifierRule(treeIterator &start, const treeIterator &end);
+
+    void enumRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
+
+    void interfaceRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
+
+    void structRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
+
+    void functionRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
+
+    void aliasRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
+
+    void moduleVariableRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
+
     void declarationRule(treeIterator &start, const treeIterator &end);
 
     std::optional<Path> pathRule(treeIterator &start, const treeIterator &end, bool allowTrailing);
