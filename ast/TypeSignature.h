@@ -7,14 +7,14 @@
 #include <string>
 #include <vector>
 
-#include "BaseSignature.h"
+#include "SignatureBase.h"
 
 
-class TypeSignature final : BaseSignature {
+class TypeSignature final : SignatureBase {
 public:
     std::string path;
-    std::vector<std::pmr::string> genericParams;
+    std::vector<std::string> genericParams;
 
-    [[nodiscard]] uint64_t start() const override;
-    [[nodiscard]] uint64_t end() const override;
+    [[nodiscard]] uint64_t start() const override {};
+    [[nodiscard]] uint64_t end() const override {};
 };

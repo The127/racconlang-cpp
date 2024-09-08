@@ -7,6 +7,5 @@
 #include "Node.h"
 
 
-class BaseSignature : Node {
-
+class SignatureBase : public Node {
 };

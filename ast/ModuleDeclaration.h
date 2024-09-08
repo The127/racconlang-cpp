@@ -16,7 +16,7 @@
 #include "UseNode.h"
 
 
-class ModuleDeclaration : Node {
+class ModuleDeclaration final : public Node {
 public:
     std::string path;
     std::vector<UseNode> uses;
@@ -26,4 +26,7 @@ public:
     std::vector<FunctionDeclaration> functionDeclarations;
     std::vector<AliasDeclaration> aliasDeclarations;
     std::vector<ModuleVariableDeclaration> moduleVariableDeclarations;
+
+    [[nodiscard]] uint64_t start() const override {}
+    [[nodiscard]] uint64_t end() const override {}
 };

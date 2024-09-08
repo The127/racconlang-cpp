@@ -7,6 +7,5 @@
 #include "Node.h"
 
 
-class GenericConstraint : Node {
-
+class GenericConstraintBase : public Node {
 };

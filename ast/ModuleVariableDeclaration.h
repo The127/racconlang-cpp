@@ -4,6 +4,11 @@
 
 #pragma once
 
-class ModuleVariableDeclaration {
+#include "Node.h"
+
+class ModuleVariableDeclaration final : public Node {
+public:
+    [[nodiscard]] uint64_t start() const override {}
+    [[nodiscard]] uint64_t end() const override {}
 
 };

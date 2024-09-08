@@ -8,20 +8,19 @@
 #include <string>
 #include <vector>
 
-#include "BaseSignature.h"
+#include "SignatureBase.h"
 #include "Node.h"
+#include "ConstraintDeclaration.h"
 
 
-class ConstraintDeclaration;
-
-class InterfaceMethodDeclaration final : Node {
+class InterfaceMethodDeclaration final : public Node {
 public:
     std::string name;
     std::vector<std::string> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
-    std::vector<BaseSignature> parameterTypes;
-    std::shared_ptr<BaseSignature> returnType;
+    std::vector<std::unique_ptr<SignatureBase>> parameterTypes;
+    std::unique_ptr<SignatureBase> returnType;
 
-    [[nodiscard]] uint64_t start() const override;
-    [[nodiscard]] uint64_t end() const override;
+    [[nodiscard]] uint64_t start() const override{};
+    [[nodiscard]] uint64_t end() const override{};
 };

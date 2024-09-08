@@ -11,7 +11,7 @@ std::vector<ModuleDeclaration> Parser::parse() {
 
     //TODO: convert result
 
-    return modules;
+    return std::move(modules);
 }
 
 void Parser::addError(const CompilerError &error) {

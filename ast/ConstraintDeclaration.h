@@ -4,15 +4,21 @@
 
 #pragma once
 
-#include <string>
+#include<string>
 #include <vector>
+#include <memory>
 
 #include "Node.h"
-#include "GenericConstraint.h"
+#include "GenericConstraintBase.h"
 
 
-class ConstraintDeclaration : Node {
+class ConstraintDeclaration final : public Node {
 public:
     std::string name;
-    std::vector<GenericConstraint> constraints;
+    std::vector<std::unique_ptr<GenericConstraintBase>> constraints;
+
+
+    [[nodiscard]] uint64_t start() const override {}
+
+    [[nodiscard]] uint64_t end() const override {}
 };

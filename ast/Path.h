@@ -10,7 +10,7 @@
 #include "Node.h"
 
 
-class Path final : Node {
+class Path final : public Node {
 public:
     std::optional<Token> rooted{};
     std::vector<Identifier> parts{};

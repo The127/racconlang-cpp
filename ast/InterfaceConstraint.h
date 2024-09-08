@@ -4,11 +4,14 @@
 
 #pragma once
 
-#include "GenericConstraint.h"
+#include "GenericConstraintBase.h"
 #include "TypeSignature.h"
 
 
-class InterfaceConstraint : GenericConstraint {
+class InterfaceConstraint final : GenericConstraintBase {
 public:
     TypeSignature typeSignature;
+
+    [[nodiscard]] uint64_t start() const override {}
+    [[nodiscard]] uint64_t end() const override {}
 };

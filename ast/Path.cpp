@@ -14,14 +14,14 @@ bool Path::isTrailing() const {
 
 uint64_t Path::start() const {
     if (isRooted()) {
-        return rooted->start();
+        return rooted->start;
     }
     return parts.begin()->start();
 }
 
 uint64_t Path::end() const {
     if(isTrailing()) {
-        return trailer->end();
+        return trailer->end;
     }
     return parts.end()->end();
 }

@@ -2,4 +2,4 @@
 // Created by zoe on 07.09.24.
 //
 
-#include "GenericConstraint.h"
+#include "GenericConstraintBase.h"

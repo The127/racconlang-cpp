@@ -41,11 +41,11 @@ add_executable(RaccoonLang main.cpp
         ast/ConstraintDeclaration.cpp
         ast/ConstraintDeclaration.h
         ast/GenericConstraint.cpp
-        ast/GenericConstraint.h
+        ast/GenericConstraintBase.h
         ast/InterfaceConstraint.cpp
         ast/InterfaceConstraint.h
         ast/BaseSignature.cpp
-        ast/BaseSignature.h
+        ast/SignatureBase.h
         ast/TypeSignature.cpp
         ast/TypeSignature.h
         ast/EnumMemberDeclaration.cpp

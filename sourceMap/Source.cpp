@@ -14,11 +14,11 @@ Location Source::getLocation(uint32_t position) {
 
     const auto line = lineBreakIndex + 1;
 
-    uint32_t column = position;
-    if (lineBreakIndex > 0) {
-        column -= lineBreaks[lineBreakIndex - 1];
-    }else {
-        position += 1;
+    uint32_t column;
+    if (lineBreakIndex == 0) {
+        column = position + 1;
+    } else {
+        column = position - lineBreaks[lineBreakIndex - 1];
     }
 
     return Location(fileName, line, column);
