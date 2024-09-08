@@ -14,9 +14,9 @@
 
 
 enum ErrorCode {
-    PathHasTrailingSeparator,
-    UseIsMissingPath,
     MissingSemicolon,
+    UseIsMissingPath,
+    PathHasTrailingSeparator,
 };
 
 class ErrorLabel {

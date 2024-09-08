@@ -32,5 +32,5 @@ public:
     [[nodiscard]] bool isTopLevelStarter() const;
     [[nodiscard]] TokenType expectedClosing() const;
 
-    std::string toString(SourceMap& sources) const;
+    std::string toString(const SourceMap& sources) const;
 };

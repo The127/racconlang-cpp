@@ -43,3 +43,11 @@ const LexerErr &TokenResult::getError() const {
 Location TokenResult::getPosition(const SourceMap &sources) const {
     return sources.getLocation(getStart());
 }
+
+std::string TokenResult::toString(const SourceMap &sources) const {
+    if(isError()) {
+        const auto& err = getError();
+        return err.token.toString(sources) + ": " + err.reason;
+    }
+    return get().toString(sources);
+}

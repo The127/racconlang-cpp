@@ -23,7 +23,7 @@ public:
           right(Token(TokenType::Error, 0, 0)) {
     }
 
-    std::string toString(SourceMap &sources, uint32_t indent) const;
+    std::string toString(const SourceMap &sources, uint32_t indent) const;
 };
 
 #include "TokenTreeNode.h"

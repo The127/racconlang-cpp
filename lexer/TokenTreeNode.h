@@ -35,4 +35,6 @@ public:
     [[nodiscard]] const TokenResult &getTokenResult() const;
     [[nodiscard]] const Token &getToken() const;
     [[nodiscard]] const LexerErr &getError() const;
+
+    [[nodiscard]] std::string toString(const SourceMap & sources, uint32_t indent) const;
 };

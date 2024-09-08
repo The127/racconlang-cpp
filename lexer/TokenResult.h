@@ -36,4 +36,6 @@ public:
     [[nodiscard]] const LexerErr &getError() const;
 
     [[nodiscard]] Location getPosition(const SourceMap &sources) const;
+
+    [[nodiscard]] std::string toString(const SourceMap & sources) const;
 };

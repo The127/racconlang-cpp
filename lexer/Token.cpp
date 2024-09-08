@@ -63,7 +63,7 @@ TokenType Token::expectedClosing() const {
     }
 }
 
-std::string Token::toString(SourceMap &sources) const {
+std::string Token::toString(const SourceMap &sources) const {
     std::string result;
     result += TokenTypeName(type);
     result += " <";

@@ -52,10 +52,17 @@ const TokenResult &TokenTreeNode::getTokenResult() const {
     return std::get<TokenResult>(value);
 }
 
-const Token & TokenTreeNode::getToken() const {
+const Token &TokenTreeNode::getToken() const {
     return getTokenResult().get();
 }
 
-const LexerErr & TokenTreeNode::getError() const {
+const LexerErr &TokenTreeNode::getError() const {
     return getTokenResult().getError();
+}
+
+std::string TokenTreeNode::toString(const SourceMap &sources, uint32_t indent) const {
+    if (isTokenTree()) {
+        return getTokenTree().toString(sources, indent);
+    }
+    return std::string(indent, ' ') + getTokenResult().toString(sources) + "\n";
 }

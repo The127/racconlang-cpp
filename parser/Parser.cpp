@@ -50,6 +50,8 @@ void Parser::useRule(treeIterator &start, const treeIterator &end) {
     auto current = start;
     current += 1;
 
+    auto use = UseNode();
+
     auto path = pathRule(start, end, true);
     if (!path) {
         auto error = CompilerError(UseIsMissingPath, (start)->getToken());
@@ -59,16 +61,29 @@ void Parser::useRule(treeIterator &start, const treeIterator &end) {
         return;
     }
 
-    if(path->isTrailing()) {
-        if(current == end || !current->isTokenTree(TokenType::OpenCurly)) {
+    use.path = *path;
 
+    if(use.path.isTrailing()) {
+        if(current == end || !current->isTokenTree(TokenType::OpenCurly)) {
+            const auto separatorToken = (current-1)->getToken();
+            auto error = CompilerError(PathHasTrailingSeparator, separatorToken);
+            error.addLabel("trailing path separator", separatorToken);
+            addError(error);
+
+            useNodes.push_back(use);
+            return;
         }
+
+        auto typeList = current->getTokenTree();
+        
     }
 
     if(current == end || !current->isToken(TokenType::Semicolon)) {
         auto error = CompilerError(MissingSemicolon, (start)->getToken());
         addError(error);
     }
+
+    useNodes.push_back(use);
 }
 
 void Parser::modRule(treeIterator &start, const treeIterator &end) {
