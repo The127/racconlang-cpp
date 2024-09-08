@@ -1,0 +1,5 @@
+mod std;
+
+pub interface Cloneable<T> {
+    pub fn clone() -> T;
+}

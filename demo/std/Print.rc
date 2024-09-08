@@ -1,0 +1,12 @@
+use std::__unsafe;
+use std::ds;
+
+mod std;
+
+pub fn println(msg: string) {
+    writeutf8((msg + "\n").asBytes());
+}
+
+
+#[intrinsic(@name: "writeutf8")]
+fn writeutf8(utf8: Array<u8>) {}

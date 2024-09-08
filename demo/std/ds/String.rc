@@ -1,0 +1,12 @@
+mod std::ds;
+
+pub struct String {
+    const length: u64;
+    const dataUtf8: Array<u8>;
+}
+
+impl String {
+    pub fn asBytes() -> Array<u8> {
+        return this.dataUtf8;
+    }
+}

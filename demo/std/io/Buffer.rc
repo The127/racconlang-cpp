@@ -1,0 +1,66 @@
+use std::ds;
+
+mod std::io;
+
+pub struct Buffer<T> {
+    readonly capacity: u64;
+    readonly position: u64;
+    readonly size: u64;
+    data: ds::Array<u8>;
+}
+
+impl Buffer {
+    pub Buffer(capacity: u64) {
+        this.capacity = capacity;
+        data = ds::Array<u8>(capacity);
+    }
+    
+    pub fn seek(position: Position){
+        const newPosition: u64 = match(position) {
+            Position::FromBeginning(p) => p,
+            Position::FromCurrent(p) => this.position + p,
+            Position::FromEnd(p) => this.size - p,
+        };
+        
+        if newPosition < 0 || newPosition > size {
+            raise std::OutOfBoundsException(newPosition, size);
+        }
+        
+        this.position = newPosition;
+    }
+    
+    pub fn flip() {
+        size = position;
+        position = 0;
+    }
+    
+    pub fn reset() {
+        size = 0;
+        position = 0;
+    }
+    
+    pub fn write(data: ds::ReadonlyArrayView<u8>) {
+        return ds::copyArray(data, this.data);
+    }
+    
+    pub fn write(data: u8) {
+        if position >= size {
+            raise std::OutOfBoundsException(position, size);
+        }
+        this.data[position] = data;
+        position += 1;
+    }
+    
+    pub fn readInto(data: ds::ArrayView<u8>) {
+        ds::copyArray(this.data, data);
+    }
+    
+    pub fn read() -> u8 {
+        if position >= size {
+            raise std::OutOfBoundsException(position, size);
+        }
+        const result = data[position];
+        position += 1;
+        return result;
+    }
+}

@@ -1,0 +1,5 @@
+mod std;
+
+pub annotation resumable {
+    result: name;
+}

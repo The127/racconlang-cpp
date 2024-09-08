@@ -1,0 +1,28 @@
+mod asdf;
+use foo::bar;
+
+let foo = 1;
+
+fasdn foo() {
+    ...
+}lkjhlkj
+fn foo() => {
+    let x = 0;
+};
+
+enum<asdf>
+struct
+alias
+interface
+fn foo<T,S>() {
+    {
+        let a = foo < (bar, asdf)>
+    }
+    let a = bar < foo;
+    let b = bar > foo;
+    bar < foo;
+
+    if foo < bar = bar > foo {}
+    bar < foo
+}
+

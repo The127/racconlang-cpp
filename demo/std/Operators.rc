@@ -1,0 +1,21 @@
+mod std;
+
+pub interface AddOp<TOther, TResult> {
+    pub fn addOp(other: TOther) -> TResult;
+}
+
+pub interface SubOp<TOther, TResult> {
+    pub fn subOp(other: TOther) -> TResult;
+}
+
+pub interface IndexedAssignOp<TIndex, TValue> {
+    pub fn indexedAssignOp(index: TIndex, val: TValue);
+}
+
+pub interface IndexedAccessOp<TIndex, TValue> {
+    pub fn indexedAccessOp(index: TIndex) -> TValue;
+}
+
+pub interface SliceOp<TIndex, TResult> {
+    pub fn sliceOp(from: TIndex, to: TIndex) -> TResult;
+}

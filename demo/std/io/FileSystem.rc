@@ -1,0 +1,82 @@
+use std;
+use std::ds;
+
+mod std::io;
+
+#[resumable(result: String)]
+pub struct PathSeparator;
+
+pub struct Path{
+    segments: ds::Array<String>;
+}
+
+impl Path {
+    pub Path(path: String) : Path(path, resume with PathSeparator());
+    
+    pub Path(path: String, separator: String) {
+        segments = path.split(separator);
+    }
+    
+    pub static fn root() -> Path => Path{};
+}
+
+impl std::AddOp<String, Self> on Path {
+    pub fn addOp(segment: String) -> Self 
+        => self + Path(segment); 
+}
+
+impl std::AddOp<Self, Self> on Path {
+    pub fn addOp(path: Self) -> Self 
+        => Path{segments: segments.iter().concat(path.segments).collect(),};
+}
+
+#[resumable(result: IFile)]
+pub struct OpenFile(path: Path);
+
+pub interface IFile {
+    pub fn seek(position: Position);
+    pub fn read(buffer: Buffer);
+    pub fn write(data: Buffer);
+    pub fn flush(); 
+}
+
+struct File {
+    isDisposed: bool;
+}
+
+impl File {
+    File(){
+        raise NotImplementedException();
+    }
+    ~File() {
+        Dispose();
+    }
+}
+
+impl IFile on File {
+    //TODO: implement interface
+}
+
+impl std::Disposable on File {
+    pub fn dispose(){
+        if isDisposed {
+            return;
+        }
+        //TODO: close handle
+        isDisposed = true;
+    }
+}
+
+pub interface IFileSystem {
+    pub fn getSeparator() -> String => "/";
+    //TODO: add functions for creating, opening files, directories etc
+}
+
+pub fn withFilesystem(action: std::Action, fs: IFileSystem){
+    do {
+        action();    
+    } handle {
+        OpenFile(path) => fs.openFile(path), //TODO: support open modi
+        PathSeparator => fs.getSeparator(),
+    }
+}   

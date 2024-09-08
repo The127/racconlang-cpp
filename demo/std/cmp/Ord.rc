@@ -1,0 +1,8 @@
+mod std::cmp;
+
+pub interface Ord<T> {
+    pub fn lessThan(t: T) -> bool;
+    pub fn lessThanOrEqual(t: T) -> bool => !greaterThan(t);
+    pub fn greaterThan(t: T) -> bool;
+    pub fn greaterThanOrEqual(t: T) -> bool => !lessThan(t);
+}

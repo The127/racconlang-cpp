@@ -1,0 +1,17 @@
+use std::ds;
+
+mod std;
+
+pub annotation exception;
+
+#[exception]
+pub struct NotImplementedException();
+
+#[exception]
+pub struct ExternFunctionCalledException();
+
+#[exception]
+pub struct OutOfBoundsException(out: u64, bounds: u64);
+
+#[exception]
+pub struct InvalidArgumentException(arg: ds::String);

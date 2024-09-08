@@ -1,0 +1,21 @@
+mod std::__unsafe;
+
+#[intrinsic(@name: "mem_alloc")]
+pub unsafe fn __mem_alloc() -> __ptr {
+    raise std::ExternFunctionCalledException();   
+}
+
+#[intrinsic(@name: "mem_free")]
+pub unsafe fn __mem_free(ptr: __ptr) {
+    raise std::ExternalFunctionCallException();
+}
+ 
+#[intrinsic(@name: "mem_copy")]
+pub unsafe fn __mem_copy(from: __ptr, to: __ptr, count: u64) {
+    raise std::ExternalFunctionCallException();
+}
+
+#[intrinsic(@name: "transmute")]
+pub unsafe fn __transmute<T>(ptr: __ptr) -> T {
+    raise std::ExternalFunctionCallException();
+}

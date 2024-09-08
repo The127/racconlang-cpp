@@ -1,0 +1,20 @@
+use std::foo::;
+
+mod main;
+
+fn foo(x: i32) -> i32 {
+    return x + 1;
+}
+
+
+
+pub fn main() {
+    let c: bool = true;
+    assert c : "hello";
+    let s: string = "Hello World!";
+    println(s);
+    
+    let a = 1;
+    let b = foo(a) + 2;
+    println(b);
+}

@@ -1,0 +1,15 @@
+use std;
+
+mod std::ds;
+
+pub enum IntervalValue<T> {
+    UnboundedIncluding,
+    UnboundedExcluding,
+    Including(val: T),
+    Excluding(val: T),
+}
+
+pub struct Interval<T> {
+    init from: IntervalValue<T>;
+    init to: IntervalValue<T>;
+}

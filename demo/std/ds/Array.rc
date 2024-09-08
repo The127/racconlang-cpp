@@ -1,0 +1,163 @@
+use std;
+use std::__unsafe;
+use std::cmp;
+
+mod std::ds;
+
+pub interface ReadonlyArrayView<T> require std::IndexedAccessOp<i64, T>, std::SliceOp<i64, ReadonlyArrayView<T>> {
+    pub fn length() -> u64;
+}
+
+pub interface ArrayView<T> require ReadonlyArrayView<T>, std::IndexedAssignOp<i64, T>, std::SliceOp<i64, ArrayView<T>> {
+    pub fn asReadonly() -> ReadonlyArrayView<T>;
+}
+
+pub struct Array<T> {
+    capacity: u64;
+    readonly count: u64;
+    unsafe __data_ptr: __ptr;
+}
+
+impl Array<T> {
+    pub Array() : Array(4);
+
+    pub Array(capacity: u64) {   
+        if capacity > I64.maxValue() {
+            raise std::InvalidArgumentException(nameof(capacity));
+        }
+    
+        this.capacity = capacity;
+        unsafe {
+            __data_ptr = __unsafe::__mem_alloc(capacity * sizeof(T));
+        }
+    }
+    
+    ~Array() {
+        unsafe {
+            __unsafe::__mem_free(__data_ptr);
+        }
+    }
+    
+    pub fn push(val: T) {
+        if count == capacity {
+            reallocate();
+        }
+        
+        self[count] = val;
+        count += 1;
+    }
+    
+    fn reallocate() {
+        capacity *= 2;
+        unsafe{
+            const __temp_ptr: __ptr = __unsafe::__mem_alloc(capacity * sizeof(T));
+            __unsafe::__mem_copy(__data_ptr, __temp_ptr, count * sizeof(T)); 
+            __unsafe::__mem_free(__data_ptr);
+            __data_ptr = __temp_ptr;
+        }
+    }
+}
+
+impl<T> std::IndexAccessOp<i64, T> on Array<T> {
+    pub fn indexedAccessOp(index: i64) -> T {
+        const index: u64 = calculateWrapAroundIndex(index, count);
+        return __unsafe::__transmute<T>(__data_ptr + index * sizeof(T));
+    }
+}
+
+impl<T> std::IndexedAssignOp<i64, T> on Array<T> {
+    pub fn indexedAssignOp(index: i64, val: T) {
+        const index: u64 = calculateWrapAroundIndex(index, count);
+        const target_ptr: __ptr = __data_ptr + index * sizeof(T);
+        //TODO: something like __unsafe::__mem_store(target_ptr, val);
+    }
+}
+
+impl<T> std::SliceOp<i64, ArrayView<T>> on Array<T> {
+    pub fn sliceOp(from: i64, to: i64) -> ArrayView<T> {
+        const (from, to) = calculateWrapAroundSliceIndexes(from, to, count);
+        return ArraySlice<T>{
+            array: self,
+            from: from,
+            count: to - from,
+        };
+    }
+}
+
+struct ArraySlice<T> {
+    array: Array<T>;
+    from: u64;
+    count: u64;
+}
+
+impl<T> ReadonlyArrayView<T> on ArraySlice<T> {
+    pub fn length() -> u64 => count;
+}
+
+impl<T> std::IndexAccessOp<i64, T> on ArraySlice<T> {
+    pub fn indexedAccessOp(index: i64) -> T {
+        const index: u64 = calculateWrapAroundIndex(index, count);
+        return array[from + index];
+    }
+}
+
+impl<T> std::SliceOp<i64, ReadonlyArrayView<T>> on ArraySlice<T> for ReadonlyArrayView<T> {
+    pub fn sliceOp(from: i64, to: i64) -> ReadonlyArrayView<T> {
+        return this[from:to];
+    }
+}
+
+impl<T> ArrayView<T> on ArraySlice<T> {
+    pub fn asReadonly() -> ReadonlyArrayView<T> => this;
+}
+
+impl<T> std::IndexedAssignOp<i64, T> on ArraySlice<T> {
+    pub fn indexedAssignOp(index: i64, val: T) {
+        const index: u64 = calculateWrapAroundIndex(index, count);
+        array[from + index] = val;
+    }
+}
+
+impl<T> std::SliceOp<i64, ArrayView<T>> on ArraySlice<T> {
+    pub fn sliceOp(from: i64, to: i64) -> ArrayView<T> {
+        const (from, to) = calculateWrapAroundSliceIndexes(from, to, count);
+        return ArraySlice<T>{
+            array: array,
+            from: from,
+            count: to - from,
+        };
+    }
+}
+
+fn calculateWrapAroundIndex(index: i64, count: u64) -> u64 {
+    let index: u64 = if index < 0 {
+        count + index
+    } else {
+        index
+    };
+
+    if index >= count {
+        raise std::OutOfBoundsException(index, count);
+    }
+    
+    return index;
+}
+
+fn calculateWrapAroundSliceIndexes(from: i64, to: i64, count: u64) -> (u64, u64) {
+    let from: u64 = calculateWrapAroundIndex(from, count);
+    let to: u64 = calculateWrapAroundIndex(to, count);
+    
+    if from > to {
+        (from, to) = (to, from);
+    }
+    
+    return (from, to);
+}
+
+pub fn copyArray<T>(source: ReadonlyArrayView<T>, target: ArrayView<T>){
+    const length = cmp::min(source.length(), target.length());
+    for i in [0..length] {
+        target[i] = source[i];
+    }
+    return length;
+}

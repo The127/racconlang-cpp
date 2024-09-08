@@ -1,0 +1,10 @@
+mod std::__unsafe;
+
+pub annotation extern {
+    dll: string;
+    cName: string;
+}
+
+pub annotation intrinsic {
+    @name: string;
+}

@@ -1,0 +1,50 @@
+use foo;
+use foo::bar;
+use foo::bar::{a,b,c};
+
+mod example;
+
+pub interface Foo require ArrayView of int {}
+
+pub interface ReadonlyArrayView of T require std::IndexedAccessOp of (u64, T), std::SliceOp of (u64, ReadonlyArrayView of T) {
+    pub fn length() -> u64;
+    pub fn /* +\ß?`@ø öäü§$&/(=)/#'"
+    部件 조선 象形文字 ウイザード ひらがな
+    asdf */ foo() -> u64;
+}
+
+pub interface ArrayView of T require ReadonlyArrayView of T, std::IndexedAssignOp of (u64, T), std::SliceOp of (u64, ArrayView of T) {
+    // foobar }
+}
+
+// ArrayView implements
+
+
+pub struct Bar;
+
+impl ArrayView of int on Bar for Foo {
+
+}
+
+impl ReadonlyArrayView of int on Bar for Foo {
+
+}
+
+impl SliceOp of (u64, ArrayView of int) on Bar for Foo {
+
+}
+
+impl SliceOp of (u64, ReadonlyArrayView of T) on Bar for Foo {
+
+}
+
+
+
+fn foo1(a: Foo) {
+}
+
+fn foo2(a: ArrayView of i32) {
+}
+
+fn foo3(a: ReadonlyArrayView of i32) {
+}

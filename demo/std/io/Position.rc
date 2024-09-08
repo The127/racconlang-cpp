@@ -1,0 +1,7 @@
+mod std::io;
+
+pub enum Position {
+    FromBeginning(position: u64),
+    FromCurrent(position: u64),
+    FromEnd(position: u64),
+}

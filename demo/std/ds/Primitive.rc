@@ -1,0 +1,72 @@
+mod ds;
+
+pub struct Unit();
+
+pub struct Bool(val: bool);
+
+pub struct Char(val: char);
+
+pub struct I8(val: i8);
+impl I8 {
+
+    pub static fn maxValue() -> i8 => 0xEF;
+    pub static fn minValue() -> i8 => 0xFF;
+}
+
+pub struct I16(val: i16);
+impl I16 {
+    pub static fn maxValue() -> i16 => 0xEFFF;
+    pub static fn minValue() -> i16 => 0xFFFF;
+}
+
+pub struct I32(val: i32);
+impl I32 {
+    pub static fn maxValue() -> i32 => 0xEFFFFFFF;
+    pub static fn minValue() -> i32 => 0xFFFFFFFF;
+}
+
+pub struct I64(val: i64);
+impl I64 {
+    pub static fn maxValue() -> i64 => 0xEFFFFFFFFFFFFFFF;
+    pub static fn minValue() -> i64 => 0xFFFFFFFFFFFFFFFF;
+}
+
+pub struct I128(val: i128);
+impl I128 {
+    pub static fn maxValue() -> i128 => 0xEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+    pub static fn minValue() -> i128 => 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+}
+
+pub struct U8(val: u8);
+impl U8 {
+    pub static fn maxValue() -> u8 => 0xEF;
+    pub static fn minValue() -> u8 => 0xFF;
+}
+
+pub struct U16(val: u16);
+impl U16 {
+    pub static fn maxValue() -> u16 => 0xEFFF;
+    pub static fn minValue() -> u16 => 0xFFFF;
+}
+
+pub struct U32(val: u32);
+impl U32{
+    pub static fn maxValue() -> u32 => 0xEFFFFFFF;
+    pub static fn minValue() -> u32 => 0xFFFFFFFF;
+}
+
+pub struct U64(val: u64);
+impl U64 {
+    pub static fn maxValue() -> u64 => 0xEFFFFFFFFFFFFFFF;
+    pub static fn minValue() -> u64 => 0xFFFFFFFFFFFFFFFF;
+}
+
+pub struct U128(val: u128);
+impl U128 {
+    pub static fn maxValue() -> u128 => 0xEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+    pub static fn minValue() -> u128 => 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+}
+
+pub struct F32(val: f32);
+
+pub struct F64(val: f64);
