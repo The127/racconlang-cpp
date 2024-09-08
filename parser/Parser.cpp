@@ -175,11 +175,11 @@ std::vector<Token> Parser::modifierRule(treeIterator &start, const treeIterator 
 void Parser::validateModifiers(std::vector<Token> &modifiers, const std::vector<TokenType> &validTokenTypes) {
     std::vector<Token> result;
     std::string note = "valid modifiers are: ";
-    for(int i{}; i < validTokenTypes.size(); ++i) {
+    for (int i{}; i < validTokenTypes.size(); ++i) {
         note += TokenTypeStringQuoted(validTokenTypes[i]);
-        if(i < validTokenTypes.size() - 2) {
+        if (i < validTokenTypes.size() - 2) {
             note += ", ";
-        }else if (i < validTokenTypes.size() - 1) {
+        } else if (i < validTokenTypes.size() - 1) {
             note += " and ";
         }
     }
@@ -190,7 +190,7 @@ void Parser::validateModifiers(std::vector<Token> &modifiers, const std::vector<
         });
         if (index == validTokenTypes.end()) {
             result.emplace_back(modifier);
-        }else {
+        } else {
             auto error = CompilerError(InvalidModifier, modifiers[0]);
             error.addLabel("not a valid modifier here", modifier);
             error.setNote(note);
@@ -202,7 +202,7 @@ void Parser::validateModifiers(std::vector<Token> &modifiers, const std::vector<
 }
 
 inline bool containsModifier(const std::vector<Token> &modifiers, const TokenType type) {
-    for (const auto modifier : modifiers) {
+    for (const auto modifier: modifiers) {
         if (modifier.type == type) {
             return true;
         }
@@ -215,9 +215,9 @@ void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<
                     "enumRule called with non-enum starting token");
 
     auto decl = EnumDeclaration();
-    if(!modifiers.empty()) {
+    if (!modifiers.empty()) {
         decl.startPos = modifiers[0].start;
-    }else {
+    } else {
         decl.startPos = start->getStart();
     }
     start += 1;
@@ -232,11 +232,11 @@ void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<
         addError(error);
     }
 
-    if(start->isTokenTree(TokenType::OpenAngle)) {
+    if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
     }
 
-    while(auto constraint = genericConstraintRule(start, end)) {
+    while (auto constraint = genericConstraintRule(start, end)) {
         decl.genericConstraints.emplace_back(std::move(*constraint));
     }
 }
@@ -246,9 +246,9 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
                     "interfaceRule called with non-interface starting token");
 
     auto decl = InterfaceDeclaration();
-    if(!modifiers.empty()) {
+    if (!modifiers.empty()) {
         decl.startPos = modifiers[0].start;
-    }else {
+    } else {
         decl.startPos = start->getStart();
     }
     start += 1;
@@ -263,7 +263,7 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
         addError(error);
     }
 
-    if(start->isTokenTree(TokenType::OpenAngle)) {
+    if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
     }
 }
@@ -273,9 +273,9 @@ void Parser::structRule(treeIterator &start, const treeIterator &end, std::vecto
                     "structRule called with non-struct starting token");
 
     auto decl = StructDeclaration();
-    if(!modifiers.empty()) {
+    if (!modifiers.empty()) {
         decl.startPos = modifiers[0].start;
-    }else {
+    } else {
         decl.startPos = start->getStart();
     }
     start += 1;
@@ -290,7 +290,7 @@ void Parser::structRule(treeIterator &start, const treeIterator &end, std::vecto
         addError(error);
     }
 
-    if(start->isTokenTree(TokenType::OpenAngle)) {
+    if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
     }
 }
@@ -300,9 +300,9 @@ void Parser::functionRule(treeIterator &start, const treeIterator &end, std::vec
                     "functionRule called with non-fn starting token");
 
     auto decl = FunctionDeclaration();
-    if(!modifiers.empty()) {
+    if (!modifiers.empty()) {
         decl.startPos = modifiers[0].start;
-    }else {
+    } else {
         decl.startPos = start->getStart();
     }
     start += 1;
@@ -317,7 +317,7 @@ void Parser::functionRule(treeIterator &start, const treeIterator &end, std::vec
         addError(error);
     }
 
-    if(start->isTokenTree(TokenType::OpenAngle)) {
+    if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
     }
 }
@@ -327,9 +327,9 @@ void Parser::aliasRule(treeIterator &start, const treeIterator &end, std::vector
                     "aliasRule called with non-alias starting token");
 
     auto decl = AliasDeclaration();
-    if(!modifiers.empty()) {
+    if (!modifiers.empty()) {
         decl.startPos = modifiers[0].start;
-    }else {
+    } else {
         decl.startPos = start->getStart();
     }
     start += 1;
@@ -344,7 +344,7 @@ void Parser::aliasRule(treeIterator &start, const treeIterator &end, std::vector
         addError(error);
     }
 
-    if(start->isTokenTree(TokenType::OpenAngle)) {
+    if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
     }
 }
@@ -354,9 +354,9 @@ void Parser::moduleVariableRule(treeIterator &start, const treeIterator &end, st
                     "moduleVariableRule called with non-let starting token");
 
     auto decl = ModuleVariableDeclaration();
-    if(!modifiers.empty()) {
+    if (!modifiers.empty()) {
         decl.startPos = modifiers[0].start;
-    }else {
+    } else {
         decl.startPos = start->getStart();
     }
     start += 1;
@@ -467,14 +467,14 @@ std::optional<ConstraintDeclaration> Parser::genericConstraintRule(treeIterator 
     auto decl = ConstraintDeclaration();
     auto current = start;
 
-    if (current->isToken(TokenType::Require)) {
+    if (current->isToken(TokenType::Where)) {
         decl.startPos = current->getStart();
         current += 1;
-    }else {
+    } else {
         return std::nullopt;
     }
 
-    decl.name = std::move(identifierRule(start, end));
+    decl.name = std::move(identifierRule(current, end));
     if (!decl.name) {
         auto error = CompilerError(UnexpectedToken, decl.startPos);
         error.addLabel("expected generic parameter name", *current);
@@ -483,12 +483,36 @@ std::optional<ConstraintDeclaration> Parser::genericConstraintRule(treeIterator 
 
     if (!current->isToken(TokenType::Colon)) {
         auto error = CompilerError(UnexpectedToken, decl.startPos);
-        error.addLabel("expected: `:`", *current);
+        error.addLabel("expected `:`", *current);
         addError(error);
-    }else {
+    } else {
         current += 1;
     }
 
+    while (current != end) {
+        if (auto c1 = interfaceConstraintRule(current, end)) {
+            decl.constraints.push_back(std::move(c1));
+        }/* else if (auto c2 = defaultConstraintRule(current, end)) {
+            decl.constraints.push_back(std::move(c2));
+        }*/
+        else if (current->isConstraintBreakout()) {
+            break;
+        } else {
+            auto error = CompilerError(InvalidGenericConstraint, decl.startPos);
+            error.addLabel("expected generic constraint", *current);
+            addError(error);
+            recoverUntil(current, end, [](const TokenTreeNode &node) {
+                return node.isConstraintBreakout() || node.isToken(TokenType::Comma);
+            }, false);
+        }
+
+        if (current != end && current->isToken(TokenType::Comma)) {
+            current += 1;
+            continue;
+        } else {
+            break;
+        }
+    }
 
 
     decl.endPos = current->getEnd();
@@ -525,8 +549,8 @@ std::vector<Identifier> Parser::identifierListRule(const TokenTreeNode &node, To
     } else if (list.right.isError()) {
         auto error = CompilerError(WrongCloser, list.left);
         error.addLabel(
-            "wrong closer for list, expected: " + TokenTypeStringQuoted(list.left.expectedClosing()),
-            list.right.getError().token);
+                "wrong closer for list, expected: " + TokenTypeStringQuoted(list.left.expectedClosing()),
+                list.right.getError().token);
         addError(error);
     }
 

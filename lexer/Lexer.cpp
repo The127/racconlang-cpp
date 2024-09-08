@@ -321,6 +321,8 @@ TokenResult Lexer::identifierRule() const {
             tokenType = TokenType::Let;
         } else if (text == "pub") {
             tokenType = TokenType::Pub;
+        } else if (text == "where") {
+            tokenType = TokenType::Where;
         }
 
         return Token(tokenType, source->offset + position, source->offset + position + offset);

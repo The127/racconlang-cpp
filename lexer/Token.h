@@ -32,6 +32,7 @@ public:
     [[nodiscard]] bool isClosing() const;
     [[nodiscard]] bool isTopLevelStarter() const;
     [[nodiscard]] bool isModifier() const;
+    [[nodiscard]] bool isConstraintBreakout() const;
     [[nodiscard]] TokenType expectedClosing() const;
 
     [[nodiscard]] std::string toString(const SourceMap& sources) const;

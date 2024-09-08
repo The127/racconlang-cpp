@@ -18,7 +18,7 @@ public:
     const std::shared_ptr<Source> source;
 
     explicit Parser(std::shared_ptr<Source> source)
-        : source(std::move(source)) {
+            : source(std::move(source)) {
         modules.emplace_back();
     }
 
@@ -38,6 +38,7 @@ private:
     void modRule(treeIterator &start, const treeIterator &end);
 
     std::vector<Token> modifierRule(treeIterator &start, const treeIterator &end);
+
     void validateModifiers(std::vector<Token> &modifiers, const std::vector<TokenType> &validTokenTypes);
 
     void enumRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
@@ -58,12 +59,18 @@ private:
 
     std::optional<ConstraintDeclaration> genericConstraintRule(treeIterator &start, const treeIterator &end);
 
+    std::unique_ptr<GenericConstraintBase> interfaceConstraintRule(treeIterator &start, const treeIterator &end);
+//    std::unique_ptr<GenericConstraintBase> defaultConstraintRule(treeIterator &start, const treeIterator &end);
+
     [[nodiscard]] std::optional<Identifier> identifierRule(treeIterator &start, const treeIterator &end) const;
 
     [[nodiscard]] std::vector<Identifier> identifierListRule(const TokenTreeNode &list, TokenType opener);
 
     static void recoverTopLevel(treeIterator &start, const treeIterator &end);
+
     static void recoverUntil(treeIterator &start, const treeIterator &end, TokenType type, bool consume);
+
     static void recoverUntil(treeIterator &start, const treeIterator &end, std::vector<TokenType> oneOf, bool consume);
-    static void recoverUntil(treeIterator &start, const treeIterator &end, const std::function<bool(const TokenTreeNode&)> &predicate, bool consume);
+
+    static void recoverUntil(treeIterator &start, const treeIterator &end, const std::function<bool(const TokenTreeNode &)> &predicate, bool consume);
 };

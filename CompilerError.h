@@ -26,6 +26,7 @@ enum ErrorCode {
     DuplicateModifier,
     InvalidModifier,
     MissingDeclarationName,
+    InvalidGenericConstraint,
 };
 
 class ErrorLabel {

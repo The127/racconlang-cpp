@@ -55,6 +55,12 @@ bool Token::isModifier() const {
     return type == TokenType::Pub;
 }
 
+bool Token::isConstraintBreakout() const {
+    return type == TokenType::Semicolon
+           || type == TokenType::EqualArrow
+           || type == TokenType::Where;
+}
+
 TokenType Token::expectedClosing() const {
     switch (type) {
         case TokenType::OpenCurly:

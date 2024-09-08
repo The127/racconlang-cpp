@@ -67,3 +67,7 @@ std::string TokenTreeNode::toString(const SourceMap &sources, uint32_t indent) c
     }
     return std::string(indent, ' ') + getTokenResult().toString(sources) + "\n";
 }
+
+bool TokenTreeNode::isConstraintBreakout() const {
+    return isTokenTree(TokenType::OpenCurly) || (isToken() && getToken().isConstraintBreakout());
+}

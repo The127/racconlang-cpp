@@ -24,6 +24,7 @@ static std::map<TokenType, std::pair<std::string, std::string>> TokenTypes = {
     {TokenType::Alias, {"Alias", "alias"}},
     {TokenType::Let, {"Let", "let"}},
     {TokenType::Pub, {"Pub", "pub"}},
+    {TokenType::Where, {"Where", "where"}},
     {TokenType::PathSeparator, {"PathSeparator", "::"}},
     {TokenType::DashArrow, {"DashArrow", "->"}},
     {TokenType::EqualArrow, {"EqualArrow", "=>"}},

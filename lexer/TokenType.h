@@ -25,6 +25,7 @@ enum class TokenType {
     Alias,          // alias
     Let,            // let
     Pub,            // pub
+    Where,          // where
 
     Colon,          // :
     PathSeparator,  // ::
