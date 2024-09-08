@@ -9,5 +9,5 @@ uint64_t ModuleVariableDeclaration::start() const {
 }
 
 uint64_t ModuleVariableDeclaration::end() const {
-    return endPost;
+    return endPos;
 }

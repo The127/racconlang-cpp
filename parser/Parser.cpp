@@ -185,10 +185,10 @@ void Parser::validateModifiers(std::vector<Token> &modifiers, const std::vector<
     }
 
     for (auto modifier: modifiers) {
-        const auto index = std::ranges::find_if(validTokenTypes.begin(), validTokenTypes.end(), [&modifier](auto &t) {
-            return modifier.type == t.type;
-        });
-        if (index == validTokenTypes.end()) {
+        auto isFound = std::ranges::find_if(validTokenTypes.begin(), validTokenTypes.end(), [&modifier](auto &t) {
+            return modifier.type == t;
+        }) == validTokenTypes.end();
+        if (isFound) {
             result.emplace_back(modifier);
         } else {
             auto error = CompilerError(InvalidModifier, modifiers[0]);
@@ -550,7 +550,7 @@ std::vector<Identifier> Parser::identifierListRule(const TokenTreeNode &node, To
         auto error = CompilerError(WrongCloser, list.left);
         error.addLabel(
                 "wrong closer for list, expected: " + TokenTypeStringQuoted(list.left.expectedClosing()),
-                list.right.getError().token);
+                list.right.getError().got);
         addError(error);
     }
 
@@ -628,4 +628,8 @@ void Parser::recoverUntil(treeIterator &start, const treeIterator &end,
 
         start += 1;
     }
+}
+
+std::unique_ptr<GenericConstraintBase> Parser::interfaceConstraintRule(treeIterator &start, const treeIterator &end) {
+    throw std::logic_error("not implemented");
 }

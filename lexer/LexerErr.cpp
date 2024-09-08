@@ -3,6 +3,7 @@
 //
 
 #include "LexerErr.h"
+#include "sourceMap/SourceMap.h"
 
 LexerErr LexerErr::UnclosedTokenTree(const Token &got, std::string expected) {
     return LexerErr(LexerErrReason::UnclosedTokenTree, got, {std::move(expected)});
