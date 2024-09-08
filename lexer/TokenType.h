@@ -54,3 +54,5 @@ enum class TokenType {
 };
 
 std::string_view TokenTypeName(TokenType type);
+std::string_view TokenTypeString(TokenType type);
+std::string TokenTypeStringQuoted(TokenType type);
