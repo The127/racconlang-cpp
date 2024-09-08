@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "AliasDeclaration.h"
@@ -18,7 +19,7 @@
 
 class ModuleDeclaration final : public Node {
 public:
-    std::string path;
+    Path path;
     std::vector<UseNode> uses;
     std::vector<EnumDeclaration> enumDeclarations;
     std::vector<InterfaceDeclaration> interfaceDeclarations;
@@ -27,6 +28,15 @@ public:
     std::vector<AliasDeclaration> aliasDeclarations;
     std::vector<ModuleVariableDeclaration> moduleVariableDeclarations;
 
-    [[nodiscard]] uint64_t start() const override {}
-    [[nodiscard]] uint64_t end() const override {}
+    ModuleDeclaration() = default;
+
+    explicit ModuleDeclaration(Path path)
+        : path(std::move(path)) {
+    }
+
+    [[nodiscard]] uint64_t start() const override {
+    }
+
+    [[nodiscard]] uint64_t end() const override {
+    }
 };

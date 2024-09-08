@@ -44,6 +44,11 @@ void Parser::parseFile() {
                 modRule(current, end);
             } else if (token.type == TokenType::Pub || token.isDeclaratorKeyword()) {
                 declarationRule(current, end);
+            } else {
+                auto error = CompilerError(UnexpectedToken, current->getStart());
+                error.addLabel("expected a top level declaration", *current);
+                addError(error);
+                recoverTopLevel(current, end);
             }
         }
     }
@@ -51,20 +56,20 @@ void Parser::parseFile() {
 
 void Parser::useRule(treeIterator &start, const treeIterator &end) {
     if (modules.size() > 1) {
-        auto error = CompilerError(UseAfterMod, start->getToken());
+        auto error = CompilerError(UseAfterMod, start->getStart());
         error.setNote("uses need to be declared before any modules");
         addError(error);
     }
 
-    auto current = start;
-    current += 1;
+    COMPILER_ASSERT(start->isToken(TokenType::Use), "useRule called with non-use starting token");
+    start += 1;
 
     auto use = UseNode();
 
     auto path = pathRule(start, end, true);
     if (!path) {
         auto error = CompilerError(UseIsMissingPath, start->getStart());
-        error.addLabel("expected a module path here", *current);
+        error.addLabel("expected a module path here", *start);
         addError(error);
         recoverTopLevel(start, end);
         return;
@@ -73,8 +78,8 @@ void Parser::useRule(treeIterator &start, const treeIterator &end) {
     use.path = *path;
 
     if (use.path.isTrailing()) {
-        if (current == end || !current->isTokenTree(TokenType::OpenCurly)) {
-            const auto separatorToken = (current - 1)->getToken();
+        if (start == end || !start->isTokenTree(TokenType::OpenCurly)) {
+            const auto separatorToken = (start - 1)->getToken();
             auto error = CompilerError(PathHasTrailingSeparator, separatorToken);
             error.addLabel("trailing path separator", separatorToken);
             addError(error);
@@ -83,20 +88,41 @@ void Parser::useRule(treeIterator &start, const treeIterator &end) {
             return;
         }
 
-        use.names = std::move(identifierListRule(*current, TokenType::OpenCurly));
+        use.names = std::move(identifierListRule(*start, TokenType::OpenCurly));
     }
 
-    if (current == end || !current->isToken(TokenType::Semicolon)) {
-        auto error = CompilerError(MissingSemicolon, current->getStart());
+    if (start == end || !start->isToken(TokenType::Semicolon)) {
+        auto error = CompilerError(MissingSemicolon, start->getStart());
         addError(error);
-        current -= 1;
+    } else {
+        start += 1;
     }
 
     useNodes.push_back(use);
 }
 
 void Parser::modRule(treeIterator &start, const treeIterator &end) {
+    COMPILER_ASSERT(start->isToken(TokenType::Mod), "modRule called with non-mod starting token");
     start += 1;
+
+    auto path = pathRule(start, end, false);
+
+    if (!path) {
+        auto error = CompilerError(UseIsMissingPath, start->getStart());
+        error.addLabel("expected a module path here", *start);
+        addError(error);
+        recoverTopLevel(start, end);
+        return;
+    }
+
+    if (start == end || !start->isToken(TokenType::Semicolon)) {
+        auto error = CompilerError(MissingSemicolon, start->getStart());
+        addError(error);
+    } else {
+        start += 1;
+    }
+
+    modules.emplace_back(*path);
 }
 
 void Parser::declarationRule(treeIterator &start, const treeIterator &end) {
