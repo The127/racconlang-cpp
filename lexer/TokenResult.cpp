@@ -40,6 +40,12 @@ const LexerErr &TokenResult::getError() const {
     return value.error();
 }
 
+const Token & TokenResult::getOrErrorToken() const {
+    if(isToken())
+        return get();
+    return getError().token;
+}
+
 Location TokenResult::getPosition(const SourceMap &sources) const {
     return sources.getLocation(getStart());
 }

@@ -11,12 +11,18 @@
 #include <vector>
 
 #include "lexer/Token.h"
+#include "lexer/TokenResult.h"
+#include "lexer/TokenTree.h"
 
 
 enum ErrorCode {
     MissingSemicolon,
+    UseAfterMod,
     UseIsMissingPath,
     PathHasTrailingSeparator,
+    WrongOpener,
+    WrongCloser,
+    UnexpectedToken,
 };
 
 class ErrorLabel {
@@ -27,14 +33,6 @@ public:
 
     ErrorLabel(std::string text, const uint64_t start, const uint64_t end)
         : text(std::move(text)), start(start), end(end) {
-    }
-
-    ErrorLabel(std::string text, const Token &startToken, const Token &endToken)
-        : text(std::move(text)), start(startToken.start), end(endToken.end) {
-    }
-
-    ErrorLabel(std::string text, const Token &token)
-        : text(std::move(text)), start(token.start), end(token.end) {
     }
 };
 
@@ -63,11 +61,27 @@ public:
     }
 
     void addLabel(const std::string &text, const Token &startToken, const Token &endToken) {
-        labels.emplace_back(text, startToken, endToken);
+        labels.emplace_back(text, startToken.start, endToken.end);
     }
 
     void addLabel(const std::string &text, const Token &token) {
-        labels.emplace_back(text, token);
+        addLabel(text, token, token);
+    }
+
+    void addLabel(const std::string &text, const TokenResult &result) {
+        addLabel(text, result.getOrErrorToken());
+    }
+
+    void addLabel(const std::string &text, const TokenResult &startResult, const TokenResult &endResult) {
+        addLabel(text, startResult.getOrErrorToken(), endResult.getOrErrorToken());
+    }
+
+    void addLabel(const std::string &text, const TokenTree &tree) {
+        addLabel(text, tree.left, tree.right.getOrErrorToken());
+    }
+
+    void addLabel(const std::string &text, const TokenTreeNode &node) {
+        addLabel(text, node.getStart(), node.getEnd());
     }
 
     void setNote(const std::string& note) {

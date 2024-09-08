@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include "CompilerError.h"
 #include "ast/ModuleDeclaration.h"
 #include "lexer/TokenTree.h"
@@ -43,5 +45,10 @@ private:
 
     [[nodiscard]] std::optional<Identifier> identifierRule(treeIterator &start, const treeIterator &end) const;
 
+    [[nodiscard]] std::vector<Identifier> identifierListRule(const TokenTreeNode &list, TokenType opener);
+
     static void recoverTopLevel(treeIterator &start, const treeIterator &end);
+    static void recoverUntil(treeIterator &start, const treeIterator &end, TokenType type, bool consume);
+    static void recoverUntil(treeIterator &start, const treeIterator &end, std::vector<TokenType> oneOf, bool consume);
+    static void recoverUntil(treeIterator &start, const treeIterator &end, const std::function<bool(const TokenTreeNode&)> &predicate, bool consume);
 };
