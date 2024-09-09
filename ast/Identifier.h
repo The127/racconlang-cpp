@@ -14,11 +14,15 @@ class Source;
 
 class Identifier final : public Node {
 public:
+    Token identifier;
+    std::string_view name;
+
     Identifier(const Token &identifier, const Source &source);
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;
 
-    Token identifier;
-    std::string_view name;
+    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
+
+    friend std::ostream & operator<< (std::ostream &out, const Identifier &identifier);
 };

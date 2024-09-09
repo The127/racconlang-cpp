@@ -9,11 +9,10 @@ int main() {
     auto directory = "demo";
 
     SourceMap sources;
-    auto source = sources.addEntry("demo/test.rc");
+    const auto source = sources.addEntry("demo/test.rc");
 
     Lexer lexer(source);
-    const auto tt = lexer.tokenize();
-    source->tokenTree = std::move(tt);
+    source->tokenTree = lexer.tokenize();
 
     std::cout << source->tokenTree->toString(sources, 0);
 
@@ -22,8 +21,8 @@ int main() {
     std::cout << std::string(5, '\n');
 
     Parser parser(source);
-    for (auto error : source->errors) {
-
+    for (const auto error : source->errors) {
+        std::cerr << error.code << std::endl;
     }
 
     const auto mods = parser.parse();
@@ -32,7 +31,7 @@ int main() {
         std::cout << std::string(10, '#');
         std::cout << std::string(5, '\n');
 
-        ///std::cout << mod.toString(sources, 0);
+        std::cout << mod.toString(sources, 0, true);
     }
 
     return 0;

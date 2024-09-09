@@ -16,5 +16,7 @@ public:
     std::vector<std::string> genericParams;
 
     [[nodiscard]] uint64_t start() const override {};
-    [[nodiscard]] uint64_t end() const override {};
+    [[nodiscard]] uint64_t end() const override {}
+
+    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;;
 };

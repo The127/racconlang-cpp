@@ -3,3 +3,7 @@
 //
 
 #include "InterfaceConstraint.h"
+
+std::string InterfaceConstraint::toString(const SourceMap &sources, int indent, bool verbose) const {
+    return "TODO";
+}

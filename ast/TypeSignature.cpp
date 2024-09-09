@@ -3,3 +3,7 @@
 //
 
 #include "TypeSignature.h"
+
+std::string TypeSignature::toString(const SourceMap &sources, int indent, bool verbose) const {
+    return "TODO";
+}

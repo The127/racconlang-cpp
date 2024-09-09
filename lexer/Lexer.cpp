@@ -162,7 +162,8 @@ const TokenResult& Lexer::peekToken() {
     consumeWhitespace();
 
     if (position >= source->text.length()) {
-        return Token(TokenType::Eof, position, position);
+        peeked = Token(TokenType::Eof, position, position);
+        return *peeked;
     }
 
     const auto ch = source->text[position];

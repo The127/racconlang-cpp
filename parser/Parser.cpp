@@ -119,6 +119,10 @@ void Parser::useRule(treeIterator &start, const treeIterator &end) {
 
 void Parser::modRule(treeIterator &start, const treeIterator &end) {
     COMPILER_ASSERT(start->isToken(TokenType::Mod), "modRule called with non-mod starting token");
+
+    auto mod = ModuleDeclaration();
+    mod.startPos = start->getStart();
+
     start += 1;
 
     auto path = pathRule(start, end, false);
@@ -131,14 +135,16 @@ void Parser::modRule(treeIterator &start, const treeIterator &end) {
         return;
     }
 
+    mod.endPos = path->end();
     if (start == end || !start->isToken(TokenType::Semicolon)) {
         auto error = CompilerError(MissingSemicolon, start->getStart());
         addError(error);
     } else {
+        mod.endPos = start->getEnd();
         start += 1;
     }
 
-    modules.emplace_back(*path);
+    modules.push_back(std::move(mod));
 }
 
 std::vector<Token> Parser::modifierRule(treeIterator &start, const treeIterator &end) {
@@ -239,6 +245,8 @@ void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<
     while (auto constraint = genericConstraintRule(start, end)) {
         decl.genericConstraints.emplace_back(std::move(*constraint));
     }
+
+
 }
 
 void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
@@ -492,7 +500,7 @@ std::optional<ConstraintDeclaration> Parser::genericConstraintRule(treeIterator 
     while (current != end) {
         if (auto c1 = interfaceConstraintRule(current, end)) {
             decl.constraints.push_back(std::move(c1));
-        }/* else if (auto c2 = defaultConstraintRule(current, end)) {
+        } /* else if (auto c2 = defaultConstraintRule(current, end)) {
             decl.constraints.push_back(std::move(c2));
         }*/
         else if (current->isConstraintBreakout()) {
@@ -508,7 +516,6 @@ std::optional<ConstraintDeclaration> Parser::genericConstraintRule(treeIterator 
 
         if (current != end && current->isToken(TokenType::Comma)) {
             current += 1;
-            continue;
         } else {
             break;
         }
@@ -549,8 +556,8 @@ std::vector<Identifier> Parser::identifierListRule(const TokenTreeNode &node, To
     } else if (list.right.isError()) {
         auto error = CompilerError(WrongCloser, list.left);
         error.addLabel(
-                "wrong closer for list, expected: " + TokenTypeStringQuoted(list.left.expectedClosing()),
-                list.right.getError().got);
+            "wrong closer for list, expected: " + TokenTypeStringQuoted(list.left.expectedClosing()),
+            list.right.getError().got);
         addError(error);
     }
 

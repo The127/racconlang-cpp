@@ -3,3 +3,7 @@
 //
 
 #include "PropertyDeclaration.h"
+
+std::string PropertyDeclaration::toString(const SourceMap &sources, int indent, bool verbose) const {
+    return "TODO";
+}
