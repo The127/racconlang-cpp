@@ -25,9 +25,14 @@ std::string EnumDeclaration::toString(const SourceMap &sources, const int indent
     }
     result += ",\n";
 
-    result += std::string(indent, ' ') + "genericParams: " + NodeUtils::nodeListString(sources, genericParams, indent + 1, verbose) + "\n";
-    result += std::string(indent, ' ') + "genericConstraints: " + NodeUtils::nodeListString(sources, genericConstraints, indent + 1, verbose) + "\n";
-    result += std::string(indent, ' ') + "memberDeclarations: " + NodeUtils::nodeListString(sources, memberDeclarations, indent + 1, verbose) + "\n";
+    if(!genericParams.empty())
+        result += std::string(indent, ' ') + "genericParams: " + NodeUtils::nodeListString(sources, genericParams, indent + 1, verbose) + "\n";
+
+    if(!genericConstraints.empty())
+        result += std::string(indent, ' ') + "genericConstraints: " + NodeUtils::nodeListString(sources, genericConstraints, indent + 1, verbose) + "\n";
+
+    if(!memberDeclarations.empty())
+        result += std::string(indent, ' ') + "memberDeclarations: " + NodeUtils::nodeListString(sources, memberDeclarations, indent + 1, verbose) + "\n";
 
     result += std::string(indent, ' ') + "},";
     return std::move(result);

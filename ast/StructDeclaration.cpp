@@ -26,9 +26,14 @@ std::string StructDeclaration::toString(const SourceMap &sources, const int inde
     }
     result += ",\n";
 
-    result += std::string(indent, ' ') + "genericParams: " + NodeUtils::nodeListString(sources, genericParams, indent + 1, verbose) + "\n";
-    result += std::string(indent, ' ') + "genericConstraints: " + NodeUtils::nodeListString(sources, genericConstraints, indent + 1, verbose) + "\n";
-    result += std::string(indent, ' ') + "propertyDeclarations: " + NodeUtils::nodeListString(sources, propertyDeclarations, indent + 1, verbose) + "\n";
+    if(!genericParams.empty())
+        result += std::string(indent, ' ') + "genericParams: " + NodeUtils::nodeListString(sources, genericParams, indent + 1, verbose) + "\n";
+
+    if(!genericConstraints.empty())
+        result += std::string(indent, ' ') + "genericConstraints: " + NodeUtils::nodeListString(sources, genericConstraints, indent + 1, verbose) + "\n";
+
+    if(!propertyDeclarations.empty())
+        result += std::string(indent, ' ') + "propertyDeclarations: " + NodeUtils::nodeListString(sources, propertyDeclarations, indent + 1, verbose) + "\n";
 
     result += std::string(indent, ' ') + "destructuresInto: [" + StringUtils::join(destructureProperties, ", ") + "],";
 

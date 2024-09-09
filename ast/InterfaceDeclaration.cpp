@@ -25,10 +25,17 @@ std::string InterfaceDeclaration::toString(const SourceMap &sources, const int i
     }
     result += ",\n";
 
-    result += std::string(indent, ' ') + "genericParams: " + NodeUtils::nodeListString(sources, genericParams, indent + 1, verbose) + "\n";
-    result += std::string(indent, ' ') + "genericConstraints: " + NodeUtils::nodeListString(sources, genericConstraints, indent + 1, verbose) + "\n";
-    result += std::string(indent, ' ') + "requiredInterfaces: " + NodeUtils::nodeListString(sources, requiredInterfaces, indent + 1, verbose) + "\n";
-    result += std::string(indent, ' ') + "methods: " + NodeUtils::nodeListString(sources, methods, indent + 1, verbose) + "\n";
+    if(!genericParams.empty())
+        result += std::string(indent, ' ') + "genericParams: " + NodeUtils::nodeListString(sources, genericParams, indent + 1, verbose) + "\n";
+
+    if(!genericConstraints.empty())
+        result += std::string(indent, ' ') + "genericConstraints: " + NodeUtils::nodeListString(sources, genericConstraints, indent + 1, verbose) + "\n";
+
+    if(!requiredInterfaces.empty())
+        result += std::string(indent, ' ') + "requiredInterfaces: " + NodeUtils::nodeListString(sources, requiredInterfaces, indent + 1, verbose) + "\n";
+
+    if(!methods.empty())
+        result += std::string(indent, ' ') + "methods: " + NodeUtils::nodeListString(sources, methods, indent + 1, verbose) + "\n";
 
     result += std::string(indent, ' ') + "},";
     return std::move(result);

@@ -25,8 +25,12 @@ std::string AliasDeclaration::toString(const SourceMap &sources, const int inden
     }
     result += ",\n";
 
-    result += std::string(indent, ' ') + "genericParams: " + NodeUtils::nodeListString(sources, genericParams, indent + 1, verbose) + "\n";
-    result += std::string(indent, ' ') + "genericConstraints: " + NodeUtils::nodeListString(sources, genericConstraints, indent + 1, verbose) + "\n";
+
+    if(!genericParams.empty())
+        result += std::string(indent, ' ') + "genericParams: " + NodeUtils::nodeListString(sources, genericParams, indent + 1, verbose) + "\n";
+
+    if(!genericConstraints.empty())
+        result += std::string(indent, ' ') + "genericConstraints: " + NodeUtils::nodeListString(sources, genericConstraints, indent + 1, verbose) + "\n";
 
     result += std::string(indent, ' ') + "},";
     return std::move(result);
