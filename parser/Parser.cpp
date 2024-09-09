@@ -9,7 +9,9 @@
 std::vector<ModuleDeclaration> Parser::parse() {
     parseFile();
 
-    //TODO: convert result
+    for (auto &module : modules) {
+        module.uses = uses;
+    }
 
     return std::move(modules);
 }
@@ -97,7 +99,7 @@ void Parser::useRule(treeIterator &start, const treeIterator &end) {
             } else {
                 use.endPos = start->getEnd();
             }
-            useNodes.push_back(use);
+            uses->uses.push_back(use);
             return;
         }
 
@@ -114,7 +116,7 @@ void Parser::useRule(treeIterator &start, const treeIterator &end) {
         start += 1;
     }
 
-    useNodes.push_back(use);
+    uses->uses.push_back(use);
 }
 
 void Parser::modRule(treeIterator &start, const treeIterator &end) {
@@ -125,9 +127,9 @@ void Parser::modRule(treeIterator &start, const treeIterator &end) {
 
     start += 1;
 
-    auto path = pathRule(start, end, false);
+    mod.path = pathRule(start, end, false);
 
-    if (!path) {
+    if (!mod.path) {
         auto error = CompilerError(UseIsMissingPath, start->getStart());
         error.addLabel("expected a module path here", *start);
         addError(error);
@@ -135,7 +137,7 @@ void Parser::modRule(treeIterator &start, const treeIterator &end) {
         return;
     }
 
-    mod.endPos = path->end();
+    mod.endPos = mod.path->end();
     if (start == end || !start->isToken(TokenType::Semicolon)) {
         auto error = CompilerError(MissingSemicolon, start->getStart());
         addError(error);

@@ -19,8 +19,10 @@ std::string UseNode::toString(const SourceMap &sources, const int indent, const 
     std::string result = NodeUtils::nameString(*this, "UseNode", verbose) + "{\n";
 
     result += std::string(indent, ' ') + "path: " + path.toString(sources, indent, verbose) + ",\n";
-    result += std::string(indent, ' ') + "names: [" + StringUtils::join(names, ", ") + "],\n";
 
-    result += std::string(indent, ' ') + "},";
+    if(!names.empty())
+        result += std::string(indent, ' ') + "names: [" + StringUtils::join(names, ", ") + "],\n";
+
+    result += std::string(indent - 1, ' ') + "},";
     return std::move(result);
 }

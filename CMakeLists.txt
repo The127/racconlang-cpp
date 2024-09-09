@@ -69,6 +69,8 @@ add_executable(RaccoonLang main.cpp
         lexer/TokenResult.cpp
         lexer/TokenResult.h
         utils/StringUtils.h
-        utils/NodeUtils.h)
+        utils/NodeUtils.h
+        ast/FileUses.cpp
+        ast/FileUses.h)
 
 target_include_directories(RaccoonLang PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

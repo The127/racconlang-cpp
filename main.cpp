@@ -22,7 +22,7 @@ int main() {
 
     Parser parser(source);
     for (const auto error : source->errors) {
-        std::cerr << error.code << std::endl;
+        std::cout << error.code << std::endl;
     }
 
     const auto mods = parser.parse();
@@ -31,7 +31,7 @@ int main() {
         std::cout << std::string(10, '#');
         std::cout << std::string(5, '\n');
 
-        std::cout << mod.toString(sources, 0, true);
+        std::cout << mod.toString(sources, 1, true);
     }
 
     return 0;

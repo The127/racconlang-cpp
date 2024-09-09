@@ -20,13 +20,13 @@ public:
     explicit Parser(std::shared_ptr<Source> source)
             : source(std::move(source)) {
         modules.emplace_back();
+        uses = std::make_shared<FileUses>();
     }
 
     std::vector<ModuleDeclaration> parse();
 
 private:
-
-    std::vector<UseNode> useNodes;
+    std::shared_ptr<FileUses> uses;
     std::vector<ModuleDeclaration> modules;
 
     void addError(const CompilerError &error);

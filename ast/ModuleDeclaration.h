@@ -10,6 +10,7 @@
 
 #include "AliasDeclaration.h"
 #include "EnumDeclaration.h"
+#include "FileUses.h"
 #include "FunctionDeclaration.h"
 #include "InterfaceDeclaration.h"
 #include "ModuleVariableDeclaration.h"
@@ -21,8 +22,8 @@ class ModuleDeclaration final : public Node {
 public:
     uint64_t startPos{};
     uint64_t endPos{};
-    Path path;
-    std::vector<UseNode> uses;
+    std::optional<Path> path;
+    std::shared_ptr<FileUses> uses;
     std::vector<EnumDeclaration> enumDeclarations;
     std::vector<InterfaceDeclaration> interfaceDeclarations;
     std::vector<StructDeclaration> structDeclarations;

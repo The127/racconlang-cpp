@@ -16,10 +16,11 @@ uint64_t ModuleDeclaration::end() const {
 std::string ModuleDeclaration::toString(const SourceMap &sources, const int indent, const bool verbose) const {
     std::string result = NodeUtils::nameString(*this, "ModuleDeclaration", verbose) + "{\n";
 
-    result += std::string(indent, ' ') + "path: " + path.toString(sources, indent, verbose) + ",\n";
+    if(path)
+        result += std::string(indent, ' ') + "path: " + path->toString(sources, indent, verbose) + ",\n";
 
-    if(!uses.empty())
-        result += std::string(indent, ' ') + "uses: " + NodeUtils::nodeListString(sources, uses, indent + 1, verbose) + "\n";
+    if(!uses->uses.empty())
+        result += std::string(indent, ' ') + "uses: " + NodeUtils::nodeListString(sources, uses->uses, indent + 1, verbose) + "\n";
 
     if(!moduleVariableDeclarations.empty())
         result += std::string(indent, ' ') + "moduleVariableDeclarations: " + NodeUtils::nodeListString(sources, moduleVariableDeclarations, indent + 1, verbose) + "\n";
@@ -39,6 +40,6 @@ std::string ModuleDeclaration::toString(const SourceMap &sources, const int inde
     if(!functionDeclarations.empty())
         result += std::string(indent, ' ') + "functionDeclarations: " + NodeUtils::nodeListString(sources, functionDeclarations, indent + 1, verbose) + "\n";
 
-    result += std::string(indent, ' ') + "},";
+    result += std::string(indent - 1, ' ') + "},";
     return std::move(result);
 }

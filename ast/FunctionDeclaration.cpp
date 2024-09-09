@@ -34,6 +34,6 @@ std::string FunctionDeclaration::toString(const SourceMap &sources, const int in
 
     result += std::string(indent, ' ') + "returnType: " + returnType->toString(sources, indent + 1, verbose) + "\n";
 
-    result += std::string(indent, ' ') + "},";
+    result += std::string(indent - 1, ' ') + "},";
     return std::move(result);
 }
