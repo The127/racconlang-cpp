@@ -19,11 +19,9 @@ std::string EnumDeclaration::toString(const SourceMap &sources, const int indent
 
     result += std::string(indent, ' ') + "isPublic: " + std::to_string(isPublic) + ",\n";
 
-    result += std::string(indent, ' ') + "name: ";
     if(name) {
-        result += name->name;
-    }
-    result += ",\n";
+        result += std::string(indent, ' ') + "name: " + std::string(name->name) + ",\n";
+    };
 
     if(!genericParams.empty())
         result += std::string(indent, ' ') + "genericParams: " + NodeUtils::nodeListString(sources, genericParams, indent + 1, verbose) + "\n";

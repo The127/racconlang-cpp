@@ -20,11 +20,9 @@ std::string StructDeclaration::toString(const SourceMap &sources, const int inde
 
     result += std::string(indent, ' ') + "isPublic: " + std::to_string(isPublic) + ",\n";
 
-    result += std::string(indent, ' ') + "name: ";
     if(name) {
-        result += name->name;
+        result += std::string(indent, ' ') + "name: " + std::string(name->name) + ",\n";
     }
-    result += ",\n";
 
     if(!genericParams.empty())
         result += std::string(indent, ' ') + "genericParams: " + NodeUtils::nodeListString(sources, genericParams, indent + 1, verbose) + "\n";

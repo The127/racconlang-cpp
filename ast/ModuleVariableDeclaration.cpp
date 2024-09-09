@@ -19,11 +19,9 @@ std::string ModuleVariableDeclaration::toString(const SourceMap &sources, const 
 
     result += std::string(indent, ' ') + "isPublic: " + std::to_string(isPublic) + ",\n";
 
-    result += std::string(indent, ' ') + "name: ";
     if(name) {
-        result += name->name;
+        result += std::string(indent, ' ') + "name: " + std::string(name->name) + ",\n";
     }
-    result += ",\n";
 
     result += std::string(indent, ' ') + "returnType: " + type->toString(sources, indent + 1, verbose) + "\n";
 
