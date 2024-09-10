@@ -20,7 +20,7 @@ std::string EnumMemberDeclaration::toString(const SourceMap &sources, int indent
     result += std::string(indent, ' ') + "name: " + name.toString(sources, indent+1, verbose) + ",\n";
 
     if(!values.empty()) {
-        result += std::string(indent, ' ') + "values: " + NodeUtils::nodeListString(sources, genericArguments, indent + 1, verbose) + "\n";
+        result += std::string(indent, ' ') + "values: " + NodeUtils::nodeListString(sources, values, indent + 1, verbose) + "\n";
     }
 
     return std::move(result);

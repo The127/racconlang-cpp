@@ -61,6 +61,12 @@ bool Token::isConstraintBreakout() const {
            || type == TokenType::Where;
 }
 
+bool Token::isSignatureStarter() const {
+    return type == TokenType::Identifier
+        || type == TokenType::PathSeparator
+        || type == TokenType::Fn;
+}
+
 TokenType Token::expectedClosing() const {
     switch (type) {
         case TokenType::OpenCurly:

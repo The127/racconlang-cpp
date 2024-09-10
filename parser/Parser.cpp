@@ -640,7 +640,7 @@ std::optional<std::unique_ptr<SignatureBase>> Parser::signatureRule(treeIterator
         return std::nullopt;
     }
 
-    if(start->isToken(TokenType::Identifier)) {
+    if(start->isToken(TokenType::Identifier) || start->isToken(TokenType::PathSeparator)) {
         auto type = typeSignatureRule(start, end);
         if(type) {
             COMPILER_ASSERT(*type, "empty unique pointer from typeSignatureRule");
@@ -658,9 +658,6 @@ std::optional<std::unique_ptr<SignatureBase>> Parser::signatureRule(treeIterator
             COMPILER_ASSERT(*tuple, "empty unique pointer from tupleSignatureRule");
             return std::move(*tuple);
         }
-    }else {
-        auto error = CompilerError(MissingSignature, start->getStart());
-        error.setNote("expected a type, function or tuple signature");
     }
 
     return std::nullopt;
@@ -718,6 +715,8 @@ std::optional<std::unique_ptr<FunctionSignature>> Parser::functionSignatureRule(
         auto error = CompilerError(FnSignatureMissingParams, decl->start());
         error.addLabel("expected function parameters", *start);
         addError(error);
+    }else {
+        decl->parameters = parameterListRule(*start, TokenType::OpenParen);
     }
 
     decl->returnType = signatureRule(start, end);
@@ -836,7 +835,27 @@ std::vector<Parameter> Parser::parameterListRule(const TokenTreeNode &node, Toke
     const auto end = list.tokens.end();
 
     while (current != end) {
-        // TODO: implement
+        auto identifier = identifierRule(current, end);
+        if(!identifier) {
+            auto error = CompilerError(ParameterNameMissing, node.getStart());
+            error.addLabel("missing parameter name", *current);
+            addError(error);
+            recoverUntil(current, end, TokenType::Comma, true);
+            continue;
+        }
+
+        auto signature = signatureRule(current, end);
+        if (!signature) {
+            auto error = CompilerError(ParameterTypeMissing, node.getStart());
+            error.addLabel("missing parameter type", *current);
+            addError(error);
+            recoverUntil(current, end, TokenType::Comma, true);
+            continue;
+        }
+
+        if(current != end && node.isToken(TokenType::Comma)) {
+            current += 1;
+        }
     }
 
     return std::move(result);
@@ -870,7 +889,21 @@ std::vector<std::unique_ptr<SignatureBase>> Parser::signatureListRule(const Toke
     const auto end = list.tokens.end();
 
     while (current != end) {
-        // TODO: implement
+        auto signature = signatureRule(current, end);
+        if (!signature) {
+            auto error = CompilerError(InvalidSignature, list.left);
+            error.addLabel("expected type, tuple or function signature", *current);
+            addError(error);
+            recoverUntil(current, end, [](const TokenTreeNode &node) {
+                return node.isSignatureStarter() || node.isToken(TokenType::Comma);
+            }, false);
+        }else {
+            result.emplace_back(std::move(*signature));
+        }
+
+        if(current != end && node.isToken(TokenType::Comma)) {
+            current += 1;
+        }
     }
 
     return std::move(result);

@@ -71,3 +71,7 @@ std::string TokenTreeNode::toString(const SourceMap &sources, uint32_t indent) c
 bool TokenTreeNode::isConstraintBreakout() const {
     return isTokenTree(TokenType::OpenCurly) || (isToken() && getToken().isConstraintBreakout());
 }
+
+bool TokenTreeNode::isSignatureStarter() const {
+    return isTokenTree(TokenType::OpenParen) || isToken() && getToken().isSignatureStarter();
+}

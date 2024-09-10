@@ -30,6 +30,7 @@ public:
     [[nodiscard]] bool isError() const;
 
     [[nodiscard]] bool isConstraintBreakout() const;
+    [[nodiscard]] bool isSignatureStarter() const;
 
     [[nodiscard]] Location getPosition(const SourceMap &sources) const;
     [[nodiscard]] uint64_t getStart() const;

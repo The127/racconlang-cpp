@@ -4,6 +4,7 @@
 
 
 #pragma once
+#include "Parameter.h"
 #include "SignatureBase.h"
 
 
@@ -16,7 +17,7 @@ public:
 
     std::vector<std::unique_ptr<SignatureBase>> genericArguments;
     std::vector<ConstraintDeclaration> genericConstraints;
-    std::vector<std::unique_ptr<SignatureBase>> parameterTypes;
+    std::vector<Parameter> parameters;
     std::optional<std::unique_ptr<SignatureBase>> returnType;
 
     [[nodiscard]] uint64_t start() const override;

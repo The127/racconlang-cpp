@@ -33,6 +33,9 @@ enum ErrorCode {
     MissingComma,
     MissingSignature,
     FnSignatureMissingParams,
+    InvalidSignature,
+    ParameterNameMissing,
+    ParameterTypeMissing,
 };
 
 class ErrorLabel {

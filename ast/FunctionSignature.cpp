@@ -3,6 +3,7 @@
 //
 
 #include "FunctionSignature.h"
+#include "ConstraintDeclaration.h"
 
 #include "utils/NodeUtils.h"
 
@@ -23,8 +24,8 @@ std::string FunctionSignature::toString(const SourceMap &sources, int indent, bo
     if(!genericConstraints.empty()) {
         result += std::string(indent, ' ') + "genericConstraints: " + NodeUtils::nodeListString(sources, genericArguments, indent + 1, verbose) + "\n";
     }
-    if(!parameterTypes.empty()) {
-        result += std::string(indent, ' ') + "parameterTypes: " + NodeUtils::nodeListString(sources, genericArguments, indent + 1, verbose) + "\n";
+    if(!parameters.empty()) {
+        result += std::string(indent, ' ') + "parameters: " + NodeUtils::nodeListString(sources, parameters, indent + 1, verbose) + "\n";
     }
 
     if(returnType) {

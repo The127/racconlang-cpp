@@ -19,7 +19,7 @@ public:
     uint64_t startPos{};
     uint64_t endPos{};
     Identifier name;
-    std::vector<std::string> genericParams;
+    std::vector<Identifier> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
     std::vector<std::unique_ptr<Parameter>> parameters;
     std::optional<std::unique_ptr<SignatureBase>> returnType;
