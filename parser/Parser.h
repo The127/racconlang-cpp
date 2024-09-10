@@ -8,7 +8,9 @@
 #include <functional>
 
 #include "CompilerError.h"
+#include "ast/FunctionSignature.h"
 #include "ast/ModuleDeclaration.h"
+#include "ast/TupleSignature.h"
 #include "lexer/TokenTree.h"
 
 using treeIterator = std::vector<TokenTreeNode>::const_iterator;
@@ -42,6 +44,7 @@ private:
     void validateModifiers(std::vector<Token> &modifiers, const std::vector<TokenType> &validTokenTypes);
 
     void enumRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
+    std::optional<EnumMemberDeclaration> enumMemberRule(treeIterator &start, const treeIterator &end);
 
     void interfaceRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
 
@@ -64,7 +67,14 @@ private:
 
     [[nodiscard]] std::optional<Identifier> identifierRule(treeIterator &start, const treeIterator &end) const;
 
-    [[nodiscard]] std::vector<Identifier> identifierListRule(const TokenTreeNode &list, TokenType opener);
+    [[nodiscard]] std::optional<std::unique_ptr<SignatureBase>> signatureRule(treeIterator &start, const treeIterator &end);
+    [[nodiscard]] std::optional<std::unique_ptr<TypeSignature>> typeSignatureRule(treeIterator &start, const treeIterator &end);
+    [[nodiscard]] std::optional<std::unique_ptr<FunctionSignature>> functionSignatureRule(treeIterator &start, const treeIterator &end);
+    [[nodiscard]] std::optional<std::unique_ptr<TupleSignature>> tupleSignatureRule(treeIterator &start, const treeIterator &end);
+
+    [[nodiscard]] std::vector<Identifier> identifierListRule(const TokenTreeNode &node, TokenType opener);
+    [[nodiscard]] std::vector<Parameter> parameterListRule(const TokenTreeNode &node, TokenType opener);
+    [[nodiscard]] std::vector<std::unique_ptr<SignatureBase>> signatureListRule(const TokenTreeNode &node, TokenType opener);
 
     static void recoverTopLevel(treeIterator &start, const treeIterator &end);
 

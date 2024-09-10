@@ -27,6 +27,12 @@ enum ErrorCode {
     InvalidModifier,
     MissingDeclarationName,
     InvalidGenericConstraint,
+    MissingEnumBody,
+    EnumMemberExpected,
+    UnclosedEnumBody,
+    MissingComma,
+    MissingSignature,
+    FnSignatureMissingParams,
 };
 
 class ErrorLabel {

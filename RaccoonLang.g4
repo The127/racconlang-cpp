@@ -34,11 +34,15 @@ topLevelDeclaration
     ;
 
 enumDeclaration
-    : 'pub'? 'enum' Identifier genericParams? constraintDeclaration* '{' enumMemberDeclaration* '}'
+    : 'pub'? 'enum' Identifier genericParams? constraintDeclaration* '{' enumMemberDeclarationList '}'
+    ;
+
+enumMemberDeclarationList
+    : enumMemberDeclaration (',' enumMemberDeclaration)* ','?
     ;
 
 enumMemberDeclaration
-    : Identifier '(' typeList ')' ','
+    : Identifier ('(' typeList ')')?
     ;
 
 interfaceDeclaration
@@ -105,6 +109,10 @@ genericParams
     :  '<' identifierList '>'
     ;
 
+genericArguments
+    : '<' typeList '>'
+    ;
+
 identifierList
     : Identifier (',' Identifier) ','?
     ;
@@ -124,7 +132,7 @@ typeNameList
     ;
 
 typeName
-    : path genericParams?
+    : path genericArguments?
     ;
 
 tupleType
@@ -132,7 +140,7 @@ tupleType
     ;
 
 fnType
-    : 'fn' genericParams? '(' typeList ')' ('->' type)? constraintDeclaration*
+    : 'fn' genericArguments? '(' typeList ')' ('->' type)? constraintDeclaration*
     ;
 
 namedTypeList

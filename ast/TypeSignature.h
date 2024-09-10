@@ -7,16 +7,20 @@
 #include <string>
 #include <vector>
 
+#include "Path.h"
 #include "SignatureBase.h"
 
 
-class TypeSignature final : SignatureBase {
+class TypeSignature final : public SignatureBase {
 public:
-    std::string path;
-    std::vector<std::string> genericParams;
+    uint64_t startPos{};
+    uint64_t endPos{};
 
-    [[nodiscard]] uint64_t start() const override {};
-    [[nodiscard]] uint64_t end() const override {}
+    Path path;
+    std::vector<std::unique_ptr<SignatureBase>> genericArguments;
+
+    [[nodiscard]] uint64_t start() const override;
+    [[nodiscard]] uint64_t end() const override;
 
     [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;;
 };

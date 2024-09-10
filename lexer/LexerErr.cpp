@@ -77,6 +77,10 @@ std::string LexerErr::toString(const SourceMap &sources) const {
         case LexerErrReason::InvalidIdentifier:
             COMPILER_ASSERT(expected.empty(), "expected is not empty for InvalidIdentifier error");
             return std::format("invalid identifier `{}` at {}", sources.getText(got), locStr);
+
+        default:
+            COMPILER_ASSERT(false, "unhandled lexer error");
+            return "";
     }
 }
 

@@ -71,6 +71,12 @@ add_executable(RaccoonLang main.cpp
         utils/StringUtils.h
         utils/NodeUtils.h
         ast/FileUses.cpp
-        ast/FileUses.h)
+        ast/FileUses.h
+        ast/Parameter.cpp
+        ast/Parameter.h
+        ast/FunctionSignature.cpp
+        ast/FunctionSignature.h
+        ast/TupleSignature.cpp
+        ast/TupleSignature.h)
 
 target_include_directories(RaccoonLang PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

@@ -1,25 +1,22 @@
 //
-// Created by zoe on 07.09.24.
+// Created by zoe on 10.09.24.
 //
 
-#pragma once
-#include <string>
-#include <vector>
-#include <memory>
 
+#pragma once
 #include "Identifier.h"
-#include "Parameter.h"
+#include "Node.h"
 #include "SignatureBase.h"
 
 
-class EnumMemberDeclaration final : public Node {
+class Parameter final : Node {
 public:
     uint64_t startPos{};
     uint64_t endPos{};
     Identifier name;
-    std::vector<std::unique_ptr<SignatureBase>> values;
+    std::unique_ptr<SignatureBase> type;
 
-    explicit EnumMemberDeclaration(Identifier name)
+    explicit Parameter(Identifier name)
         : name(std::move(name)) {
     }
 
@@ -28,4 +25,3 @@ public:
 
     [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
 };
-

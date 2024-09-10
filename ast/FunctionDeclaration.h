@@ -10,6 +10,7 @@
 #include "SignatureBase.h"
 #include "ConstraintDeclaration.h"
 #include "Identifier.h"
+#include "Parameter.h"
 #include "Node.h"
 
 class FunctionDeclaration final : public Node{
@@ -20,7 +21,7 @@ public:
     std::optional<Identifier> name;
     std::vector<Identifier> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
-    std::vector<std::unique_ptr<SignatureBase>> parameters;
+    std::vector<Parameter> parameters;
     std::unique_ptr<SignatureBase> returnType;
     //TODO: body as expression
 
