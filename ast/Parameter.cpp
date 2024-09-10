@@ -20,5 +20,6 @@ std::string Parameter::toString(const SourceMap &sources, int indent, bool verbo
     result += std::string(indent, ' ') + "name: " + name.toString(sources, indent+1, verbose) + ",\n";
     result += std::string(indent, ' ') + "type: " + type->toString(sources, indent+1, verbose) + ",\n";
 
+    result += std::string(indent - 1, ' ') + "},";
     return std::move(result);
 }

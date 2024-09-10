@@ -23,5 +23,6 @@ std::string EnumMemberDeclaration::toString(const SourceMap &sources, int indent
         result += std::string(indent, ' ') + "values: " + NodeUtils::nodeListString(sources, values, indent + 1, verbose) + "\n";
     }
 
+    result += std::string(indent - 1, ' ') + "},";
     return std::move(result);
 }

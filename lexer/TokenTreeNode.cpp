@@ -41,7 +41,7 @@ uint64_t TokenTreeNode::getStart() const {
 
 uint64_t TokenTreeNode::getEnd() const {
     if (isTokenTree())
-        return getTokenTree().left.end;
+        return getTokenTree().right.getEnd();
     return getTokenResult().getEnd();
 }
 

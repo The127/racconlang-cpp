@@ -33,5 +33,6 @@ std::string InterfaceMethodDeclaration::toString(const SourceMap &sources, int i
         result += std::string(indent, ' ') + "returnType: " + (*returnType)->toString(sources, indent+1, verbose) + ",\n";
     }
 
+    result += std::string(indent - 1, ' ') + "},";
     return std::move(result);
 }

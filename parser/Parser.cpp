@@ -245,6 +245,7 @@ void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<
     if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.endPos = start->getEnd();
         decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
+        start += 1;
     }
 
     while (auto constraint = genericConstraintRule(start, end)) {
@@ -345,6 +346,7 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
     if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.endPos = start->getEnd();
         decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
+        start += 1;
     }
 
     //TODO: require list
@@ -382,6 +384,7 @@ void Parser::structRule(treeIterator &start, const treeIterator &end, std::vecto
     if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.endPos = start->getEnd();
         decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
+        start += 1;
     }
 
     //TODO:
@@ -414,6 +417,7 @@ void Parser::functionRule(treeIterator &start, const treeIterator &end, std::vec
     if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.endPos = start->getEnd();
         decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
+        start += 1;
     }
 
     //TODO:
@@ -446,6 +450,7 @@ void Parser::aliasRule(treeIterator &start, const treeIterator &end, std::vector
     if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.endPos = start->getEnd();
         decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
+        start += 1;
     }
 
     //TODO:

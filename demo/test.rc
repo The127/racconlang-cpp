@@ -3,6 +3,6 @@ use std::foo::;
 mod main;
 
 pub enum Option<T>{
-    Some(T value),
+    Some(T),
     None,
 }
