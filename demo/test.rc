@@ -3,6 +3,7 @@ use std::foo::;
 mod main;
 
 pub enum Option<T>{
-    Some(T),
-    None,
+    Some(T, (T, i8), fn(int,float)->bool, fn(int)),
+    Foo(X<T>, (Y<T>, T), fn(X<T>)->Y<T>),
+    None
 }

@@ -293,8 +293,9 @@ std::optional<EnumMemberDeclaration> Parser::enumMemberRule(treeIterator &start,
     }
 
     auto decl = EnumMemberDeclaration(*identifierRule(start, end));
-    decl.startPos = start->getStart();
-    decl.endPos = start->getEnd();
+
+    decl.startPos = decl.name.start();
+    decl.endPos = decl.name.end();
 
     if(start == end) {
         return std::move(decl);
@@ -684,6 +685,7 @@ std::optional<std::unique_ptr<TypeSignature>> Parser::typeSignatureRule(treeIter
     if (start->isTokenTree(TokenType::OpenAngle)) {
         decl->endPos = start->getEnd();
         decl->genericArguments = std::move(signatureListRule(*start, TokenType::OpenAngle));
+        start += 1;
     }
 
     return std::move(decl);
@@ -707,6 +709,7 @@ std::optional<std::unique_ptr<FunctionSignature>> Parser::functionSignatureRule(
     if (start->isTokenTree(TokenType::OpenAngle)) {
         decl->endPos = start->getEnd();
         decl->genericArguments = std::move(signatureListRule(*start, TokenType::OpenAngle));
+        start += 1;
     }
 
     if(start == end) {
@@ -722,6 +725,7 @@ std::optional<std::unique_ptr<FunctionSignature>> Parser::functionSignatureRule(
         addError(error);
     }else {
         decl->parameters = parameterListRule(*start, TokenType::OpenParen);
+        start += 1;
     }
 
     decl->returnType = signatureRule(start, end);
@@ -745,6 +749,7 @@ std::optional<std::unique_ptr<TupleSignature>> Parser::tupleSignatureRule(treeIt
     decl->endPos = start->getEnd();
 
     decl->types = signatureListRule(*start, TokenType::OpenParen);
+    start += 1;
 
     return std::move(decl);
 }
@@ -858,8 +863,14 @@ std::vector<Parameter> Parser::parameterListRule(const TokenTreeNode &node, Toke
             continue;
         }
 
-        if(current != end && node.isToken(TokenType::Comma)) {
-            current += 1;
+        if(current != end) {
+            if(node.isToken(TokenType::Comma)) {
+                current += 1;
+            }else {
+                auto error = CompilerError(MissingComma, list.left);
+                error.addLabel("expected a comma", *current);
+                addError(error);
+            }
         }
     }
 
@@ -895,19 +906,25 @@ std::vector<std::unique_ptr<SignatureBase>> Parser::signatureListRule(const Toke
 
     while (current != end) {
         auto signature = signatureRule(current, end);
-        if (!signature) {
+        if (signature) {
+            result.emplace_back(std::move(*signature));
+        } else {
             auto error = CompilerError(InvalidSignature, list.left);
             error.addLabel("expected type, tuple or function signature", *current);
             addError(error);
             recoverUntil(current, end, [](const TokenTreeNode &node) {
                 return node.isSignatureStarter() || node.isToken(TokenType::Comma);
             }, false);
-        }else {
-            result.emplace_back(std::move(*signature));
         }
 
-        if(current != end && node.isToken(TokenType::Comma)) {
-            current += 1;
+        if(current != end) {
+            if(current->isToken(TokenType::Comma)) {
+              current += 1;
+            } else {
+                auto error = CompilerError(MissingComma, list.left);
+                error.addLabel("expected a comma", *current);
+                addError(error);
+            }
         }
     }
 
