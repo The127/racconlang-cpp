@@ -11,18 +11,25 @@
 #include "SignatureBase.h"
 #include "Node.h"
 #include "ConstraintDeclaration.h"
+#include "Parameter.h"
 
 
 class InterfaceMethodDeclaration final : public Node {
 public:
-    std::string name;
+    uint64_t startPos{};
+    uint64_t endPos{};
+    Identifier name;
     std::vector<std::string> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
-    std::vector<std::unique_ptr<SignatureBase>> parameterTypes;
-    std::unique_ptr<SignatureBase> returnType;
+    std::vector<std::unique_ptr<Parameter>> parameters;
+    std::optional<std::unique_ptr<SignatureBase>> returnType;
 
-    [[nodiscard]] uint64_t start() const override{};
-    [[nodiscard]] uint64_t end() const override{}
+    explicit InterfaceMethodDeclaration(Identifier name)
+        : name(std::move(name)) {
+    }
+
+    [[nodiscard]] uint64_t start() const override;
+    [[nodiscard]] uint64_t end() const override;
 
     [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;;
 };

@@ -4,6 +4,8 @@
 
 #include "Parameter.h"
 
+#include "utils/NodeUtils.h"
+
 uint64_t Parameter::start() const {
     return startPos;
 }
@@ -13,5 +15,10 @@ uint64_t Parameter::end() const {
 }
 
 std::string Parameter::toString(const SourceMap &sources, int indent, bool verbose) const {
-    return "TODO";
+    std::string result = NodeUtils::nameString(*this, "Parameter", verbose) + "{\n";
+
+    result += std::string(indent, ' ') + "name: " + name.toString(sources, indent+1, verbose) + ",\n";
+    result += std::string(indent, ' ') + "type: " + type->toString(sources, indent+1, verbose) + ",\n";
+
+    return std::move(result);
 }

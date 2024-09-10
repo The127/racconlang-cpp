@@ -4,6 +4,8 @@
 
 #include "EnumMemberDeclaration.h"
 
+#include "utils/NodeUtils.h"
+
 uint64_t EnumMemberDeclaration::start() const {
     return startPos;
 }
@@ -13,5 +15,13 @@ uint64_t EnumMemberDeclaration::end() const {
 }
 
 std::string EnumMemberDeclaration::toString(const SourceMap &sources, int indent, bool verbose) const {
-    return "TODO";
+    std::string result = NodeUtils::nameString(*this, "EnumMemberDeclaration", verbose) + "{\n";
+
+    result += std::string(indent, ' ') + "name: " + name.toString(sources, indent+1, verbose) + ",\n";
+
+    if(!values.empty()) {
+        result += std::string(indent, ' ') + "values: " + NodeUtils::nodeListString(sources, genericArguments, indent + 1, verbose) + "\n";
+    }
+
+    return std::move(result);
 }
