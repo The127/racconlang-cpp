@@ -18,14 +18,16 @@ uint64_t Path::start() const {
     if (isRooted()) {
         return rooted->start;
     }
-    return parts.begin()->start();
+    COMPILER_ASSERT(!parts.empty(), "path parts is empty");
+    return parts.front().start();
 }
 
 uint64_t Path::end() const {
     if(isTrailing()) {
         return trailer->end;
     }
-    return parts.end()->end();
+    COMPILER_ASSERT(!parts.empty(), "path parts is empty");
+    return parts.back().end();
 }
 
 std::string Path::toString(const SourceMap &sources, const int indent, const bool verbose) const {

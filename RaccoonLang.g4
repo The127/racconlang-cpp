@@ -46,11 +46,13 @@ enumMemberDeclaration
     ;
 
 interfaceDeclaration
-    : 'pub'? 'interface' Identifier genericParams? ('require' typeNameList)? constraintDeclaration* (';' | '{' interfaceMethodDeclaration '}')
+    : 'pub'? 'interface' Identifier genericParams? (':' typeNameList)? constraintDeclaration* '{' interfaceMethodDeclaration '}'
     ;
 
 interfaceMethodDeclaration
     : 'pub'? 'fn' Identifier genericParams? '(' namedTypeList ')' ('->' type)? constraintDeclaration* ';'
+    | 'pub'? 'get' Identifier ';'
+    | 'pub'? 'set' Identifier ';'
     ;
 
 structDeclaration

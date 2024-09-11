@@ -9,7 +9,7 @@
 std::vector<ModuleDeclaration> Parser::parse() {
     parseFile();
 
-    for (auto &module : modules) {
+    for (auto &module: modules) {
         module.uses = uses;
     }
 
@@ -195,7 +195,7 @@ void Parser::validateModifiers(std::vector<Token> &modifiers, const std::vector<
     for (auto modifier: modifiers) {
         auto isFound = std::ranges::find_if(validTokenTypes.begin(), validTokenTypes.end(), [&modifier](auto &t) {
             return modifier.type == t;
-        }) == validTokenTypes.end();
+        }) != validTokenTypes.end();
         if (isFound) {
             result.emplace_back(modifier);
         } else {
@@ -234,6 +234,11 @@ void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<
     validateModifiers(modifiers, {TokenType::Pub});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
 
+    if (start == end) {
+        modules.back().enumDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
     decl.name = identifierRule(start, end);
     if (!decl.name) {
         auto error = CompilerError(MissingDeclarationName, decl.startPos);
@@ -242,10 +247,20 @@ void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<
     }
     decl.endPos = decl.name->end();
 
+    if (start == end) {
+        modules.back().enumDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
     if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.endPos = start->getEnd();
         decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
         start += 1;
+    }
+
+    if (start == end) {
+        modules.back().enumDeclarations.emplace_back(std::move(decl));
+        return;
     }
 
     while (auto constraint = genericConstraintRule(start, end)) {
@@ -253,16 +268,21 @@ void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<
         decl.endPos = constraint->end();
     }
 
-    if(!start->isTokenTree(TokenType::OpenCurly)) {
+    if (start == end) {
+        modules.back().enumDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
+    if (!start->isTokenTree(TokenType::OpenCurly)) {
         auto error = CompilerError(MissingEnumBody, decl.startPos);
         error.addLabel("expected start of enum body: `{`", *start);
         error.setNote("empty enums are not allowed");
         addError(error);
-    }else {
+    } else {
         decl.endPos = start->getEnd();
         const auto &body = start->getTokenTree();
 
-        if(body.right.isError()) {
+        if (body.right.isError()) {
             auto error = CompilerError(UnclosedEnumBody, body.left.start);
             error.addLabel("expected end of enum body: `}`", body.right);
             addError(error);
@@ -271,7 +291,7 @@ void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<
         treeIterator bodyStart = body.tokens.begin(); // NOLINT(*-use-auto)
         const auto bodyEnd = body.tokens.end();
 
-        while(auto member = enumMemberRule(bodyStart, bodyEnd)) {
+        while (auto member = enumMemberRule(bodyStart, bodyEnd)) {
             decl.memberDeclarations.emplace_back(std::move(*member));
         }
     }
@@ -280,11 +300,11 @@ void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<
 }
 
 std::optional<EnumMemberDeclaration> Parser::enumMemberRule(treeIterator &start, const treeIterator &end) {
-    if(start == end) {
+    if (start == end) {
         return std::nullopt;
     }
 
-    if(!start->isToken(TokenType::Identifier)) {
+    if (!start->isToken(TokenType::Identifier)) {
         auto error = CompilerError(EnumMemberExpected, start->getStart());
         error.addLabel("expected an enum member`}`", *start);
         addError(error);
@@ -297,17 +317,17 @@ std::optional<EnumMemberDeclaration> Parser::enumMemberRule(treeIterator &start,
     decl.startPos = decl.name.start();
     decl.endPos = decl.name.end();
 
-    if(start == end) {
+    if (start == end) {
         return std::move(decl);
     }
 
-    if(start->isTokenTree(TokenType::OpenParen)) {
+    if (start->isTokenTree(TokenType::OpenParen)) {
         decl.endPos = start->getEnd();
         decl.values = signatureListRule(*start, TokenType::OpenParen);
     }
 
-    if(start != end) {
-        if(start->isToken(TokenType::Comma)) {
+    if (start != end) {
+        if (start->isToken(TokenType::Comma)) {
             start += 1;
         } else {
             auto error = CompilerError(MissingComma, start->getStart());
@@ -339,10 +359,15 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
     decl.name = identifierRule(start, end);
     if (!decl.name) {
         auto error = CompilerError(MissingDeclarationName, decl.startPos);
-        error.addLabel("expected enum name", *start);
+        error.addLabel("expected interface name", *start);
         addError(error);
     }
     decl.endPos = decl.name->end();
+
+    if (start == end) {
+        modules.back().interfaceDeclarations.emplace_back(std::move(decl));
+        return;
+    }
 
     if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.endPos = start->getEnd();
@@ -350,12 +375,169 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
         start += 1;
     }
 
-    //TODO: require list
+    if (start == end) {
+        modules.back().interfaceDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
+    if (!start->isTokenTree(TokenType::Colon)
+        && !start->isToken(TokenType::Where)
+        && !start->isTokenTree(TokenType::OpenCurly)) {
+        auto error = CompilerError(UnexpectedToken, decl.startPos);
+        error.addLabel(
+            "unexpected token, expected: inheritance list (`:`), constraints (`where`), interface body (`{`)",
+            *start);
+        addError(error);
+
+        recoverUntil(start, end, [](const TokenTreeNode &node) {
+            return (node.isToken() && node.getToken().isTopLevelStarter())
+                   || node.isToken(TokenType::Colon)
+                   || node.isToken(TokenType::Where)
+                   || node.isTokenTree(TokenType::OpenCurly);
+        }, false);
+    }
+
+    if (start == end) {
+        modules.back().interfaceDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
+    if (start->isToken() && start->getToken().isTopLevelStarter()) {
+        modules.back().interfaceDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
+    if (start->isToken(TokenType::Colon)) {
+        decl.endPos = start->getEnd();
+        start += 1;
+
+
+        while (start != end) {
+            auto signature = typeSignatureRule(start, end);
+
+            if (!signature) {
+                auto error = CompilerError(UnexpectedToken, decl.startPos);
+                error.addLabel("expected type signature in inheritance list", *start);
+                addError(error);
+
+                recoverUntil(start, end, [](const TokenTreeNode &node) {
+                    return (node.isToken() && node.getToken().isTopLevelStarter())
+                           || node.isToken(TokenType::Comma)
+                           || node.isToken(TokenType::Where)
+                           || node.isTokenTree(TokenType::OpenCurly);
+                }, false);
+                if (start != end && start->isToken(TokenType::Comma)) {
+                    decl.endPos = start->getEnd();
+                    start += 1;
+                    continue;
+                }
+                if (start != end && start->isToken() && start->getToken().isTopLevelStarter()) {
+                    modules.back().interfaceDeclarations.emplace_back(std::move(decl));
+                    return;
+                }
+                break;
+            }
+
+            decl.requiredInterfaces.emplace_back(std::move(*signature));
+
+            if (start != end && start->isToken(TokenType::Comma)) {
+                decl.endPos = start->getEnd();
+                start += 1;
+            } else {
+                auto error = CompilerError(MissingComma, decl.startPos);
+                error.addLabel("missing comma", *start);
+                addError(error);
+            }
+        }
+    }
+
+    if (start == end) {
+        auto error = CompilerError(MissingInterfaceBody, decl.startPos);
+        error.addLabel(
+            "missing interface body",
+            *start);
+        addError(error);
+        modules.back().interfaceDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
+    if (!start->isToken(TokenType::Where)
+        && !start->isTokenTree(TokenType::OpenCurly)) {
+        auto error = CompilerError(UnexpectedToken, decl.startPos);
+        error.addLabel(
+            "unexpected token, expected: constraints (`where`), interface body (`{`)",
+            *start);
+        addError(error);
+
+        recoverUntil(start, end, [](const TokenTreeNode &node) {
+            return (node.isToken() && node.getToken().isTopLevelStarter())
+                   || node.isToken(TokenType::Where)
+                   || node.isTokenTree(TokenType::OpenCurly);
+        }, false);
+
+        if (start == end) {
+            modules.back().interfaceDeclarations.emplace_back(std::move(decl));
+            return;
+        }
+    }
+
+
+    if (start->isToken() && start->getToken().isTopLevelStarter()) {
+        modules.back().interfaceDeclarations.emplace_back(std::move(decl));
+        return;
+    }
 
     while (auto constraint = genericConstraintRule(start, end)) {
         decl.genericConstraints.emplace_back(std::move(*constraint));
         decl.endPos = constraint->end();
     }
+
+    if (start == end) {
+        auto error = CompilerError(MissingInterfaceBody, decl.startPos);
+        error.addLabel(
+            "missing interface body",
+            *start);
+        addError(error);
+        modules.back().interfaceDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
+    if (!start->isTokenTree(TokenType::OpenCurly)) {
+        auto error = CompilerError(UnexpectedToken, decl.startPos);
+        error.addLabel(
+            "unexpected token, expected: interface body (`{`)",
+            *start);
+        addError(error);
+
+        recoverUntil(start, end, [](const TokenTreeNode &node) {
+            return (node.isToken() && node.getToken().isTopLevelStarter())
+                   || node.isToken(TokenType::Where)
+                   || node.isTokenTree(TokenType::OpenCurly);
+        }, false);
+    }
+
+    if (start->isToken() && start->getToken().isTopLevelStarter()) {
+        modules.back().interfaceDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
+    if (start == end) {
+        modules.back().interfaceDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
+    if (!start->isTokenTree(TokenType::OpenCurly)) {
+        auto error = CompilerError(MissingInterfaceBody, decl.startPos);
+        error.addLabel("expected start of interface body: `{`", *start);
+        error.setNote("empty interfaces are not allowed");
+        addError(error);
+    } else {
+        decl.endPos = start->getEnd();
+        // TODO
+        start += 1;
+    }
+
+    modules.back().interfaceDeclarations.emplace_back(std::move(decl));
 }
 
 void Parser::structRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
@@ -374,13 +556,23 @@ void Parser::structRule(treeIterator &start, const treeIterator &end, std::vecto
     validateModifiers(modifiers, {TokenType::Pub});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
 
+    if (start == end) {
+        modules.back().structDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
     decl.name = identifierRule(start, end);
     if (!decl.name) {
         auto error = CompilerError(MissingDeclarationName, decl.startPos);
-        error.addLabel("expected enum name", *start);
+        error.addLabel("expected struct name", *start);
         addError(error);
     }
     decl.endPos = decl.name->end();
+
+    if (start == end) {
+        modules.back().structDeclarations.emplace_back(std::move(decl));
+        return;
+    }
 
     if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.endPos = start->getEnd();
@@ -407,13 +599,23 @@ void Parser::functionRule(treeIterator &start, const treeIterator &end, std::vec
     validateModifiers(modifiers, {TokenType::Pub});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
 
+    if (start == end) {
+        modules.back().functionDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
     decl.name = identifierRule(start, end);
     if (!decl.name) {
         auto error = CompilerError(MissingDeclarationName, decl.startPos);
-        error.addLabel("expected enum name", *start);
+        error.addLabel("expected function name", *start);
         addError(error);
     }
     decl.endPos = decl.name->end();
+
+    if (start == end) {
+        modules.back().functionDeclarations.emplace_back(std::move(decl));
+        return;
+    }
 
     if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.endPos = start->getEnd();
@@ -440,13 +642,23 @@ void Parser::aliasRule(treeIterator &start, const treeIterator &end, std::vector
     validateModifiers(modifiers, {TokenType::Pub});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
 
+    if (start == end) {
+        modules.back().aliasDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
     decl.name = identifierRule(start, end);
     if (!decl.name) {
         auto error = CompilerError(MissingDeclarationName, decl.startPos);
-        error.addLabel("expected enum name", *start);
+        error.addLabel("expected alias name", *start);
         addError(error);
     }
     decl.endPos = decl.name->end();
+
+    if (start == end) {
+        modules.back().aliasDeclarations.emplace_back(std::move(decl));
+        return;
+    }
 
     if (start->isTokenTree(TokenType::OpenAngle)) {
         decl.endPos = start->getEnd();
@@ -473,13 +685,23 @@ void Parser::moduleVariableRule(treeIterator &start, const treeIterator &end, st
     validateModifiers(modifiers, {TokenType::Pub});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
 
+    if (start == end) {
+        modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
     decl.name = identifierRule(start, end);
     if (!decl.name) {
         auto error = CompilerError(MissingDeclarationName, decl.startPos);
-        error.addLabel("expected enum name", *start);
+        error.addLabel("expected variable name", *start);
         addError(error);
     }
     decl.endPos = decl.name->end();
+
+    if (start == end) {
+        modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
+        return;
+    }
 
     //TODO:
 }
@@ -603,7 +825,7 @@ std::optional<ConstraintDeclaration> Parser::genericConstraintRule(treeIterator 
 
     while (current != end) {
         if (auto c1 = interfaceConstraintRule(current, end)) {
-            decl.constraints.push_back(std::move(c1));
+            decl.constraints.emplace_back(std::make_unique<InterfaceConstraint>(std::move(*c1)));
         } /* else if (auto c2 = defaultConstraintRule(current, end)) {
             decl.constraints.push_back(std::move(c2));
         }*/
@@ -641,114 +863,118 @@ std::optional<Identifier> Parser::identifierRule(treeIterator &start, const tree
     return Identifier(current->getToken(), *source);
 }
 
-std::optional<std::unique_ptr<SignatureBase>> Parser::signatureRule(treeIterator &start, const treeIterator &end) {
-    if(start == end) {
+std::optional<std::unique_ptr<SignatureBase> > Parser::signatureRule(treeIterator &start, const treeIterator &end) {
+    if (start == end) {
         return std::nullopt;
     }
 
-    if(start->isToken(TokenType::Identifier) || start->isToken(TokenType::PathSeparator)) {
+    if (start->isToken(TokenType::Identifier) || start->isToken(TokenType::PathSeparator)) {
         auto type = typeSignatureRule(start, end);
-        if(type) {
-            COMPILER_ASSERT(*type, "empty unique pointer from typeSignatureRule");
-            return std::move(*type);
+        if (type) {
+            return std::make_unique<TypeSignature>(std::move(*type));
         }
-    }else if(start->isToken(TokenType::Fn)) {
+    } else if (start->isToken(TokenType::Fn)) {
         auto fn = functionSignatureRule(start, end);
-        if(fn) {
-            COMPILER_ASSERT(*fn, "empty unique pointer from functionSignatureRule");
-            return std::move(*fn);
+        if (fn) {
+            return std::make_unique<FunctionSignature>(std::move(*fn));
         }
-    }else if(start->isTokenTree(TokenType::OpenParen)) {
+    } else if (start->isTokenTree(TokenType::OpenParen)) {
         auto tuple = tupleSignatureRule(start, end);
-        if(tuple) {
-            COMPILER_ASSERT(*tuple, "empty unique pointer from tupleSignatureRule");
-            return std::move(*tuple);
+        if (tuple) {
+            return std::make_unique<TupleSignature>(std::move(*tuple));
         }
     }
 
     return std::nullopt;
 }
 
-std::optional<std::unique_ptr<TypeSignature>> Parser::typeSignatureRule(treeIterator &start, const treeIterator &end) {
-    COMPILER_ASSERT(start == end || start->isToken(TokenType::Identifier), "typeSignatureRule called on non-identifier token tree node");
+std::optional<TypeSignature> Parser::typeSignatureRule(treeIterator &start, const treeIterator &end) {
+    if (start == end || !start->isToken(TokenType::Identifier)) {
+        return std::nullopt;
+    }
 
-    auto decl = std::make_unique<TypeSignature>();
-    decl->startPos = start->getStart();
+    auto decl = TypeSignature();
+    decl.startPos = start->getStart();
 
-    decl->path = std::move(*pathRule(start, end, false));
-    decl->endPos = decl->path.end();
+    decl.path = std::move(*pathRule(start, end, false));
+    decl.endPos = decl.path.end();
 
-    if(start == end) {
+    if (start == end) {
         return std::move(decl);
     }
 
     if (start->isTokenTree(TokenType::OpenAngle)) {
-        decl->endPos = start->getEnd();
-        decl->genericArguments = std::move(signatureListRule(*start, TokenType::OpenAngle));
+        decl.endPos = start->getEnd();
+        decl.genericArguments = std::move(signatureListRule(*start, TokenType::OpenAngle));
         start += 1;
     }
 
     return std::move(decl);
 }
 
-std::optional<std::unique_ptr<FunctionSignature>> Parser::functionSignatureRule(treeIterator &start, const treeIterator &end) {
-    COMPILER_ASSERT(start == end || start->isToken(TokenType::Fn), "functionSignatureRule called on non-fn token tree node");
+std::optional<FunctionSignature> Parser::functionSignatureRule(
+    treeIterator &start, const treeIterator &end) {
+    if (start == end || !start->isToken(TokenType::Fn)) {
+        return std::nullopt;
+    }
 
-    auto decl = std::make_unique<FunctionSignature>();
-    decl->startPos = start->getStart();
-    decl->endPos = start->getEnd();
+    auto decl = FunctionSignature();
+    decl.startPos = start->getStart();
+    decl.endPos = start->getEnd();
     start += 1;
 
-    if(start == end) {
-        auto error = CompilerError(FnSignatureMissingParams, decl->start());
-        error.addLabel("expected function parameters", decl->end(), decl->end());
+    if (start == end) {
+        auto error = CompilerError(FnSignatureMissingParams, decl.start());
+        error.addLabel("expected function parameters", decl.end(), decl.end());
         addError(error);
         return std::move(decl);
     }
 
     if (start->isTokenTree(TokenType::OpenAngle)) {
-        decl->endPos = start->getEnd();
-        decl->genericArguments = std::move(signatureListRule(*start, TokenType::OpenAngle));
+        decl.endPos = start->getEnd();
+        decl.genericArguments = std::move(signatureListRule(*start, TokenType::OpenAngle));
         start += 1;
     }
 
-    if(start == end) {
-        auto error = CompilerError(FnSignatureMissingParams, decl->start());
-        error.addLabel("expected function parameters", (start-1)->getEnd(), (start-1)->getEnd());
+    if (start == end) {
+        auto error = CompilerError(FnSignatureMissingParams, decl.start());
+        error.addLabel("expected function parameters", (start - 1)->getEnd(), (start - 1)->getEnd());
         addError(error);
         return std::move(decl);
     }
 
     if (!start->isTokenTree(TokenType::OpenParen)) {
-        auto error = CompilerError(FnSignatureMissingParams, decl->start());
+        auto error = CompilerError(FnSignatureMissingParams, decl.start());
         error.addLabel("expected function parameters", *start);
         addError(error);
-    }else {
-        decl->parameters = parameterListRule(*start, TokenType::OpenParen);
+    } else {
+        decl.parameterTypes = signatureListRule(*start, TokenType::OpenParen);
         start += 1;
     }
 
-    decl->returnType = signatureRule(start, end);
-    if(decl->returnType) {
-        decl->endPos = (*decl->returnType)->end();
+    decl.returnType = signatureRule(start, end);
+    if (decl.returnType) {
+        decl.endPos = (*decl.returnType)->end();
     }
 
     while (auto constraint = genericConstraintRule(start, end)) {
-        decl->genericConstraints.emplace_back(std::move(*constraint));
-        decl->endPos = constraint->end();
+        decl.genericConstraints.emplace_back(std::move(*constraint));
+        decl.endPos = constraint->end();
     }
 
     return std::move(decl);
 }
 
-std::optional<std::unique_ptr<TupleSignature>> Parser::tupleSignatureRule(treeIterator &start, const treeIterator &end) {
-    COMPILER_ASSERT(start == end || start->isTokenTree(TokenType::OpenParen), "tupleSignatureRule called on non-openParen token tree node");
+std::optional<TupleSignature> Parser::tupleSignatureRule(treeIterator &start, const treeIterator &end) {
+    if (start == end || !start->isTokenTree(TokenType::OpenParen)) {
+        return std::nullopt;
+    }
 
-    auto decl = std::make_unique<TupleSignature>();
-    decl->startPos = start->getStart();
-    decl->endPos = start->getEnd();
+    auto decl = TupleSignature();
+    decl.startPos = start->getStart();
+    decl.endPos = start->getEnd();
 
-    decl->types = signatureListRule(*start, TokenType::OpenParen);
+    decl.types = signatureListRule(*start, TokenType::OpenParen);
     start += 1;
 
     return std::move(decl);
@@ -846,7 +1072,7 @@ std::vector<Parameter> Parser::parameterListRule(const TokenTreeNode &node, Toke
 
     while (current != end) {
         auto identifier = identifierRule(current, end);
-        if(!identifier) {
+        if (!identifier) {
             auto error = CompilerError(ParameterNameMissing, node.getStart());
             error.addLabel("missing parameter name", *current);
             addError(error);
@@ -863,10 +1089,12 @@ std::vector<Parameter> Parser::parameterListRule(const TokenTreeNode &node, Toke
             continue;
         }
 
-        if(current != end) {
-            if(node.isToken(TokenType::Comma)) {
+        result.emplace_back(std::move(*identifier), std::move(*signature));
+
+        if (current != end) {
+            if (node.isToken(TokenType::Comma)) {
                 current += 1;
-            }else {
+            } else {
                 auto error = CompilerError(MissingComma, list.left);
                 error.addLabel("expected a comma", *current);
                 addError(error);
@@ -877,7 +1105,7 @@ std::vector<Parameter> Parser::parameterListRule(const TokenTreeNode &node, Toke
     return std::move(result);
 }
 
-std::vector<std::unique_ptr<SignatureBase>> Parser::signatureListRule(const TokenTreeNode &node, TokenType opener) {
+std::vector<std::unique_ptr<SignatureBase> > Parser::signatureListRule(const TokenTreeNode &node, TokenType opener) {
     if (!node.isTokenTree()) {
         auto error = CompilerError(UnexpectedToken, node.getStart());
         error.addLabel("unexpected token", node);
@@ -887,7 +1115,7 @@ std::vector<std::unique_ptr<SignatureBase>> Parser::signatureListRule(const Toke
 
     auto list = node.getTokenTree();
 
-    std::vector<std::unique_ptr<SignatureBase>> result;
+    std::vector<std::unique_ptr<SignatureBase> > result;
 
     if (list.left.type != opener) {
         auto error = CompilerError(WrongOpener, list.left);
@@ -917,9 +1145,9 @@ std::vector<std::unique_ptr<SignatureBase>> Parser::signatureListRule(const Toke
             }, false);
         }
 
-        if(current != end) {
-            if(current->isToken(TokenType::Comma)) {
-              current += 1;
+        if (current != end) {
+            if (current->isToken(TokenType::Comma)) {
+                current += 1;
             } else {
                 auto error = CompilerError(MissingComma, list.left);
                 error.addLabel("expected a comma", *current);
@@ -968,6 +1196,12 @@ void Parser::recoverUntil(treeIterator &start, const treeIterator &end,
     }
 }
 
-std::unique_ptr<GenericConstraintBase> Parser::interfaceConstraintRule(treeIterator &start, const treeIterator &end) {
-    throw std::logic_error("not implemented");
+std::optional<InterfaceConstraint> Parser::interfaceConstraintRule(treeIterator &start, const treeIterator &end) {
+    InterfaceConstraint constraint;
+    auto type = typeSignatureRule(start, end);
+    if (!type) {
+        return std::nullopt;
+    }
+    constraint.typeSignature = std::move(*type);
+    return constraint;
 }

@@ -9,6 +9,7 @@
 
 #include "CompilerError.h"
 #include "ast/FunctionSignature.h"
+#include "ast/InterfaceConstraint.h"
 #include "ast/ModuleDeclaration.h"
 #include "ast/TupleSignature.h"
 #include "lexer/TokenTree.h"
@@ -62,15 +63,15 @@ private:
 
     std::optional<ConstraintDeclaration> genericConstraintRule(treeIterator &start, const treeIterator &end);
 
-    std::unique_ptr<GenericConstraintBase> interfaceConstraintRule(treeIterator &start, const treeIterator &end);
+    std::optional<InterfaceConstraint> interfaceConstraintRule(treeIterator &start, const treeIterator &end);
 //    std::unique_ptr<GenericConstraintBase> defaultConstraintRule(treeIterator &start, const treeIterator &end);
 
     [[nodiscard]] std::optional<Identifier> identifierRule(treeIterator &start, const treeIterator &end) const;
 
     [[nodiscard]] std::optional<std::unique_ptr<SignatureBase>> signatureRule(treeIterator &start, const treeIterator &end);
-    [[nodiscard]] std::optional<std::unique_ptr<TypeSignature>> typeSignatureRule(treeIterator &start, const treeIterator &end);
-    [[nodiscard]] std::optional<std::unique_ptr<FunctionSignature>> functionSignatureRule(treeIterator &start, const treeIterator &end);
-    [[nodiscard]] std::optional<std::unique_ptr<TupleSignature>> tupleSignatureRule(treeIterator &start, const treeIterator &end);
+    [[nodiscard]] std::optional<TypeSignature> typeSignatureRule(treeIterator &start, const treeIterator &end);
+    [[nodiscard]] std::optional<FunctionSignature> functionSignatureRule(treeIterator &start, const treeIterator &end);
+    [[nodiscard]] std::optional<TupleSignature> tupleSignatureRule(treeIterator &start, const treeIterator &end);
 
     [[nodiscard]] std::vector<Identifier> identifierListRule(const TokenTreeNode &node, TokenType opener);
     [[nodiscard]] std::vector<Parameter> parameterListRule(const TokenTreeNode &node, TokenType opener);

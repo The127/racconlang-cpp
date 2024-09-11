@@ -306,8 +306,6 @@ TokenResult Lexer::identifierRule() const {
             tokenType = TokenType::Enum;
         } else if (text == "interface") {
             tokenType = TokenType::Interface;
-        } else if (text == "require") {
-            tokenType = TokenType::Require;
         } else if (text == "fn") {
             tokenType = TokenType::Fn;
         } else if (text == "struct") {
@@ -324,6 +322,10 @@ TokenResult Lexer::identifierRule() const {
             tokenType = TokenType::Pub;
         } else if (text == "where") {
             tokenType = TokenType::Where;
+        } else if (text == "get") {
+            tokenType = TokenType::Get;
+        }else if (text == "set") {
+            tokenType = TokenType::Set;
         }
 
         return Token(tokenType, source->offset + position, source->offset + position + offset);

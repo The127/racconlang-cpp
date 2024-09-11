@@ -16,8 +16,9 @@ public:
     Identifier name;
     std::unique_ptr<SignatureBase> type;
 
-    explicit Parameter(Identifier name)
-        : name(std::move(name)) {
+    explicit Parameter(Identifier name, std::unique_ptr<SignatureBase> type)
+        : name(std::move(name)),
+          type(std::move(type)) {
     }
 
     [[nodiscard]] uint64_t start() const override;

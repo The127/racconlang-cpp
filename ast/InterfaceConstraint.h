@@ -8,7 +8,7 @@
 #include "TypeSignature.h"
 
 
-class InterfaceConstraint final : GenericConstraintBase {
+class InterfaceConstraint final : public GenericConstraintBase {
 public:
     TypeSignature typeSignature;
 

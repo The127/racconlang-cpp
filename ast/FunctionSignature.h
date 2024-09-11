@@ -17,7 +17,7 @@ public:
 
     std::vector<std::unique_ptr<SignatureBase>> genericArguments;
     std::vector<ConstraintDeclaration> genericConstraints;
-    std::vector<Parameter> parameters;
+    std::vector<std::unique_ptr<SignatureBase>> parameterTypes;
     std::optional<std::unique_ptr<SignatureBase>> returnType;
 
     [[nodiscard]] uint64_t start() const override;

@@ -17,7 +17,6 @@ enum class TokenType {
     Mod,            // mod
     Enum,           // enum
     Interface,      // interface
-    Require,        // require
     Fn,             // fn
     Struct,         // struct
     Destructures,   // destructures
@@ -26,6 +25,8 @@ enum class TokenType {
     Let,            // let
     Pub,            // pub
     Where,          // where
+    Get,            // get
+    Set,            // set
 
     Colon,          // :
     PathSeparator,  // ::

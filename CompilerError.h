@@ -36,6 +36,7 @@ enum ErrorCode {
     InvalidSignature,
     ParameterNameMissing,
     ParameterTypeMissing,
+    MissingInterfaceBody,
 };
 
 class ErrorLabel {
