@@ -20,3 +20,7 @@ pub interface Foo<T> : Bar, Bar2<T> where T : Asdf {
 
     set x(value: u8);
 }
+
+let bar: T;
+mut let foo: u8;
+pub let x: Foo<T>;

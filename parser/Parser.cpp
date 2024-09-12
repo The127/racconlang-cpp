@@ -453,7 +453,7 @@ std::optional<InterfaceMethodDeclaration> Parser::interfaceMethodRule(treeIterat
     }
 
     if (start == end) {
-        auto error = CompilerError(UnexpectedToken, (start - 1)->getStart());
+        auto error = CompilerError(MissingSemicolon, (start - 1)->getStart());
         error.setNote("unexpected end of method declaration, expected `;`");
         addError(error);
         return std::move(decl);
@@ -464,6 +464,7 @@ std::optional<InterfaceMethodDeclaration> Parser::interfaceMethodRule(treeIterat
         error.addLabel("Missing semicolon", *start);
         addError(error);
     }else {
+        decl.endPos = start->getEnd();
         start += 1;
     }
 
@@ -526,6 +527,23 @@ std::optional<InterfaceGetter> Parser::interfaceGetterRule(treeIterator &start, 
         error.addLabel("unexpected end of getter declaration, expected return type", *start);
         addError(error);
         return std::move(decl);
+    }
+
+    if(start == end) {
+        auto error = CompilerError(MissingSemicolon, (start-1)->getStart());
+        error.setNote("expected a semicolon");
+        addError(error);
+    }
+
+    if(!start->isToken(TokenType::Semicolon)) {
+        if(start == end) {
+            auto error = CompilerError(MissingSemicolon, start->getStart());
+            error.setNote("expected a semicolon");
+            addError(error);
+        }
+    }else {
+        decl.endPos = start->getEnd();
+        start += 1;
     }
 
     return std::move(decl);
@@ -593,6 +611,23 @@ std::optional<InterfaceSetter> Parser::interfaceSetterRule(treeIterator &start, 
         addError(error);
     }else {
         decl.parameter = std::move(params[0]);
+    }
+
+    if(start == end) {
+        auto error = CompilerError(MissingSemicolon, (start-1)->getStart());
+        error.setNote("expected a semicolon");
+        addError(error);
+    }
+
+    if(!start->isToken(TokenType::Semicolon)) {
+        if(start == end) {
+            auto error = CompilerError(MissingSemicolon, start->getStart());
+            error.setNote("expected a semicolon");
+            addError(error);
+        }
+    }else {
+        decl.endPos = start->getEnd();
+        start += 1;
     }
 
     return std::move(decl);
@@ -990,10 +1025,14 @@ void Parser::moduleVariableRule(treeIterator &start, const treeIterator &end, st
     decl.endPos = start->getEnd();
     start += 1;
 
-    validateModifiers(modifiers, {TokenType::Pub});
+    validateModifiers(modifiers, {TokenType::Pub, TokenType::Mut});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
+    decl.isMut = containsModifier(modifiers, TokenType::Mut);
 
     if (start == end) {
+        auto error = CompilerError(MissingDeclarationName, decl.startPos);
+        error.addLabel("expected variable name", *(start-1));
+        addError(error);
         modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
         return;
     }
@@ -1007,11 +1046,60 @@ void Parser::moduleVariableRule(treeIterator &start, const treeIterator &end, st
     decl.endPos = decl.name->end();
 
     if (start == end) {
+        auto error = CompilerError(MissingSemicolon, decl.startPos);
+        error.addLabel("missing semicolon", *(start-1));
+        addError(error);
         modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
         return;
     }
 
-    //TODO:
+    if(!start->isToken(TokenType::Colon)) {
+        auto error = CompilerError(UnexpectedToken, decl.startPos);
+        error.addLabel("expected colon: `:`", *start);
+        addError(error);
+        modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
+    decl.endPos = start->getEnd();
+    start += 1;
+
+    if (start == end) {
+        auto error = CompilerError(MissingVariableType, decl.startPos);
+        error.addLabel("expected a type signature", *(start-1));
+        addError(error);
+        modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
+    decl.type = signatureRule(start, end);
+
+    if(!decl.type) {
+        auto error = CompilerError(MissingVariableType, decl.startPos);
+        error.addLabel("expected a type signature", *start);
+        addError(error);
+        modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
+    if (start == end) {
+        auto error = CompilerError(UnexpectedToken, (start - 1)->getStart());
+        error.setNote("unexpected end of method declaration, expected `;`");
+        addError(error);
+        modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
+        return;
+    }
+
+    if(!start->isToken(TokenType::Semicolon)) {
+        auto error = CompilerError(MissingSemicolon, decl.start());
+        error.addLabel("Missing semicolon", *start);
+        addError(error);
+    }else {
+        decl.endPos = start->getEnd();
+        start += 1;
+    }
+
+    modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
 }
 
 void Parser::declarationRule(treeIterator &start, const treeIterator &end) {

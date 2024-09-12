@@ -76,11 +76,7 @@ structDestructure
     ;
 
 functionDeclaration
-    : 'pub'? 'fn' Identifier genericParams? '(' parameterList ')' ('->' type)? constraintDeclaration* (methodBody | lambdaBody)
-    ;
-
-methodBody
-    : '{' '}'
+    : 'pub'? 'fn' Identifier genericParams? '(' parameterList ')' ('->' type)? constraintDeclaration* (blockExpression | lambdaBody)
     ;
 
 lambdaBody
@@ -92,7 +88,7 @@ aliasDeclaration
     ;
 
 moduleVariableDeclaration
-    : 'pub'? 'let' Identifier ':' type ';'
+    : 'pub'? 'let' 'mut'? Identifier ':' type ';'
     ;
 
 constraintDeclaration
@@ -155,6 +151,10 @@ parameterList
 
 parameter
     : ('mut' | 'ref')? Identifier ':' type
+    ;
+
+blockExpression
+    : '{' '}'
     ;
 
 Identifier

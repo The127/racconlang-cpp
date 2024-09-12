@@ -45,6 +45,7 @@ enum ErrorCode {
     MissingSetterName,
     MissingSetterParam,
     TooManySetterParams,
+    MissingVariableType,
 };
 
 class ErrorLabel {
