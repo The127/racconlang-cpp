@@ -8,6 +8,13 @@ pub enum Option<T>{
 }
 
 pub interface Foo<T> : Bar, Bar2<T> where T : Asdf {
+    pub fn foo();
+    pub fn foo3() -> mut u8;
+    mut pub fn foo2(a: u8, b: (u8, u8));
+    pub fn bar<T>(t: T);
+    pub fn qux<T1, T2>(value: T1) where T1 : SomeInterface<T2>;
+    pub fn qux2<T1, T2>(value: T1) -> T2 where T1 : SomeInterface<T2>;
+
     pub get x -> u8;
     pub mut get y -> mut Bar<T>;
 

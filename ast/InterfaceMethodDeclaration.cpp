@@ -30,7 +30,7 @@ std::string InterfaceMethodDeclaration::toString(const SourceMap &sources, int i
         result += std::string(indent, ' ') + "genericConstraints: " + NodeUtils::nodeListString(sources, genericConstraints, indent + 1, verbose) + "\n";
     }
     if(!parameters.empty()) {
-        result += std::string(indent, ' ') + "parameterTypes: " + NodeUtils::nodeListString(sources, parameters, indent + 1, verbose) + "\n";
+        result += std::string(indent, ' ') + "parameters: " + NodeUtils::nodeListString(sources, parameters, indent + 1, verbose) + "\n";
     }
 
     if(returnType) {

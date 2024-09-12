@@ -56,7 +56,7 @@ interfaceMethodDeclaration
     ;
 
 structDeclaration
-    : 'pub'? 'struct' Identifier genericParams? (';' | shortStructBody | longStructBody)
+    : 'pub'? 'struct' Identifier genericParams? (constraintDeclaration* ';' | shortStructBody | longStructBody)
     ;
 
 shortStructBody

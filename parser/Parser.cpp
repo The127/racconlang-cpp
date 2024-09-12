@@ -376,22 +376,96 @@ std::optional<InterfaceMethodDeclaration> Parser::interfaceMethodRule(treeIterat
     decl.endPos = decl.name->end();
 
     if (start == end) {
-        auto error = CompilerError(MissingMethodName, (start - 1)->getStart());
+        auto error = CompilerError(UnexpectedToken, (start - 1)->getStart());
         error.setNote("unexpected end of method declaration");
         addError(error);
         return std::nullopt;
     }
 
-    // generic params?
+    if(!start->isTokenTree(TokenType::OpenAngle) && !start->isTokenTree(TokenType::OpenParen)) {
+        auto error = CompilerError(UnexpectedToken, decl.start());
+        error.addLabel("expected generic parameters or method parameters", *start);
+        addError(error);
+        recoverUntil(start, end, [](const TokenTreeNode &node) {
+            return node.isTokenTree(TokenType::OpenParen)
+                || node.isTokenTree(TokenType::OpenAngle)
+                || node.isToken(TokenType::Semicolon);
+        }, false);
+        if(start->isToken(TokenType::Semicolon)) {
+            start += 1;
+            return std::nullopt;
+        }
+        if(start == end) {
+            return std::nullopt;
+        }
+    }
 
-    // ()
+    if (start->isTokenTree(TokenType::OpenAngle)) {
+        decl.endPos = start->getEnd();
+        decl.genericParams = std::move(identifierListRule(*start, TokenType::OpenAngle));
+        start += 1;
+    }
 
-    // -> mut type?
+    if (start == end) {
+        auto error = CompilerError(UnexpectedToken, (start - 1)->getStart());
+        error.setNote("unexpected end of method declaration, expected method parameters");
+        addError(error);
+        return std::nullopt;
+    }
 
-    // constraints
+    if(!start->isTokenTree(TokenType::OpenParen)) {
+        auto error = CompilerError(UnexpectedToken, decl.start());
+        error.addLabel("expected method parameters", *start);
+        addError(error);
+        return std::nullopt;
+    }
 
-    // ;
+    decl.parameters = parameterListRule(*start, TokenType::OpenParen);
+    start += 1;
 
+    if (start == end) {
+        auto error = CompilerError(UnexpectedToken, (start - 1)->getStart());
+        error.setNote("unexpected end of method declaration, expected return type, generic constraints or `;`");
+        addError(error);
+        return std::move(decl);
+    }
+
+    if(start->isToken(TokenType::DashArrow)) {
+        start += 1;
+        if (start == end) {
+            auto error = CompilerError(UnexpectedToken, (start - 1)->getStart());
+            error.setNote("unexpected end of method declaration, expected return type, generic constraints or `;`");
+            addError(error);
+            return std::nullopt;
+        }
+
+        decl.returnType = returnTypeRule(start, end);
+        if(!decl.returnType) {
+            auto error = CompilerError(MissingMethodReturnType, decl.start());
+            error.addLabel("expected method return type", *start);
+            addError(error);
+            return std::nullopt;
+        }
+    }
+
+    while(auto constraint = genericConstraintRule(start, end)) {
+        decl.genericConstraints.emplace_back(std::move(*constraint));
+    }
+
+    if (start == end) {
+        auto error = CompilerError(UnexpectedToken, (start - 1)->getStart());
+        error.setNote("unexpected end of method declaration, expected `;`");
+        addError(error);
+        return std::move(decl);
+    }
+
+    if(!start->isToken(TokenType::Semicolon)) {
+        auto error = CompilerError(MissingSemicolon, decl.start());
+        error.addLabel("Missing semicolon", *start);
+        addError(error);
+    }else {
+        start += 1;
+    }
 
     return std::move(decl);
 }

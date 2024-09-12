@@ -39,6 +39,7 @@ enum ErrorCode {
     MissingInterfaceBody,
     RefAlreadyImpliesMut,
     MissingMethodName,
+    MissingMethodReturnType,
     MissingGetterName,
     MissingGetterReturnType,
     MissingSetterName,

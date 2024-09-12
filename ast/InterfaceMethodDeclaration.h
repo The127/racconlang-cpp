@@ -23,7 +23,7 @@ public:
     std::optional<Identifier> name;
     std::vector<Identifier> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
-    std::vector<std::unique_ptr<Parameter>> parameters;
+    std::vector<Parameter> parameters;
     std::optional<ReturnType> returnType;
 
     [[nodiscard]] uint64_t start() const override;
