@@ -50,9 +50,9 @@ interfaceDeclaration
     ;
 
 interfaceMethodDeclaration
-    : 'pub'? 'fn' Identifier genericParams? '(' namedTypeList ')' ('->' type)? constraintDeclaration* ';'
-    | 'pub'? 'get' Identifier ';'
-    | 'pub'? 'set' Identifier ';'
+    : 'pub'? 'mut'? 'fn' Identifier genericParams? '(' parameterList ')' ('->' returnType)? constraintDeclaration* ';'
+    | 'pub'? 'mut'? 'get' Identifier '->' returnType ';'
+    | 'pub'? 'mut'? 'set' Identifier '(' parameter ')' ';'
     ;
 
 structDeclaration
@@ -60,7 +60,7 @@ structDeclaration
     ;
 
 shortStructBody
-    : '(' namedTypeList ')' constraintDeclaration*
+    : '(' parameterList ')' constraintDeclaration*
     ;
 
 longStructBody
@@ -76,7 +76,7 @@ structDestructure
     ;
 
 functionDeclaration
-    : 'pub'? 'fn' Identifier genericParams? '(' namedTypeList ')' ('->' type)? constraintDeclaration* (methodBody | lambdaBody)
+    : 'pub'? 'fn' Identifier genericParams? '(' parameterList ')' ('->' type)? constraintDeclaration* (methodBody | lambdaBody)
     ;
 
 methodBody
@@ -123,6 +123,10 @@ typeList
     : type (',' type)* ','?
     ;
 
+returnType
+    : 'mut'? type
+    ;
+
 type
     : typeName
     | tupleType
@@ -145,12 +149,16 @@ fnType
     : 'fn' genericArguments? '(' typeList ')' ('->' type)? constraintDeclaration*
     ;
 
-namedTypeList
-    : Identifier ':' type (Identifier ':' type)* ','?
+parameterList
+    : parameter (',' parameter)* ','?
+    ;
+
+parameter
+    : ('mut' | 'ref')? Identifier ':' type
     ;
 
 Identifier
-    : 'Identifier'
+    : [@] [a-zA-Z_] [a-zA-Z0-9_]*
     ;
 
 // comments and white space -> ignored

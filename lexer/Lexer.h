@@ -12,11 +12,15 @@
 
 class Lexer {
 public:
-    const std::shared_ptr<Source> source;
+    Source& source;
 
-    explicit Lexer(std::shared_ptr<Source> source)
-        : source(std::move(source)) {
+    explicit Lexer(Source& source)
+        : source(source) {
     }
+
+    Lexer(const Lexer&) = delete;
+    Lexer& operator=(const Lexer&) = delete;
+    Lexer(Lexer&&) = default;
 
     TokenTree tokenize();
 

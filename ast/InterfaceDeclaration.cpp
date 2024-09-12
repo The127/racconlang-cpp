@@ -34,7 +34,11 @@ std::string InterfaceDeclaration::toString(const SourceMap &sources, const int i
 
     if(!methods.empty())
         result += std::string(indent, ' ') + "methods: " + NodeUtils::nodeListString(sources, methods, indent + 1, verbose) + "\n";
+    if(!getters.empty())
+        result += std::string(indent, ' ') + "getters: " + NodeUtils::nodeListString(sources, getters, indent + 1, verbose) + "\n";
+    if(!setters.empty())
+        result += std::string(indent, ' ') + "setters: " + NodeUtils::nodeListString(sources, setters, indent + 1, verbose) + "\n";
 
-    result += std::string(indent - 1, ' ') + "},";
+    result += std::string(indent - 1, ' ') + "}";
     return std::move(result);
 }

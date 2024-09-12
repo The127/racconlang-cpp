@@ -18,13 +18,17 @@ using treeIterator = std::vector<TokenTreeNode>::const_iterator;
 
 class Parser {
 public:
-    const std::shared_ptr<Source> source;
+    Source& source;
 
-    explicit Parser(std::shared_ptr<Source> source)
-            : source(std::move(source)) {
+    explicit Parser(Source& source)
+            : source(source) {
         modules.emplace_back();
         uses = std::make_shared<FileUses>();
     }
+
+    Parser(const Parser&) = delete;
+    Parser& operator=(const Parser&) = delete;
+    Parser(Parser&&) = default;
 
     std::vector<ModuleDeclaration> parse();
 
@@ -46,6 +50,10 @@ private:
 
     void enumRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
     std::optional<EnumMemberDeclaration> enumMemberRule(treeIterator &start, const treeIterator &end);
+
+    std::optional<InterfaceMethodDeclaration> interfaceMethodRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
+    std::optional<InterfaceGetter> interfaceGetterRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
+    std::optional<InterfaceSetter> interfaceSetterRule(treeIterator &tart, const treeIterator &end, std::vector<Token> modifiers);
 
     void interfaceRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
 
@@ -72,6 +80,8 @@ private:
     [[nodiscard]] std::optional<TypeSignature> typeSignatureRule(treeIterator &start, const treeIterator &end);
     [[nodiscard]] std::optional<FunctionSignature> functionSignatureRule(treeIterator &start, const treeIterator &end);
     [[nodiscard]] std::optional<TupleSignature> tupleSignatureRule(treeIterator &start, const treeIterator &end);
+
+    [[nodiscard]] std::optional<ReturnType> returnTypeRule(treeIterator &start, const treeIterator &end);
 
     [[nodiscard]] std::vector<Identifier> identifierListRule(const TokenTreeNode &node, TokenType opener);
     [[nodiscard]] std::vector<Parameter> parameterListRule(const TokenTreeNode &node, TokenType opener);

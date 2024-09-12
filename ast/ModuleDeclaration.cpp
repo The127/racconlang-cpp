@@ -40,6 +40,6 @@ std::string ModuleDeclaration::toString(const SourceMap &sources, const int inde
     if(!functionDeclarations.empty())
         result += std::string(indent, ' ') + "functionDeclarations: " + NodeUtils::nodeListString(sources, functionDeclarations, indent + 1, verbose) + "\n";
 
-    result += std::string(indent - 1, ' ') + "},";
+    result += std::string(indent - 1, ' ') + "}";
     return std::move(result);
 }

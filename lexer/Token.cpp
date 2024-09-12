@@ -52,7 +52,9 @@ bool Token::isTopLevelStarter() const {
 }
 
 bool Token::isModifier() const {
-    return type == TokenType::Pub;
+    return type == TokenType::Pub
+    || type == TokenType::Mut
+    || type == TokenType::Ref;
 }
 
 bool Token::isConstraintBreakout() const {

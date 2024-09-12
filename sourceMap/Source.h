@@ -33,9 +33,14 @@ public:
           offset(offset) {
     }
 
+    Source(const Source&) = delete;
+    Source& operator=(const Source&) = delete;
+    Source(Source&&) = default;
+
     void addLineBreak(uint32_t position);
     void addLineComment(uint32_t line, const Token& comment);
+    void addError(CompilerError error);
 
-    Location getLocation(uint32_t position);
+    Location getLocation(uint32_t position) const;
     [[nodiscard]] std::string_view getText(uint32_t start, uint32_t end) const;
 };

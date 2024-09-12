@@ -21,6 +21,6 @@ std::string TupleSignature::toString(const SourceMap &sources, const int indent,
         result += std::string(indent, ' ') + "types: " + NodeUtils::nodeListString(sources, types, indent + 1, verbose) + "\n";
     }
 
-    result += std::string(indent - 1, ' ') + "},";
+    result += std::string(indent - 1, ' ') + "}";
     return std::move(result);
 }

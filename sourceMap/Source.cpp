@@ -14,8 +14,12 @@ void Source::addLineComment(uint32_t line, const Token &comment) {
     lineComments.emplace(line, comment);
 }
 
+void Source::addError(CompilerError error) {
+    this->errors.emplace_back(std::move(error));
+}
 
-Location Source::getLocation(uint32_t position) {
+
+Location Source::getLocation(uint32_t position) const {
     const auto it = std::lower_bound(lineBreaks.begin(), lineBreaks.end(), position);
     const uint32_t lineBreakIndex = std::distance(lineBreaks.begin(), it);
 

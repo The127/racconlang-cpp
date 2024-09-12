@@ -8,4 +8,8 @@ pub enum Option<T>{
 }
 
 pub interface Foo<T> : Bar, Bar2<T> where T : Asdf {
+    pub get x -> u8;
+    pub mut get y -> mut Bar<T>;
+
+    set x(value: u8);
 }

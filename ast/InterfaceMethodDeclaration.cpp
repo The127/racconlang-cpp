@@ -17,7 +17,11 @@ uint64_t InterfaceMethodDeclaration::end() const {
 std::string InterfaceMethodDeclaration::toString(const SourceMap &sources, int indent, bool verbose) const {
     std::string result = NodeUtils::nameString(*this, "InterfaceMethodDeclaration", verbose) + "{\n";
 
-    result += std::string(indent, ' ') + "name: " + name.toString(sources, indent+1, verbose) + ",\n";
+    result += std::string(indent, ' ') + "isMut: " + std::to_string(isMut) + ",\n";
+
+    if(name) {
+        result += std::string(indent, ' ') + "name: " + name->toString(sources, indent+1, verbose) + ",\n";
+    }
 
     if(!genericParams.empty()) {
         result += std::string(indent, ' ') + "genericParams: " + NodeUtils::nodeListString(sources, genericParams, indent + 1, verbose) + "\n";
@@ -30,9 +34,9 @@ std::string InterfaceMethodDeclaration::toString(const SourceMap &sources, int i
     }
 
     if(returnType) {
-        result += std::string(indent, ' ') + "returnType: " + (*returnType)->toString(sources, indent+1, verbose) + ",\n";
+        result += std::string(indent, ' ') + "returnType: " + returnType->toString(sources, indent+1, verbose) + ",\n";
     }
 
-    result += std::string(indent - 1, ' ') + "},";
+    result += std::string(indent - 1, ' ') + "}";
     return std::move(result);
 }

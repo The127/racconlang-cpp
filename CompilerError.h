@@ -37,6 +37,13 @@ enum ErrorCode {
     ParameterNameMissing,
     ParameterTypeMissing,
     MissingInterfaceBody,
+    RefAlreadyImpliesMut,
+    MissingMethodName,
+    MissingGetterName,
+    MissingGetterReturnType,
+    MissingSetterName,
+    MissingSetterParam,
+    TooManySetterParams,
 };
 
 class ErrorLabel {

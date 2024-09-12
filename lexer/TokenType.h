@@ -27,6 +27,8 @@ enum class TokenType {
     Where,          // where
     Get,            // get
     Set,            // set
+    Mut,            // mut
+    Ref,            // ref
 
     Colon,          // :
     PathSeparator,  // ::

@@ -17,15 +17,15 @@ std::vector<ModuleDeclaration> Parser::parse() {
 }
 
 void Parser::addError(const CompilerError &error) {
-    source->errors.push_back(error);
+    source.addError(error);
 }
 
 void Parser::parseFile() {
-    COMPILER_ASSERT(source->tokenTree, "Token tree was not set: " + source->fileName);
+    COMPILER_ASSERT(source.tokenTree, "Token tree was not set: " + source.fileName);
 
-    auto tokenTree = *source->tokenTree;
-    COMPILER_ASSERT(tokenTree.left.type == TokenType::Bof, "Token tree did not start with BOF: " + source->fileName);
-    COMPILER_ASSERT(tokenTree.right.isToken(TokenType::Eof), "Token tree did not end with an EOF: " + source->fileName);
+    auto tokenTree = *source.tokenTree;
+    COMPILER_ASSERT(tokenTree.left.type == TokenType::Bof, "Token tree did not start with BOF: " + source.fileName);
+    COMPILER_ASSERT(tokenTree.right.isToken(TokenType::Eof), "Token tree did not end with an EOF: " + source.fileName);
 
     treeIterator current = tokenTree.tokens.begin(); // NOLINT(*-use-auto)
     const auto end = tokenTree.tokens.end();
@@ -181,6 +181,7 @@ std::vector<Token> Parser::modifierRule(treeIterator &start, const treeIterator 
 }
 
 void Parser::validateModifiers(std::vector<Token> &modifiers, const std::vector<TokenType> &validTokenTypes) {
+    // TODO: check that the order is correct (but still return all the valid modifiers)
     std::vector<Token> result;
     std::string note = "valid modifiers are: ";
     for (int i{}; i < validTokenTypes.size(); ++i) {
@@ -335,6 +336,189 @@ std::optional<EnumMemberDeclaration> Parser::enumMemberRule(treeIterator &start,
             addError(error);
             recoverUntil(start, end, TokenType::Identifier, false);
         }
+    }
+
+    return std::move(decl);
+}
+
+std::optional<InterfaceMethodDeclaration> Parser::interfaceMethodRule(treeIterator &start, const treeIterator &end,
+                                                                      std::vector<Token> modifiers) {
+    if (start == end) {
+        return std::nullopt;
+    }
+    COMPILER_ASSERT(start->isToken() && start->isToken(TokenType::Fn),
+                    "interfaceMethodRule called with non-fn starting token");
+
+    auto decl = InterfaceMethodDeclaration();
+    decl.startPos = start->getStart();
+    start += 1;
+
+    validateModifiers(modifiers, {TokenType::Pub, TokenType::Mut});
+    if (!modifiers.empty()) {
+        decl.startPos = modifiers.front().start;
+        decl.isMut = containsModifier(modifiers, TokenType::Mut);
+    }
+
+    if (start == end) {
+        auto error = CompilerError(MissingMethodName, (start - 1)->getStart());
+        error.setNote("unexpected end of method declaration");
+        addError(error);
+        return std::nullopt;
+    }
+
+    decl.name = identifierRule(start, end);
+    if (!decl.name) {
+        auto error = CompilerError(MissingMethodName, decl.startPos);
+        error.addLabel("expected method name", *start);
+        addError(error);
+        return std::nullopt;
+    }
+    decl.endPos = decl.name->end();
+
+    if (start == end) {
+        auto error = CompilerError(MissingMethodName, (start - 1)->getStart());
+        error.setNote("unexpected end of method declaration");
+        addError(error);
+        return std::nullopt;
+    }
+
+    // generic params?
+
+    // ()
+
+    // -> mut type?
+
+    // constraints
+
+    // ;
+
+
+    return std::move(decl);
+}
+
+std::optional<InterfaceGetter> Parser::interfaceGetterRule(treeIterator &start, const treeIterator &end,
+                                                           std::vector<Token> modifiers) {
+    if (start == end) {
+        return std::nullopt;
+    }
+    COMPILER_ASSERT(start->isToken() && start->isToken(TokenType::Get),
+                    "interfaceGetterRule called with non-get starting token");
+
+    auto decl = InterfaceGetter();
+    decl.startPos = start->getStart();
+    start += 1;
+
+    validateModifiers(modifiers, {TokenType::Pub, TokenType::Mut});
+    if (!modifiers.empty()) {
+        decl.startPos = modifiers.front().start;
+        decl.isMut = containsModifier(modifiers, TokenType::Mut);
+    }
+
+    if (start == end) {
+        auto error = CompilerError(MissingGetterName, (start - 1)->getStart());
+        error.setNote("unexpected end of getter declaration");
+        addError(error);
+        return std::nullopt;
+    }
+
+    decl.name = identifierRule(start, end);
+    if (!decl.name) {
+        auto error = CompilerError(MissingGetterName, decl.startPos);
+        error.addLabel("expected getter name", *start);
+        addError(error);
+    }
+    decl.endPos = decl.name->end();
+
+    if (start == end) {
+        auto error = CompilerError(MissingGetterReturnType, (start - 1)->getStart());
+        error.setNote("unexpected end of getter declaration, expected return type`->`");
+        addError(error);
+        return std::move(decl);
+    }
+
+    if (!start->isToken(TokenType::DashArrow)) {
+        auto error = CompilerError(MissingGetterReturnType, decl.startPos);
+        error.addLabel("unexpected end of getter declaration, expected return type: `->`", *start);
+        addError(error);
+        return std::move(decl);
+    }
+
+    decl.endPos = start->getEnd();
+    start += 1;
+
+    decl.returnType = returnTypeRule(start, end);
+    if(!decl.returnType) {
+        auto error = CompilerError(MissingGetterReturnType, decl.startPos);
+        error.addLabel("unexpected end of getter declaration, expected return type", *start);
+        addError(error);
+        return std::move(decl);
+    }
+
+    return std::move(decl);
+}
+
+std::optional<InterfaceSetter> Parser::interfaceSetterRule(treeIterator &start, const treeIterator &end,
+                                                           std::vector<Token> modifiers) {
+    if (start == end) {
+        return std::nullopt;
+    }
+    COMPILER_ASSERT(start->isToken() && start->isToken(TokenType::Set),
+                    "interfaceSetterRule called with non-set starting token");
+
+    auto decl = InterfaceSetter();
+    decl.startPos = start->getStart();
+    start += 1;
+
+    validateModifiers(modifiers, {TokenType::Pub});
+    if (!modifiers.empty()) {
+        decl.startPos = modifiers.front().start;
+    }
+
+    if (start == end) {
+        auto error = CompilerError(MissingSetterName, (start - 1)->getStart());
+        error.setNote("unexpected end of setter declaration");
+        addError(error);
+        return std::nullopt;
+    }
+
+    decl.name = identifierRule(start, end);
+    if (!decl.name) {
+        auto error = CompilerError(MissingSetterName, decl.startPos);
+        error.addLabel("expected setter name", *start);
+        addError(error);
+        return std::nullopt;
+    }
+    decl.endPos = decl.name->end();
+
+    if (start == end) {
+        auto error = CompilerError(MissingSetterParam, (start - 1)->getStart());
+        error.setNote("unexpected end of setter declaration, expected parameter: `(`");
+        addError(error);
+        return std::move(decl);
+    }
+
+    if (!start->isTokenTree(TokenType::OpenParen)) {
+        auto error = CompilerError(MissingSetterParam, decl.startPos);
+        error.addLabel("unexpected end of setter declaration, expected parameter: `(`", *start);
+        addError(error);
+        return std::move(decl);
+    }
+
+    decl.endPos = start->getEnd();
+    auto params = parameterListRule(*start, TokenType::OpenParen);
+
+    if(params.size() > 1) {
+        auto error = CompilerError(TooManySetterParams, params[1].start());
+        error.setNote("setters must have exactly 1 parameter");
+        addError(error);
+    }
+
+    if (params.empty()) {
+        auto error = CompilerError(MissingSetterParam, (start-1)->getStart());
+        error.setNote("setters must have exactly 1 parameter");
+        addError(error);
+    }else {
+        decl.parameter = std::move(params[0]);
     }
 
     return std::move(decl);
@@ -533,8 +717,58 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
         addError(error);
     } else {
         decl.endPos = start->getEnd();
-        // TODO
-        start += 1;
+
+        auto tokenTree = start->getTokenTree();
+        if (tokenTree.right.isError()) {
+            auto error = CompilerError(WrongCloser, tokenTree.left);
+            error.addLabel(
+                "wrong closer for interface body, expected: " + TokenTypeStringQuoted(tokenTree.left.expectedClosing()),
+                tokenTree.right.getError().got);
+            addError(error);
+        }
+
+        treeIterator bodyStart = tokenTree.tokens.begin(); // NOLINT(*-use-auto)
+        auto bodyEnd = tokenTree.tokens.end();
+
+        while (bodyStart != bodyEnd) {
+            auto originalStart = bodyStart;
+            std::vector<Token> memberModifiers;
+            if (bodyStart->isToken() && bodyStart->getToken().isModifier()) {
+                memberModifiers = modifierRule(bodyStart, bodyEnd);
+                validateModifiers(memberModifiers, {TokenType::Pub, TokenType::Mut});
+            }
+            if (bodyStart == bodyEnd) {
+                auto error = CompilerError(UnexpectedToken, originalStart->getStart());
+                error.addLabel("unexpected token here", *originalStart);
+                break;
+            }
+
+            if (bodyStart->isToken(TokenType::Fn)) {
+                auto method = interfaceMethodRule(bodyStart, bodyEnd, std::move(memberModifiers));
+                if (method) {
+                    decl.methods.emplace_back(std::move(*method));
+                }
+            } else if (bodyStart->isToken(TokenType::Get)) {
+                auto getter = interfaceGetterRule(bodyStart, bodyEnd, std::move(memberModifiers));
+                if (getter) {
+                    decl.getters.emplace_back(std::move(*getter));
+                }
+            } else if (bodyStart->isToken(TokenType::Set)) {
+                auto setter = interfaceSetterRule(bodyStart, bodyEnd, std::move(memberModifiers));
+                if (setter) {
+                    decl.setters.emplace_back(std::move(*setter));
+                }
+            } else {
+                auto error = CompilerError(UnexpectedToken, originalStart->getStart());
+                error.addLabel("unexpected token here", *bodyStart);
+                recoverUntil(bodyStart, bodyEnd, [](const TokenTreeNode &node) {
+                    return node.isToken() && (
+                               node.getToken().isModifier()
+                               || node.isToken(TokenType::Get)
+                               || node.isToken(TokenType::Set));
+                }, false);
+            }
+        }
     }
 
     modules.back().interfaceDeclarations.emplace_back(std::move(decl));
@@ -860,7 +1094,7 @@ std::optional<Identifier> Parser::identifierRule(treeIterator &start, const tree
     }
 
     start += 1;
-    return Identifier(current->getToken(), *source);
+    return Identifier::make(current->getToken(), source);
 }
 
 std::optional<std::unique_ptr<SignatureBase> > Parser::signatureRule(treeIterator &start, const treeIterator &end) {
@@ -980,6 +1214,35 @@ std::optional<TupleSignature> Parser::tupleSignatureRule(treeIterator &start, co
     return std::move(decl);
 }
 
+std::optional<ReturnType> Parser::returnTypeRule(treeIterator &start, const treeIterator &end) {
+    if(start == end) {
+        return std::nullopt;
+    }
+
+    ReturnType result;
+
+    auto modifiers = modifierRule(start, end);
+    validateModifiers(modifiers, {TokenType::Mut});
+    result.isMut = containsModifier(modifiers, TokenType::Mut);
+
+    if(!modifiers.empty()) {
+        result.startPos = modifiers.front().start;
+        result.endPos = modifiers.back().end;
+    }
+
+    auto type = signatureRule(start, end);
+    if(!type) {
+        return std::nullopt;
+    }
+
+    result.type = std::move(*type);
+    if(modifiers.empty()) {
+        result.endPos = result.type->end();
+    }
+
+    return std::move(result);
+}
+
 std::vector<Identifier> Parser::identifierListRule(const TokenTreeNode &node, TokenType opener) {
     if (!node.isTokenTree()) {
         auto error = CompilerError(UnexpectedToken, node.getStart());
@@ -1071,6 +1334,9 @@ std::vector<Parameter> Parser::parameterListRule(const TokenTreeNode &node, Toke
     const auto end = list.tokens.end();
 
     while (current != end) {
+        auto modifiers = modifierRule(current, end);
+        validateModifiers(modifiers, {TokenType::Mut, TokenType::Ref});
+
         auto identifier = identifierRule(current, end);
         if (!identifier) {
             auto error = CompilerError(ParameterNameMissing, node.getStart());
@@ -1078,6 +1344,21 @@ std::vector<Parameter> Parser::parameterListRule(const TokenTreeNode &node, Toke
             addError(error);
             recoverUntil(current, end, TokenType::Comma, true);
             continue;
+        }
+
+        if(current == end) {
+            auto error = CompilerError(ParameterTypeMissing, node.getStart());
+            error.addLabel("expected `:`", *(current-1));
+            addError(error);
+            return std::move(result);
+        }
+
+        if(!current->isToken(TokenType::Colon)) {
+            auto error = CompilerError(UnexpectedToken, node.getStart());
+            error.addLabel("expected `:`", *current);
+            addError(error);
+        }else {
+            current += 1;
         }
 
         auto signature = signatureRule(current, end);
@@ -1089,7 +1370,16 @@ std::vector<Parameter> Parser::parameterListRule(const TokenTreeNode &node, Toke
             continue;
         }
 
-        result.emplace_back(std::move(*identifier), std::move(*signature));
+        result.emplace_back(containsModifier(modifiers, TokenType::Mut),
+                            containsModifier(modifiers, TokenType::Ref),
+                            std::move(*identifier),
+                            std::move(*signature));
+
+        if (result.back().isMut && result.back().isRef) {
+            auto error = CompilerError(RefAlreadyImpliesMut, modifiers.front());
+            error.setNote("redundant `mut` specification, `ref` implies `mut`");
+            addError(error);
+        }
 
         if (current != end) {
             if (node.isToken(TokenType::Comma)) {

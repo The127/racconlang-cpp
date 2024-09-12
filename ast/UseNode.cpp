@@ -23,6 +23,6 @@ std::string UseNode::toString(const SourceMap &sources, const int indent, const 
     if(!names.empty())
         result += std::string(indent, ' ') + "names: [" + StringUtils::join(names, ", ") + "],\n";
 
-    result += std::string(indent - 1, ' ') + "},";
+    result += std::string(indent - 1, ' ') + "}";
     return std::move(result);
 }

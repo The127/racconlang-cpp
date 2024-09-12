@@ -21,6 +21,6 @@ std::string PropertyDeclaration::toString(const SourceMap &sources, const int in
     result += std::string(indent, ' ') + "name: " + name.toString(sources, indent+1, verbose) + ",\n";
     result += std::string(indent, ' ') + "type: " + type->toString(sources, indent+1, verbose) + ",\n";
 
-    result += std::string(indent - 1, ' ') + "},";
+    result += std::string(indent - 1, ' ') + "}";
     return std::move(result);
 }

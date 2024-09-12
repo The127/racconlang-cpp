@@ -8,6 +8,9 @@
 
 #include "ConstraintDeclaration.h"
 #include "Identifier.h"
+#include "InterfaceGetter.h"
+#include "InterfaceMethodDeclaration.h"
+#include "InterfaceSetter.h"
 #include "TypeSignature.h"
 
 class InterfaceDeclaration final :public Node {
@@ -19,7 +22,9 @@ public:
     std::vector<Identifier> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
     std::vector<TypeSignature> requiredInterfaces;
-    std::vector<TypeSignature> methods;
+    std::vector<InterfaceMethodDeclaration> methods;
+    std::vector<InterfaceGetter> getters;
+    std::vector<InterfaceSetter> setters;
 
 
     [[nodiscard]] uint64_t start() const override;

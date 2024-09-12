@@ -7,11 +7,11 @@
 #include "InternalError.h"
 
 TokenTree Lexer::tokenize() {
-    COMPILER_ASSERT(!source->tokenTree, "Token tree was already set: " + source->fileName);
+    COMPILER_ASSERT(!source.tokenTree, "Token tree was already set: " + source.fileName);
     std::vector<TokenTree> stack{};
     std::vector<std::vector<Token>> commentStack{};
 
-    stack.emplace_back(Token(TokenType::Bof, source->offset, source->offset));
+    stack.emplace_back(Token(TokenType::Bof, source.offset, source.offset));
     commentStack.emplace_back();
 
     std::vector<Token> pending_comments;
@@ -23,8 +23,8 @@ TokenTree Lexer::tokenize() {
             pending_comments.push_back(tokenResult.get());
             continue;
         } else if (tokenResult.isToken(TokenType::LineComment)) {
-            auto loc = source->getLocation(tokenResult.getStart() - source->offset);
-            source->addLineComment(loc.line, tokenResult.get());
+            auto loc = source.getLocation(tokenResult.getStart() - source.offset);
+            source.addLineComment(loc.line, tokenResult.get());
             continue;
         }
 
@@ -131,22 +131,22 @@ TokenTree Lexer::tokenize() {
 
 TokenResult Lexer::nextToken() {
     peekToken(); // ensure that a token has been read and is available in `peeked`
-    position = peeked->getEnd() - source->offset;
+    position = peeked->getEnd() - source.offset;
     auto token = std::move(*peeked);
     peeked = {};
     return token;
 }
 
 void Lexer::consumeWhitespace() {
-    const auto length = source->text.length();
+    const auto length = source.text.length();
     while (position < length) {
         if (
-                source->text[position] == ' '
-                || source->text[position] == '\t'
+                source.text[position] == ' '
+                || source.text[position] == '\t'
                 ) {
             position += 1;
-        } else if (source->text[position] == '\n') {
-            source->addLineBreak(position);
+        } else if (source.text[position] == '\n') {
+            source.addLineBreak(position);
             position += 1;
         } else {
             break;
@@ -161,36 +161,36 @@ const TokenResult& Lexer::peekToken() {
 
     consumeWhitespace();
 
-    if (position >= source->text.length()) {
+    if (position >= source.text.length()) {
         peeked = Token(TokenType::Eof, position, position);
         return *peeked;
     }
 
-    const auto ch = source->text[position];
+    const auto ch = source.text[position];
     switch (ch) {
         case '{':
-            peeked = Token(TokenType::OpenCurly, source->offset + position, source->offset + position + 1);
+            peeked = Token(TokenType::OpenCurly, source.offset + position, source.offset + position + 1);
             return *peeked;
         case '}':
-            peeked = Token(TokenType::CloseCurly, source->offset + position, source->offset + position + 1);
+            peeked = Token(TokenType::CloseCurly, source.offset + position, source.offset + position + 1);
             return *peeked;
         case '(':
-            peeked = Token(TokenType::OpenParen, source->offset + position, source->offset + position + 1);
+            peeked = Token(TokenType::OpenParen, source.offset + position, source.offset + position + 1);
             return *peeked;
         case ')':
-            peeked = Token(TokenType::CloseParen, source->offset + position, source->offset + position + 1);
+            peeked = Token(TokenType::CloseParen, source.offset + position, source.offset + position + 1);
             return *peeked;
         case '<':
-            peeked = Token(TokenType::OpenAngle, source->offset + position, source->offset + position + 1);
+            peeked = Token(TokenType::OpenAngle, source.offset + position, source.offset + position + 1);
             return *peeked;
         case '>':
-            peeked = Token(TokenType::CloseAngle, source->offset + position, source->offset + position + 1);
+            peeked = Token(TokenType::CloseAngle, source.offset + position, source.offset + position + 1);
             return *peeked;
         case ';':
-            peeked = Token(TokenType::Semicolon, source->offset + position, source->offset + position + 1);
+            peeked = Token(TokenType::Semicolon, source.offset + position, source.offset + position + 1);
             return *peeked;
         case ',':
-            peeked = Token(TokenType::Comma, source->offset + position, source->offset + position + 1);
+            peeked = Token(TokenType::Comma, source.offset + position, source.offset + position + 1);
             return *peeked;
         case ':':
             peeked = colonRule();
@@ -217,69 +217,69 @@ const TokenResult& Lexer::peekToken() {
 }
 
 TokenResult Lexer::colonRule() const {
-    if (position + 1 < source->text.length() && source->text[position + 1] == ':') {
-        return Token(TokenType::PathSeparator, source->offset + position, source->offset + position + 2);
+    if (position + 1 < source.text.length() && source.text[position + 1] == ':') {
+        return Token(TokenType::PathSeparator, source.offset + position, source.offset + position + 2);
     }
-    return Token(TokenType::Colon, source->offset + position, source->offset + position + 1);
+    return Token(TokenType::Colon, source.offset + position, source.offset + position + 1);
 }
 
 TokenResult Lexer::dashRule() const {
-    if (position + 1 < source->text.length() && source->text[position + 1] == '>') {
-        return Token(TokenType::DashArrow, source->offset + position, source->offset + position + 2);
+    if (position + 1 < source.text.length() && source.text[position + 1] == '>') {
+        return Token(TokenType::DashArrow, source.offset + position, source.offset + position + 2);
     }
-    return LexerErr::UnexpectedInput(source->offset + position, source->offset + position + 1);
+    return LexerErr::UnexpectedInput(source.offset + position, source.offset + position + 1);
 }
 
 TokenResult Lexer::equalsRule() const {
-    if (position + 1 < source->text.length() && source->text[position + 1] == '>') {
-        return Token(TokenType::EqualArrow, source->offset + position, source->offset + position + 2);
+    if (position + 1 < source.text.length() && source.text[position + 1] == '>') {
+        return Token(TokenType::EqualArrow, source.offset + position, source.offset + position + 2);
     }
-    return Token(TokenType::Equals, source->offset + position, source->offset + position + 1);
+    return Token(TokenType::Equals, source.offset + position, source.offset + position + 1);
 }
 
 TokenResult Lexer::slashRule() const {
-    if (position + 1 < source->text.length()) {
-        const auto remaining = source->text.length() - position;
+    if (position + 1 < source.text.length()) {
+        const auto remaining = source.text.length() - position;
         uint32_t offset = 2;
-        if (source->text[position + 1] == '/') {
+        if (source.text[position + 1] == '/') {
             while (offset < remaining) {
-                if (source->text[position + offset] == '\n') {
+                if (source.text[position + offset] == '\n') {
                     break;
                 }
                 offset += 1;
             }
-            return Token(TokenType::LineComment, source->offset + position, source->offset + position + offset);
+            return Token(TokenType::LineComment, source.offset + position, source.offset + position + offset);
         }
-        if (source->text[position + 1] == '*') {
+        if (source.text[position + 1] == '*') {
             while (offset < remaining) {
-                if (offset + 1 < remaining && source->text[position + offset] == '*' && source->text[
+                if (offset + 1 < remaining && source.text[position + offset] == '*' && source.text[
                                                                                                 position + offset + 1] == '/') {
-                    return Token(TokenType::MultiLineComment, source->offset + position,
-                                 source->offset + position + offset + 2);
+                    return Token(TokenType::MultiLineComment, source.offset + position,
+                                 source.offset + position + offset + 2);
                 }
-                if (source->text[position + offset] == '\n') {
-                    source->addLineBreak(offset);
+                if (source.text[position + offset] == '\n') {
+                    source.addLineBreak(offset);
                 }
                 offset += 1;
             }
-            return LexerErr::UnexpectedEndOfInput(source->offset + position + offset, "*/");
+            return LexerErr::UnexpectedEndOfInput(source.offset + position + offset, "*/");
         }
     }
-    return LexerErr::UnexpectedInput(source->offset + position, source->offset + position + 1);
+    return LexerErr::UnexpectedInput(source.offset + position, source.offset + position + 1);
 }
 
 TokenResult Lexer::identifierRule() const {
-    auto ch = source->text[position];
+    auto ch = source.text[position];
     if (ch >= 'a' && ch <= 'z'
         || ch >= 'A' && ch <= 'Z'
         || ch == '_'
         || ch == '@'
             ) {
         uint32_t offset = 1;
-        const uint32_t remaining = source->text.length() - position;
+        const uint32_t remaining = source.text.length() - position;
 
         while (offset < remaining) {
-            ch = source->text[position + offset];
+            ch = source.text[position + offset];
             if (ch >= 'a' && ch <= 'z'
                 || ch >= 'A' && ch <= 'Z'
                 || ch >= '0' && ch <= '9'
@@ -291,13 +291,13 @@ TokenResult Lexer::identifierRule() const {
             }
         }
 
-        const auto text = source->getText(position, position + offset);
+        const auto text = source.getText(position, position + offset);
         auto tokenType = TokenType::Identifier;
 
         if (text == "_") {
             tokenType = TokenType::Discard;
         } else if (text == "@") {
-            return LexerErr::InvalidIdentifier(source->offset + position, source->offset + position + 1);
+            return LexerErr::InvalidIdentifier(source.offset + position, source.offset + position + 1);
         } else if (text == "use") {
             tokenType = TokenType::Use;
         } else if (text == "mod") {
@@ -324,13 +324,17 @@ TokenResult Lexer::identifierRule() const {
             tokenType = TokenType::Where;
         } else if (text == "get") {
             tokenType = TokenType::Get;
-        }else if (text == "set") {
+        } else if (text == "set") {
             tokenType = TokenType::Set;
+        } else if (text == "mut") {
+            tokenType = TokenType::Mut;
+        } else if (text == "ref") {
+            tokenType = TokenType::Ref;
         }
 
-        return Token(tokenType, source->offset + position, source->offset + position + offset);
+        return Token(tokenType, source.offset + position, source.offset + position + offset);
     }
-    return LexerErr::UnexpectedInput(source->offset + position, source->offset + position + 1);
+    return LexerErr::UnexpectedInput(source.offset + position, source.offset + position + 1);
 }
 
 TokenResult Lexer::quotedStringRule() {

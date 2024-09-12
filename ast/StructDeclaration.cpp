@@ -35,6 +35,6 @@ std::string StructDeclaration::toString(const SourceMap &sources, const int inde
 
     result += std::string(indent, ' ') + "destructuresInto: [" + StringUtils::join(destructureProperties, ", ") + "],";
 
-    result += std::string(indent - 1, ' ') + "},";
+    result += std::string(indent - 1, ' ') + "}";
     return std::move(result);
 }
