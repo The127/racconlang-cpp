@@ -15,10 +15,13 @@ public:
     uint64_t startPos{};
     uint64_t endPos{};
 
-    std::vector<std::unique_ptr<SignatureBase>> genericArguments;
-    std::vector<ConstraintDeclaration> genericConstraints;
     std::vector<std::unique_ptr<SignatureBase>> parameterTypes;
     std::optional<std::unique_ptr<SignatureBase>> returnType;
+
+    FunctionSignature();
+    FunctionSignature(FunctionSignature&&) noexcept;
+    FunctionSignature& operator=(FunctionSignature&&) noexcept;
+    ~FunctionSignature() override;
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;

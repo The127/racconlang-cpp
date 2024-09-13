@@ -3,8 +3,15 @@
 //
 
 #include "AliasDeclaration.h"
+#include "ConstraintDeclaration.h"
+#include "GenericConstraintBase.h"
 
 #include "utils/NodeUtils.h"
+
+AliasDeclaration::AliasDeclaration() = default;
+AliasDeclaration::AliasDeclaration(AliasDeclaration &&) noexcept = default;
+AliasDeclaration & AliasDeclaration::operator=(AliasDeclaration &&) noexcept = default;
+AliasDeclaration::~AliasDeclaration() = default;
 
 uint64_t AliasDeclaration::start() const {
     return startPos;

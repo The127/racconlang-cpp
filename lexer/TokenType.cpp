@@ -20,6 +20,7 @@ static std::map<TokenType, std::pair<std::string, std::string>> TokenTypes = {
     {TokenType::Struct, {"Struct", "struct"}},
     {TokenType::Destructures, {"Destructures", "destructures"}},
     {TokenType::Into, {"Into", "into"}},
+    {TokenType::DestructuresInto, {"DestructuresInto", "destructures into"}},
     {TokenType::Alias, {"Alias", "alias"}},
     {TokenType::Let, {"Let", "let"}},
     {TokenType::Pub, {"Pub", "pub"}},

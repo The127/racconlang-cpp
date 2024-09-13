@@ -6,12 +6,13 @@
 #include <string>
 #include <vector>
 
-#include "ConstraintDeclaration.h"
 #include "Identifier.h"
-#include "InterfaceGetter.h"
-#include "InterfaceMethodDeclaration.h"
-#include "InterfaceSetter.h"
 #include "TypeSignature.h"
+
+class InterfaceSetter;
+class InterfaceGetter;
+class InterfaceMethodDeclaration;
+class ConstraintDeclaration;
 
 class InterfaceDeclaration final :public Node {
 public:
@@ -26,6 +27,10 @@ public:
     std::vector<InterfaceGetter> getters;
     std::vector<InterfaceSetter> setters;
 
+    InterfaceDeclaration();
+    InterfaceDeclaration(InterfaceDeclaration&&) noexcept;
+    InterfaceDeclaration& operator=(InterfaceDeclaration&&) noexcept;
+    ~InterfaceDeclaration() override;
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;

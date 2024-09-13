@@ -5,6 +5,16 @@
 #include "TokenTreeNode.h"
 #include "sourceMap/SourceMap.h"
 
+TokenTreeNode::TokenTreeNode(TokenTree tree, std::vector<Token> comments): value(std::move(tree)), precedingComments(std::move(comments)) {
+}
+
+TokenTreeNode::TokenTreeNode(TokenResult result, std::vector<Token> comments): value(std::move(result)), precedingComments(std::move(comments)) {
+}
+
+TokenTreeNode::TokenTreeNode(TokenTreeNode &&) noexcept = default;
+TokenTreeNode & TokenTreeNode::operator=(TokenTreeNode &&) noexcept = default;
+TokenTreeNode::~TokenTreeNode() = default;
+
 bool TokenTreeNode::isTokenTree() const {
     return std::holds_alternative<TokenTree>(value);
 }
@@ -74,4 +84,16 @@ bool TokenTreeNode::isConstraintBreakout() const {
 
 bool TokenTreeNode::isSignatureStarter() const {
     return isTokenTree(TokenType::OpenParen) || isToken() && getToken().isSignatureStarter();
+}
+
+bool TokenTreeNode::isTopLevelStarter() const {
+    return isToken() && getToken().isTopLevelStarter();
+}
+
+bool TokenTreeNode::isModifier() const {
+    return isToken() && getToken().isTopLevelStarter();
+}
+
+bool TokenTreeNode::isDeclaratorKeyword() const {
+    return isToken() && getToken().isTopLevelStarter();
 }

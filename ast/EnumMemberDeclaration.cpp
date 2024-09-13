@@ -6,6 +6,15 @@
 
 #include "utils/NodeUtils.h"
 
+EnumMemberDeclaration::EnumMemberDeclaration(Identifier name)
+    : name(std::move(name)) {
+}
+
+EnumMemberDeclaration::EnumMemberDeclaration(EnumMemberDeclaration &&) noexcept = default;
+EnumMemberDeclaration & EnumMemberDeclaration::operator=(EnumMemberDeclaration &&) noexcept = default;
+
+EnumMemberDeclaration::~EnumMemberDeclaration() = default;
+
 uint64_t EnumMemberDeclaration::start() const {
     return startPos;
 }

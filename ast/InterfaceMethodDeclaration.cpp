@@ -4,7 +4,16 @@
 
 #include "InterfaceMethodDeclaration.h"
 
+#include "Parameter.h"
+#include "ConstraintDeclaration.h"
+
 #include "utils/NodeUtils.h"
+
+InterfaceMethodDeclaration::InterfaceMethodDeclaration() = default;
+
+InterfaceMethodDeclaration::InterfaceMethodDeclaration(InterfaceMethodDeclaration &&) noexcept = default;
+
+InterfaceMethodDeclaration::~InterfaceMethodDeclaration() = default;
 
 uint64_t InterfaceMethodDeclaration::start() const {
     return startPos;

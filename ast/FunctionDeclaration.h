@@ -7,11 +7,12 @@
 #include <string>
 #include <vector>
 
-#include "SignatureBase.h"
-#include "ConstraintDeclaration.h"
 #include "Identifier.h"
-#include "Parameter.h"
 #include "Node.h"
+#include "SignatureBase.h"
+
+class Parameter;
+class ConstraintDeclaration;
 
 class FunctionDeclaration final : public Node{
 public:
@@ -24,6 +25,11 @@ public:
     std::vector<Parameter> parameters;
     std::unique_ptr<SignatureBase> returnType;
     //TODO: body as expression
+
+    FunctionDeclaration();
+    FunctionDeclaration(FunctionDeclaration&&) noexcept;
+    FunctionDeclaration& operator=(FunctionDeclaration&&) noexcept;
+    ~FunctionDeclaration() override;
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;

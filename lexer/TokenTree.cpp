@@ -9,7 +9,15 @@
 #include <iostream>
 
 
-std::string TokenTree::toString(const SourceMap &sources, uint32_t indent) const {
+TokenTree::TokenTree(const Token &left): left(left),
+                                         right(Token(TokenType::Error, 0, 0)) {
+}
+
+TokenTree::TokenTree(TokenTree &&) noexcept = default;
+TokenTree & TokenTree::operator=(TokenTree &&) noexcept = default;
+TokenTree::~TokenTree() = default;
+
+std::string TokenTree::toString(const SourceMap &sources, const uint32_t indent) const {
     std::string result;
 
     result += std::string(indent, ' ');

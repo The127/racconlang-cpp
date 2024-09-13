@@ -17,12 +17,14 @@
 
 enum ErrorCode {
     MissingSemicolon,
+    MissingStructBody,
     UseAfterMod,
     UseIsMissingPath,
     PathHasTrailingSeparator,
     WrongOpener,
     WrongCloser,
     UnexpectedToken,
+    UnexpectedEndOfInput,
     DuplicateModifier,
     InvalidModifier,
     MissingDeclarationName,
@@ -54,9 +56,7 @@ public:
     uint64_t start;
     uint64_t end;
 
-    ErrorLabel(std::string text, const uint64_t start, const uint64_t end)
-        : text(std::move(text)), start(start), end(end) {
-    }
+    ErrorLabel(std::string text, uint64_t start, uint64_t end);
 };
 
 class CompilerError {
@@ -67,47 +67,28 @@ public:
     std::optional<std::string> note;
 
 
-    CompilerError(const ErrorCode code, const uint64_t position)
-        : code(code), position(position) {
-    }
+    CompilerError(ErrorCode code, uint64_t position);
+    CompilerError(ErrorCode code, const Token &token);
 
-    CompilerError(const ErrorCode code, const Token &token)
-        : code(code), position(token.start) {
-    }
+    CompilerError(CompilerError&&) noexcept;
+    CompilerError& operator=(CompilerError&&) noexcept;
+    ~CompilerError();
 
-    void addLabel(const ErrorLabel &label) {
-        labels.push_back(label);
-    }
+    void addLabel(const ErrorLabel &label);
 
-    void addLabel(const std::string &text, const uint64_t start, const uint64_t end) {
-        labels.emplace_back(text, start, end);
-    }
+    void addLabel(const std::string &text, uint64_t start, uint64_t end);
 
-    void addLabel(const std::string &text, const Token &startToken, const Token &endToken) {
-        labels.emplace_back(text, startToken.start, endToken.end);
-    }
+    void addLabel(const std::string &text, const Token &startToken, const Token &endToken);
 
-    void addLabel(const std::string &text, const Token &token) {
-        addLabel(text, token, token);
-    }
+    void addLabel(const std::string &text, const Token &token);
 
-    void addLabel(const std::string &text, const TokenResult &result) {
-        addLabel(text, result.getOrErrorToken());
-    }
+    void addLabel(const std::string &text, const TokenResult &result);
 
-    void addLabel(const std::string &text, const TokenResult &startResult, const TokenResult &endResult) {
-        addLabel(text, startResult.getOrErrorToken(), endResult.getOrErrorToken());
-    }
+    void addLabel(const std::string &text, const TokenResult &startResult, const TokenResult &endResult);
 
-    void addLabel(const std::string &text, const TokenTree &tree) {
-        addLabel(text, tree.left, tree.right.getOrErrorToken());
-    }
+    void addLabel(const std::string &text, const TokenTree &tree);
 
-    void addLabel(const std::string &text, const TokenTreeNode &node) {
-        addLabel(text, node.getStart(), node.getEnd());
-    }
+    void addLabel(const std::string &text, const TokenTreeNode &node);
 
-    void setNote(const std::string& note) {
-        this->note = note;
-    }
+    void setNote(const std::string& note);
 };

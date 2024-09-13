@@ -6,6 +6,11 @@
 
 #include "utils/NodeUtils.h"
 
+InterfaceGetter::InterfaceGetter() = default;
+InterfaceGetter::InterfaceGetter(InterfaceGetter &&) noexcept = default;
+InterfaceGetter & InterfaceGetter::operator=(InterfaceGetter &&) noexcept = default;
+InterfaceGetter::~InterfaceGetter() = default;
+
 uint64_t InterfaceGetter::start() const {
     return startPos;
 }

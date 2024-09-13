@@ -11,7 +11,7 @@
 namespace StringUtils {
 
     template<typename T>
-    static std::string join(const std::vector<T> values, const std::string &delimiter) {
+    static std::string join(const std::vector<T>& values, const std::string &delimiter) {
         std::stringstream result;
 
         for (const auto &value : values) {

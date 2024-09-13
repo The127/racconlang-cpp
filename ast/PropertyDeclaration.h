@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <iostream>
 #include <memory>
 #include <string>
 
@@ -17,12 +18,14 @@ public:
     uint64_t startPos{};
     uint64_t endPos{};
     bool isPublic = false;
+    bool isMut = false;
     Identifier name;
-    std::unique_ptr<SignatureBase> type;
+    std::optional<std::unique_ptr<SignatureBase>> type;
 
-    PropertyDeclaration(Identifier name)
-        : name(std::move(name)) {
-    }
+    explicit PropertyDeclaration(const Identifier& name);
+    PropertyDeclaration(PropertyDeclaration&&) noexcept;
+    PropertyDeclaration& operator=(PropertyDeclaration&&) noexcept;
+    ~PropertyDeclaration() override;
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;

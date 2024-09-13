@@ -3,9 +3,16 @@
 //
 
 #include "StructDeclaration.h"
+#include "PropertyDeclaration.h"
+#include "ConstraintDeclaration.h"
 
 #include "utils/NodeUtils.h"
 #include "utils/StringUtils.h"
+
+StructDeclaration::StructDeclaration() = default;
+StructDeclaration::StructDeclaration(StructDeclaration &&) noexcept = default;
+StructDeclaration & StructDeclaration::operator=(StructDeclaration &&) noexcept = default;
+StructDeclaration::~StructDeclaration() = default;
 
 uint64_t StructDeclaration::start() const {
     return startPos;

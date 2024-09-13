@@ -18,12 +18,10 @@ public:
     Identifier name;
     std::unique_ptr<SignatureBase> type;
 
-    explicit Parameter(const bool isMut, const bool isRef, Identifier name, std::unique_ptr<SignatureBase> type)
-        : isMut(isMut)
-          , isRef(isRef)
-          , name(std::move(name))
-          , type(std::move(type)) {
-    }
+    explicit Parameter(bool isMut, bool isRef, Identifier name, std::unique_ptr<SignatureBase> type);
+    Parameter(Parameter&&) noexcept;
+    Parameter& operator=(Parameter&&) noexcept;
+    ~Parameter() override;
 
     [[nodiscard]] uint64_t start() const override;
 

@@ -3,8 +3,17 @@
 //
 
 #include "InterfaceDeclaration.h"
+#include "ConstraintDeclaration.h"
+#include "InterfaceGetter.h"
+#include "InterfaceMethodDeclaration.h"
+#include "InterfaceSetter.h"
 
 #include "utils/NodeUtils.h"
+
+InterfaceDeclaration::InterfaceDeclaration() = default;
+InterfaceDeclaration::InterfaceDeclaration(InterfaceDeclaration &&) noexcept = default;
+InterfaceDeclaration & InterfaceDeclaration::operator=(InterfaceDeclaration &&) noexcept = default;
+InterfaceDeclaration::~InterfaceDeclaration() = default;
 
 uint64_t InterfaceDeclaration::start() const {
     return startPos;

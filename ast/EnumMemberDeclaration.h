@@ -19,9 +19,10 @@ public:
     Identifier name;
     std::vector<std::unique_ptr<SignatureBase>> values;
 
-    explicit EnumMemberDeclaration(Identifier name)
-        : name(std::move(name)) {
-    }
+    explicit EnumMemberDeclaration(Identifier name);
+    EnumMemberDeclaration(EnumMemberDeclaration&&) noexcept;
+    EnumMemberDeclaration& operator=(EnumMemberDeclaration&&) noexcept;
+    ~EnumMemberDeclaration() override;
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;

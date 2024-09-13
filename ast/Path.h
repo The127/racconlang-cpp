@@ -13,9 +13,14 @@
 
 class Path final : public Node {
 public:
-    std::optional<Token> rooted{};
-    std::vector<Identifier> parts{};
-    std::optional<Token> trailer{};
+    std::optional<Token> rooted;
+    std::vector<Identifier> parts;
+    std::optional<Token> trailer;
+
+    Path();
+    Path(Path&&) noexcept;
+    Path& operator=(Path&&) noexcept;
+    ~Path() override;
 
     [[nodiscard]] bool isRooted() const;
     [[nodiscard]] bool isTrailing() const;

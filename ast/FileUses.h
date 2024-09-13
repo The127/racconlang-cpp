@@ -11,4 +11,9 @@ class FileUses {
 public:
     bool isVerified{};
     std::vector<UseNode> uses;
+
+    FileUses();
+    FileUses(FileUses&& other) noexcept;
+    FileUses& operator=(FileUses&& other) noexcept;
+    ~FileUses();
 };

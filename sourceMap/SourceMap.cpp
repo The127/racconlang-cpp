@@ -3,38 +3,47 @@
 //
 
 #include "SourceMap.h"
+
+#include "Location.h"
+#include "Source.h"
 #include "lexer/Token.h"
 
-Source& SourceMap::addEntry(const std::string &fileName) {
+SourceMap::SourceMap() = default;
+
+SourceMap & SourceMap::operator=(SourceMap &&) noexcept = default;
+SourceMap::SourceMap(SourceMap &&) noexcept = default;
+
+std::shared_ptr<Source> SourceMap::addEntry(const std::string &fileName) {
     std::ifstream file(fileName);
     if (!file.is_open()) {
         throw std::runtime_error("Could not open file: " + fileName);
     }
     std::string text(std::istreambuf_iterator<char>(file), {});
 
-    auto& entry = entries.emplace_back(fileName, std::move(text), offset);
+    auto source = std::make_shared<Source>(fileName, std::move(text), offset);
+    entries.push_back(source);
 
     offset += text.size();
-    return entry;
+    return std::move(source);
 }
 
-const Source& SourceMap::findEntryByPosition(const uint64_t position) const {
+std::shared_ptr<Source> SourceMap::findEntryByPosition(const uint64_t position) const {
     const auto it = std::lower_bound(entries.begin(), entries.end(), position,
-        [](const Source &entry, const uint64_t pos) {
-            return entry.offset <= pos;
+        [](const std::shared_ptr<Source> &entry, const uint64_t pos) {
+            return entry->offset <= pos;
         });
     const auto index = std::distance(entries.begin(), it) - 1;
     return entries[index];
 }
 
 Location SourceMap::getLocation(const uint64_t position) const {
-    auto& entry = findEntryByPosition(position);
-    return entry.getLocation(position - entry.offset);
+    const auto entry = findEntryByPosition(position);
+    return entry->getLocation(position - entry->offset);
 }
 
 std::string_view SourceMap::getText(const uint64_t start, const uint64_t end) const {
-    auto& entry = findEntryByPosition(start);
-    return entry.getText(start - entry.offset, end - entry.offset);
+    const auto entry = findEntryByPosition(start);
+    return entry->getText(start - entry->offset, end - entry->offset);
 }
 
 

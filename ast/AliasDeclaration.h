@@ -9,9 +9,10 @@
 #include <optional>
 #include <vector>
 
-#include "ConstraintDeclaration.h"
 #include "Identifier.h"
 #include "Node.h"
+
+class ConstraintDeclaration;
 
 class AliasDeclaration final : public Node {
 public:
@@ -21,6 +22,11 @@ public:
     std::optional<Identifier> name;
     std::vector<Identifier> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
+
+    AliasDeclaration();
+    AliasDeclaration(AliasDeclaration&&) noexcept;
+    AliasDeclaration& operator=(AliasDeclaration&&) noexcept;
+    ~AliasDeclaration() override;
     
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;

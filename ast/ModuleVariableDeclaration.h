@@ -19,6 +19,11 @@ public:
     std::optional<Identifier> name;
     std::optional<std::unique_ptr<SignatureBase>> type;
 
+    ModuleVariableDeclaration();
+    ModuleVariableDeclaration(ModuleVariableDeclaration&&) noexcept;
+    ModuleVariableDeclaration& operator=(ModuleVariableDeclaration&&) noexcept;
+    ~ModuleVariableDeclaration() override;
+
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;
 

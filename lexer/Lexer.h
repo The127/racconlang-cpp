@@ -4,23 +4,21 @@
 
 #pragma once
 
-#include <utility>
-
 #include "TokenTree.h"
-#include "../sourceMap/Source.h"
+#include "sourceMap/Source.h"
 
 
 class Lexer {
 public:
-    Source& source;
+    std::shared_ptr<Source> source;
 
-    explicit Lexer(Source& source)
-        : source(source) {
-    }
+    explicit Lexer(std::shared_ptr<Source> source);
 
     Lexer(const Lexer&) = delete;
     Lexer& operator=(const Lexer&) = delete;
-    Lexer(Lexer&&) = default;
+    Lexer(Lexer&&) noexcept;
+    Lexer& operator=(Lexer&&) noexcept;
+    ~Lexer();
 
     TokenTree tokenize();
 

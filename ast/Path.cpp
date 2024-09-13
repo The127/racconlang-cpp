@@ -4,7 +4,13 @@
 
 #include "Path.h"
 
+#include "InternalError.h"
 #include "utils/StringUtils.h"
+
+Path::Path() = default;
+Path::Path(Path &&) noexcept = default;
+Path & Path::operator=(Path &&) noexcept = default;
+Path::~Path() = default;
 
 bool Path::isRooted() const {
     return rooted.has_value();

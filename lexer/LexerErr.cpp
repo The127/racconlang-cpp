@@ -3,7 +3,16 @@
 //
 
 #include "LexerErr.h"
+
+#include "sourceMap/Location.h"
 #include "sourceMap/SourceMap.h"
+
+LexerErr::LexerErr(LexerErrReason reason, const Token &got, std::vector<std::string> expected): reason(reason), got(got), expected(std::move(expected)) {
+}
+
+LexerErr::LexerErr(LexerErr &&) noexcept = default;
+LexerErr & LexerErr::operator=(LexerErr &&) noexcept = default;
+LexerErr::~LexerErr() = default;
 
 LexerErr LexerErr::UnclosedTokenTree(const Token &got, std::string expected) {
     return LexerErr(LexerErrReason::UnclosedTokenTree, got, {std::move(expected)});

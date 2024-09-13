@@ -3,3 +3,5 @@
 //
 
 #include "Node.h"
+
+Node::~Node() = default;

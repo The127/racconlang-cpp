@@ -6,6 +6,11 @@
 
 #include "utils/NodeUtils.h"
 
+TypeSignature::TypeSignature() = default;
+TypeSignature::TypeSignature(TypeSignature &&) noexcept = default;
+TypeSignature & TypeSignature::operator=(TypeSignature &&) noexcept = default;
+TypeSignature::~TypeSignature() = default;
+
 uint64_t TypeSignature::start() const {
     return startPos;
 }

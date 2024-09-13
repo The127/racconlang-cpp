@@ -1,9 +1,8 @@
 //
 // Created by zoe on 12.09.24.
 //
-
-
 #pragma once
+
 #include "Identifier.h"
 #include "Node.h"
 #include "ReturnType.h"
@@ -16,6 +15,11 @@ public:
     bool isMut{};
     std::optional<Identifier> name;
     std::optional<ReturnType> returnType;
+
+    InterfaceGetter();
+    InterfaceGetter(InterfaceGetter&&) noexcept;
+    InterfaceGetter& operator=(InterfaceGetter&&) noexcept;
+    ~InterfaceGetter() override;
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;

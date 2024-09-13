@@ -8,12 +8,12 @@
 #include <vector>
 #include <memory>
 
-#include "ConstraintDeclaration.h"
-#include "EnumMemberDeclaration.h"
 #include "Node.h"
-#include "GenericConstraintBase.h"
 #include "Identifier.h"
 
+
+class EnumMemberDeclaration;
+class ConstraintDeclaration;
 
 class EnumDeclaration final :public Node {
 public:
@@ -24,6 +24,11 @@ public:
     std::vector<Identifier> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
     std::vector<EnumMemberDeclaration> memberDeclarations;
+
+    EnumDeclaration();
+    EnumDeclaration(EnumDeclaration&&) noexcept;
+    EnumDeclaration& operator=(EnumDeclaration&&) noexcept;
+    ~EnumDeclaration() override;
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;

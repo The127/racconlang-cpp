@@ -3,8 +3,17 @@
 //
 
 #include "FunctionDeclaration.h"
+#include "SignatureBase.h"
+#include "ConstraintDeclaration.h"
+#include "GenericConstraintBase.h"
+#include "Parameter.h"
 
 #include "utils/NodeUtils.h"
+
+FunctionDeclaration::FunctionDeclaration() = default;
+FunctionDeclaration::FunctionDeclaration(FunctionDeclaration &&) noexcept = default;
+FunctionDeclaration & FunctionDeclaration::operator=(FunctionDeclaration &&) noexcept = default;
+FunctionDeclaration::~FunctionDeclaration() = default;
 
 uint64_t FunctionDeclaration::start() const {
     return startPos;

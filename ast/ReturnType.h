@@ -15,6 +15,11 @@ public:
     bool isMut{};
     std::unique_ptr<SignatureBase> type;
 
+    ReturnType();
+    ReturnType(ReturnType&&) noexcept;
+    ReturnType& operator=(ReturnType&&) noexcept;
+    ~ReturnType() override;
+
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;
 

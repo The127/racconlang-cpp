@@ -14,11 +14,7 @@ public:
     uint32_t line;
     uint32_t column;
 
-    Location(const std::string_view fileName, const uint32_t line, const uint32_t column)
-        : fileName(fileName),
-          line(line),
-          column(column) {
-    }
+    Location(std::string_view fileName, uint32_t line, uint32_t column);
 
     [[nodiscard]] std::string toString() const;
 };

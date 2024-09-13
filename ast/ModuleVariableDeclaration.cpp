@@ -6,6 +6,11 @@
 
 #include "utils/NodeUtils.h"
 
+ModuleVariableDeclaration::ModuleVariableDeclaration() = default;
+ModuleVariableDeclaration::ModuleVariableDeclaration(ModuleVariableDeclaration &&) noexcept = default;
+ModuleVariableDeclaration & ModuleVariableDeclaration::operator=(ModuleVariableDeclaration &&) noexcept = default;
+ModuleVariableDeclaration::~ModuleVariableDeclaration() = default;
+
 uint64_t ModuleVariableDeclaration::start() const {
     return startPos;
 }

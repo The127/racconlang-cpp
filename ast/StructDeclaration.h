@@ -5,10 +5,11 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "ConstraintDeclaration.h"
 #include "Identifier.h"
 #include "Node.h"
-#include "PropertyDeclaration.h"
+
+class PropertyDeclaration;
+class ConstraintDeclaration;
 
 class StructDeclaration final : public Node {
 public:
@@ -19,8 +20,12 @@ public:
     std::vector<Identifier> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
     std::vector<PropertyDeclaration> propertyDeclarations;
-    std::vector<std::string> destructureProperties;
+    std::vector<Identifier> destructureProperties;
 
+    StructDeclaration();
+    StructDeclaration(StructDeclaration&&) noexcept;
+    StructDeclaration& operator=(StructDeclaration&&) noexcept;
+    ~StructDeclaration() override;
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;

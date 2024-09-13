@@ -14,13 +14,13 @@ public:
     std::variant<TokenTree, TokenResult> value;
     std::vector<Token> precedingComments;
 
-    explicit(false) TokenTreeNode(const TokenTree& tree, std::vector<Token> comments)
-        : value(tree), precedingComments(std::move(comments)) {
-    }
+    explicit(false) TokenTreeNode(TokenTree tree, std::vector<Token> comments);
 
-    explicit(false) TokenTreeNode(const TokenResult& result, std::vector<Token> comments)
-        : value(result), precedingComments(std::move(comments)) {
-    }
+    explicit(false) TokenTreeNode(TokenResult result, std::vector<Token> comments);
+
+    TokenTreeNode(TokenTreeNode&&) noexcept;
+    TokenTreeNode& operator=(TokenTreeNode&&) noexcept;
+    ~TokenTreeNode();
 
     [[nodiscard]] bool isTokenTree() const;
     [[nodiscard]] bool isTokenTree(TokenType type) const;
@@ -31,6 +31,9 @@ public:
 
     [[nodiscard]] bool isConstraintBreakout() const;
     [[nodiscard]] bool isSignatureStarter() const;
+    [[nodiscard]] bool isTopLevelStarter() const;
+    [[nodiscard]] bool isModifier() const;
+    [[nodiscard]] bool isDeclaratorKeyword() const;
 
     [[nodiscard]] Location getPosition(const SourceMap &sources) const;
     [[nodiscard]] uint64_t getStart() const;

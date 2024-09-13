@@ -6,6 +6,14 @@
 
 #include "utils/NodeUtils.h"
 
+ReturnType::ReturnType() = default;
+
+ReturnType::ReturnType(ReturnType &&) noexcept = default;
+
+ReturnType & ReturnType::operator=(ReturnType &&) noexcept = default;
+
+ReturnType::~ReturnType() = default;
+
 uint64_t ReturnType::start() const {
     return startPos;
 }

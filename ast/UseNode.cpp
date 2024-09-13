@@ -7,6 +7,11 @@
 #include "utils/StringUtils.h"
 #include "utils/NodeUtils.h"
 
+UseNode::UseNode() = default;
+UseNode::UseNode(UseNode &&) noexcept = default;
+UseNode & UseNode::operator=(UseNode &&) noexcept = default;
+UseNode::~UseNode() = default;
+
 uint64_t UseNode::start() const {
     return startPos;
 }

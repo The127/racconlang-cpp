@@ -14,6 +14,11 @@ uint64_t InterfaceConstraint::end() const {
     return typeSignature.end();
 }
 
+InterfaceConstraint::InterfaceConstraint() = default;
+InterfaceConstraint::InterfaceConstraint(InterfaceConstraint &&other) noexcept = default;
+InterfaceConstraint & InterfaceConstraint::operator=(InterfaceConstraint &&other) noexcept = default;
+InterfaceConstraint::~InterfaceConstraint() = default;
+
 std::string InterfaceConstraint::toString(const SourceMap &sources, int indent, bool verbose) const {
     std::string result = NodeUtils::nameString(*this, "InterfaceConstraint", verbose) + "{\n";
 

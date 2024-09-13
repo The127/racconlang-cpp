@@ -15,5 +15,10 @@ public:
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;
 
+    InterfaceConstraint();
+    InterfaceConstraint(InterfaceConstraint&& other) noexcept;
+    InterfaceConstraint& operator=(InterfaceConstraint&& other) noexcept;
+    ~InterfaceConstraint() override;
+
     [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
 };

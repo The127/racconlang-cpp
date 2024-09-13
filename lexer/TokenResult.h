@@ -14,13 +14,13 @@ class TokenResult {
 public:
     std::expected<Token, LexerErr> value;
 
-    explicit(false) TokenResult(const Token &token)
-        : value(token) {
-    }
+    explicit(false) TokenResult(const Token &token);
 
-    explicit(false) TokenResult(const LexerErr& err)
-        : value(std::unexpected(err)) {
-    }
+    explicit(false) TokenResult(LexerErr err);
+
+    TokenResult(TokenResult&&) noexcept;
+    TokenResult& operator=(TokenResult&&) noexcept;
+    ~TokenResult();
 
     [[nodiscard]] uint64_t getStart() const;
 

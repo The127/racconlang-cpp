@@ -6,6 +6,11 @@
 
 #include "utils/NodeUtils.h"
 
+InterfaceSetter::InterfaceSetter() = default;
+InterfaceSetter::InterfaceSetter(InterfaceSetter &&) noexcept = default;
+InterfaceSetter & InterfaceSetter::operator=(InterfaceSetter &&) noexcept = default;
+InterfaceSetter::~InterfaceSetter() = default;
+
 uint64_t InterfaceSetter::start() const {
     return startPos;
 }

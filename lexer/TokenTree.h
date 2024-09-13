@@ -14,16 +14,15 @@ class TokenTreeNode;
 class TokenTree {
 public:
     Token left;
-    std::vector<TokenTreeNode> tokens{};
+    std::vector<TokenTreeNode> tokens;
     TokenResult right;
 
-    explicit TokenTree(const Token &left)
-        : left(left),
-          right(Token(TokenType::Error, 0, 0)) {
-    }
+    explicit TokenTree(const Token &left);
+    TokenTree(TokenTree&&) noexcept;
+    TokenTree& operator=(TokenTree&&) noexcept;
+    ~TokenTree();
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, uint32_t indent) const;
-    [[nodiscard]] std::string toString(const SourceMap &sources) const;
+    [[nodiscard]] std::string toString(const SourceMap &sources, uint32_t indent = 0) const;
 };
 
 #include "TokenTreeNode.h"

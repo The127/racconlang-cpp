@@ -6,6 +6,11 @@
 
 #include "utils/NodeUtils.h"
 
+ConstraintDeclaration::ConstraintDeclaration() = default;
+ConstraintDeclaration::ConstraintDeclaration(ConstraintDeclaration &&) noexcept = default;
+ConstraintDeclaration & ConstraintDeclaration::operator=(ConstraintDeclaration &&) noexcept = default;
+ConstraintDeclaration::~ConstraintDeclaration() = default;
+
 uint64_t ConstraintDeclaration::start() const {
     return startPos;
 }

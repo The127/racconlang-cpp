@@ -7,12 +7,12 @@
 #include <cstdint>
 #include <string>
 
-#include "sourceMap/Source.h"
+#include "sourceMap/SourceMap.h"
 
 
 class Node {
 public:
-    virtual ~Node() = default;
+    virtual ~Node();
 
     [[nodiscard]] virtual uint64_t start() const = 0;
     [[nodiscard]] virtual uint64_t end() const = 0;

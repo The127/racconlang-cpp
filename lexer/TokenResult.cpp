@@ -5,6 +5,16 @@
 #include "TokenResult.h"
 #include "sourceMap/SourceMap.h"
 
+TokenResult::TokenResult(const Token &token): value(token) {
+}
+
+TokenResult::TokenResult(LexerErr err): value(std::unexpected(std::move(err))) {
+}
+
+TokenResult::TokenResult(TokenResult &&) noexcept = default;
+TokenResult & TokenResult::operator=(TokenResult &&) noexcept = default;
+TokenResult::~TokenResult() = default;
+
 uint64_t TokenResult::getStart() const {
     if (isError())
         return getError().got.start;

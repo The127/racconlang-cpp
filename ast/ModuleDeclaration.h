@@ -8,15 +8,17 @@
 #include <utility>
 #include <vector>
 
-#include "AliasDeclaration.h"
-#include "EnumDeclaration.h"
-#include "FileUses.h"
-#include "FunctionDeclaration.h"
-#include "InterfaceDeclaration.h"
-#include "ModuleVariableDeclaration.h"
-#include "StructDeclaration.h"
-#include "UseNode.h"
+#include "Node.h"
+#include "Path.h"
 
+
+class ModuleVariableDeclaration;
+class AliasDeclaration;
+class FunctionDeclaration;
+class StructDeclaration;
+class InterfaceDeclaration;
+class EnumDeclaration;
+class FileUses;
 
 class ModuleDeclaration final : public Node {
 public:
@@ -31,11 +33,12 @@ public:
     std::vector<AliasDeclaration> aliasDeclarations;
     std::vector<ModuleVariableDeclaration> moduleVariableDeclarations;
 
-    ModuleDeclaration() = default;
+    ModuleDeclaration();
+    ModuleDeclaration(ModuleDeclaration&&) noexcept;
+    ModuleDeclaration& operator=(ModuleDeclaration&&) noexcept;
+    ~ModuleDeclaration() override;
 
-    explicit ModuleDeclaration(Path path)
-        : path(std::move(path)) {
-    }
+    explicit ModuleDeclaration(Path path);
 
     [[nodiscard]] uint64_t start() const override;
 

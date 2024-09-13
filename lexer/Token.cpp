@@ -4,8 +4,20 @@
 
 #include "Token.h"
 #include "sourceMap/SourceMap.h"
+#include "sourceMap/Location.h"
 
 #include <stdexcept>
+
+
+Token::Token(TokenType type, u_int64_t start, u_int64_t end): type(type),
+                                                              start(start),
+                                                              end(end) {
+}
+
+Token::Token(const Token &) = default;
+Token::Token(Token &&) noexcept = default;
+Token & Token::operator=(const Token &) = default;
+Token & Token::operator=(Token &&) noexcept = default;
 
 bool Token::isComment() const {
     return type == TokenType::LineComment

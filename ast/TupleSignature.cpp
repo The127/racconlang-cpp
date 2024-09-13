@@ -6,6 +6,11 @@
 
 #include "utils/NodeUtils.h"
 
+TupleSignature::TupleSignature() = default;
+TupleSignature::TupleSignature(TupleSignature &&) noexcept = default;
+TupleSignature & TupleSignature::operator=(TupleSignature &&) noexcept = default;
+TupleSignature::~TupleSignature() = default;
+
 uint64_t TupleSignature::start() const {
     return startPos;
 }

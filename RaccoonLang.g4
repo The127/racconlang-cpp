@@ -56,7 +56,7 @@ interfaceMethodDeclaration
     ;
 
 structDeclaration
-    : 'pub'? 'struct' Identifier genericParams? (constraintDeclaration* ';' | shortStructBody | longStructBody)
+    : 'pub'? 'struct' Identifier genericParams?  (shortStructBody | longStructBody)
     ;
 
 shortStructBody
@@ -88,7 +88,7 @@ aliasDeclaration
     ;
 
 moduleVariableDeclaration
-    : 'pub'? 'let' 'mut'? Identifier ':' type ';'
+    : 'pub'? 'mut'? 'let' Identifier ':' type ';'
     ;
 
 constraintDeclaration

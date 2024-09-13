@@ -24,3 +24,37 @@ pub interface Foo<T> : Bar, Bar2<T> where T : Asdf {
 let bar: T;
 mut let foo: u8;
 pub let x: Foo<T>;
+
+pub struct Foo<T> {
+
+} where T : Foobar;
+
+pub struct Foo<T> where T : Foobar {
+    pub x: T;
+    pub y: T;
+} destructures into (x, y);
+
+impl<T> for Foo<T> {
+    Foo(x: T, y: T) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+pub struct Foo(x: int, y: int);
+
+fn foo(f: Foo) -> Foo {
+    /*
+    let g = Foo(1,2);
+    return f with {
+        x: 12,
+    };
+    */
+}
+
+struct Bar {} foo destructures into (x, y);
+
+
+fn foo<T>(callback: fn(Foo<T>)){
+    123 asdf;
+}

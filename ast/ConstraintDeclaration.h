@@ -9,9 +9,9 @@
 #include <memory>
 
 #include "Node.h"
-#include "GenericConstraintBase.h"
 #include "Identifier.h"
 
+#include "GenericConstraintBase.h"
 
 class ConstraintDeclaration final : public Node {
 public:
@@ -20,6 +20,10 @@ public:
     std::optional<Identifier> name;
     std::vector<std::unique_ptr<GenericConstraintBase>> constraints;
 
+    ConstraintDeclaration();
+    ConstraintDeclaration(ConstraintDeclaration&&) noexcept;
+    ConstraintDeclaration& operator=(ConstraintDeclaration&&) noexcept;
+    ~ConstraintDeclaration() override;
 
     [[nodiscard]] uint64_t start() const override;
 

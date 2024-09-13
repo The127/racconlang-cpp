@@ -4,6 +4,17 @@
 
 #include "Source.h"
 #include "InternalError.h"
+#include "CompilerError.h"
+
+Source::Source(std::string fileName, std::string text, const uint64_t offset): fileName(std::move(fileName)),
+                                                                               text(std::move(text)),
+                                                                               offset(offset) {
+}
+
+Source::Source(Source &&) noexcept = default;
+Source & Source::operator=(Source &&) noexcept = default;
+
+Source::~Source() = default;
 
 void Source::addLineBreak(const uint32_t position) {
     lineBreaks.push_back(position - offset);

@@ -6,29 +6,41 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include "CompilerError.h"
-#include "ast/FunctionSignature.h"
-#include "ast/InterfaceConstraint.h"
-#include "ast/ModuleDeclaration.h"
-#include "ast/TupleSignature.h"
-#include "lexer/TokenTree.h"
+#include "ast/FileUses.h"
+
+class Parameter;
+class TupleSignature;
+class FunctionSignature;
+class TypeSignature;
+class SignatureBase;
+class InterfaceConstraint;
+class ModuleDeclaration;
+class Source;
+class ReturnType;
+class PropertyDeclaration;
+class InterfaceSetter;
+class InterfaceGetter;
+class InterfaceMethodDeclaration;
+class EnumMemberDeclaration;
+class ConstraintDeclaration;
+
 
 using treeIterator = std::vector<TokenTreeNode>::const_iterator;
 
 class Parser {
 public:
-    Source& source;
+    std::shared_ptr<Source> source;
 
-    explicit Parser(Source& source)
-            : source(source) {
-        modules.emplace_back();
-        uses = std::make_shared<FileUses>();
-    }
+    explicit Parser(std::shared_ptr<Source> source);
 
     Parser(const Parser&) = delete;
     Parser& operator=(const Parser&) = delete;
-    Parser(Parser&&) = default;
+    Parser(Parser&&) noexcept;
+    Parser& operator=(Parser&&) noexcept;
+    ~Parser();
 
     std::vector<ModuleDeclaration> parse();
 
@@ -36,7 +48,7 @@ private:
     std::shared_ptr<FileUses> uses;
     std::vector<ModuleDeclaration> modules;
 
-    void addError(const CompilerError &error);
+    void addError(CompilerError error);
 
     void parseFile();
 
@@ -59,6 +71,8 @@ private:
 
     void structRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
 
+    std::optional<PropertyDeclaration> propertyDeclarationRule(treeIterator& tree_iterator, const treeIterator& iterator);
+
     void functionRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
 
     void aliasRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
@@ -69,7 +83,7 @@ private:
 
     std::optional<Path> pathRule(treeIterator &start, const treeIterator &end, bool allowTrailing);
 
-    std::optional<ConstraintDeclaration> genericConstraintRule(treeIterator &start, const treeIterator &end);
+    ConstraintDeclaration genericConstraintRule(treeIterator &start, const treeIterator &end);
 
     std::optional<InterfaceConstraint> interfaceConstraintRule(treeIterator &start, const treeIterator &end);
 //    std::unique_ptr<GenericConstraintBase> defaultConstraintRule(treeIterator &start, const treeIterator &end);

@@ -3,8 +3,15 @@
 //
 
 #include "EnumDeclaration.h"
+#include "EnumMemberDeclaration.h"
+#include "ConstraintDeclaration.h"
 
 #include "utils/NodeUtils.h"
+
+EnumDeclaration::EnumDeclaration() = default;
+EnumDeclaration::EnumDeclaration(EnumDeclaration &&) noexcept = default;
+EnumDeclaration & EnumDeclaration::operator=(EnumDeclaration &&) noexcept = default;
+EnumDeclaration::~EnumDeclaration() = default;
 
 uint64_t EnumDeclaration::start() const {
     return startPos;

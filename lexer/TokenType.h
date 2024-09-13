@@ -21,6 +21,7 @@ enum class TokenType {
     Struct,         // struct
     Destructures,   // destructures
     Into,           // into
+    DestructuresInto, // destructures into
     Alias,          // alias
     Let,            // let
     Pub,            // pub

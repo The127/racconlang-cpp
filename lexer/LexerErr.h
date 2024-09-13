@@ -24,9 +24,11 @@ public:
     Token got;
     std::vector<std::string> expected;
 
-    LexerErr(LexerErrReason reason, const Token &got, std::vector<std::string> expected)
-            : reason(reason), got(got), expected(std::move(expected)) {
-    }
+    LexerErr(LexerErrReason reason, const Token &got, std::vector<std::string> expected);
+
+    LexerErr(LexerErr&&) noexcept;
+    LexerErr& operator=(LexerErr&&) noexcept;
+    ~LexerErr();
 
     static LexerErr UnclosedTokenTree(const Token &got, std::string expected);
 

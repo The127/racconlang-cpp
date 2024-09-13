@@ -8,12 +8,13 @@
 #include <string>
 #include <vector>
 
-#include "SignatureBase.h"
 #include "Node.h"
-#include "ConstraintDeclaration.h"
-#include "Parameter.h"
+#include "Identifier.h"
 #include "ReturnType.h"
 
+
+class Parameter;
+class ConstraintDeclaration;
 
 class InterfaceMethodDeclaration final : public Node {
 public:
@@ -25,6 +26,11 @@ public:
     std::vector<ConstraintDeclaration> genericConstraints;
     std::vector<Parameter> parameters;
     std::optional<ReturnType> returnType;
+
+    InterfaceMethodDeclaration();
+    InterfaceMethodDeclaration(InterfaceMethodDeclaration&&) noexcept;
+    InterfaceMethodDeclaration& operator=(InterfaceMethodDeclaration&& other) noexcept;
+    ~InterfaceMethodDeclaration() override;
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;
