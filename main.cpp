@@ -25,8 +25,9 @@ int main() {
     std::cout << std::string(5, '\n');
 
     Parser parser(source);
+    parser.parse();
 
-    const auto& mods = parser.parse();
+    const auto& mods = source->modules;
     for (const auto& mod : mods) {
         std::cout << std::string(5, '\n');
         std::cout << std::string(10, '#');

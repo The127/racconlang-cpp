@@ -42,7 +42,7 @@ public:
     Parser& operator=(Parser&&) noexcept;
     ~Parser();
 
-    std::vector<ModuleDeclaration> parse();
+    void parse();
 
 private:
     std::shared_ptr<FileUses> uses;

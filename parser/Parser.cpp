@@ -40,14 +40,14 @@ Parser &Parser::operator=(Parser &&) noexcept = default;
 
 Parser::~Parser() = default;
 
-std::vector<ModuleDeclaration> Parser::parse() {
+void Parser::parse() {
     parseFile();
 
     for (auto &module: modules) {
         module.uses = uses;
     }
 
-    return std::move(modules);
+    source->modules = std::move(modules);
 }
 
 void Parser::addError(CompilerError error) {
@@ -167,7 +167,7 @@ void Parser::modRule(treeIterator &start, const treeIterator &end) {
 
 std::vector<Token> Parser::modifierRule(treeIterator &start, const treeIterator &end) {
     std::vector<Token> result;
-    auto startPosition = start->getStart();
+    const auto startPosition = start->getStart();
 
     while (start != end && start->isModifier()) {
         const auto &token = start->getToken();
