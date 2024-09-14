@@ -8,7 +8,7 @@
 #include <functional>
 #include <memory>
 
-#include "CompilerError.h"
+#include "../errors/CompilerError.h"
 #include "ast/FileUses.h"
 
 class Parameter;
@@ -34,7 +34,7 @@ class Parser {
 public:
     std::shared_ptr<Source> source;
 
-    explicit Parser(std::shared_ptr<Source> source);
+    explicit Parser(const std::shared_ptr<Source>& source);
 
     Parser(const Parser&) = delete;
     Parser& operator=(const Parser&) = delete;

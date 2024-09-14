@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "InternalError.h"
+#include "../errors/InternalError.h"
 
 Lexer::Lexer(std::shared_ptr<Source> source): source(std::move(source)) {
 }
@@ -15,7 +15,7 @@ Lexer::Lexer(Lexer &&) noexcept = default;
 Lexer & Lexer::operator=(Lexer &&) noexcept = default;
 Lexer::~Lexer() = default;
 
-TokenTree Lexer::tokenize() {
+void Lexer::tokenize() {
     COMPILER_ASSERT(!source->tokenTree, "Token tree was already set: " + source->fileName);
     std::vector<TokenTree> stack{};
     std::vector<std::vector<Token>> commentStack{};
@@ -59,7 +59,8 @@ TokenTree Lexer::tokenize() {
             stack.pop_back();
 
             if (stack.empty()) {
-                return temp;
+                source->tokenTree = std::move(temp);
+                return;
             }
 
             stack.back().tokens.emplace_back(std::move(temp), std::move(commentStack.back()));
@@ -109,7 +110,8 @@ TokenTree Lexer::tokenize() {
                 stack.pop_back();
 
                 if (stack.empty()) {
-                    return temp;
+                    source->tokenTree = std::move(temp);
+                    return;
                 }
 
                 stack.back().tokens.emplace_back(std::move(temp), std::move(commentStack.back()));

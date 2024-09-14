@@ -3,8 +3,8 @@
 //
 
 #include "Source.h"
-#include "InternalError.h"
-#include "CompilerError.h"
+#include "../errors/InternalError.h"
+#include "../errors/CompilerError.h"
 
 Source::Source(std::string fileName, std::string text, const uint64_t offset): fileName(std::move(fileName)),
                                                                                text(std::move(text)),
@@ -30,7 +30,7 @@ void Source::addError(CompilerError error) {
 }
 
 
-Location Source::getLocation(uint32_t position) const {
+Location Source::getLocation(const uint32_t position) const {
     const auto it = std::lower_bound(lineBreaks.begin(), lineBreaks.end(), position);
     const uint32_t lineBreakIndex = std::distance(lineBreaks.begin(), it);
 
@@ -47,5 +47,30 @@ Location Source::getLocation(uint32_t position) const {
 }
 
 std::string_view Source::getText(const uint32_t start, const uint32_t end) const {
+    return std::string_view(text).substr(start, end - start);
+}
+
+std::string_view Source::getLine(const uint32_t position) const {
+    const auto it = std::lower_bound(lineBreaks.begin(), lineBreaks.end(), position);
+    const uint32_t lineBreakIndex = std::distance(lineBreaks.begin(), it);
+
+    const auto line = lineBreakIndex + 1;
+
+    uint32_t start, end;
+    if (line == 1) {
+        start = 0;
+        if (lineBreaks.empty()) {
+            end = text.size();
+        } else {
+            end = lineBreaks[0];
+        }
+    } else {
+        start = lineBreaks[line - 2] + 1;
+        if (lineBreaks.size() < line) {
+            end = text.size();
+        } else {
+            end = lineBreaks[line - 1];
+        }
+    }
     return std::string_view(text).substr(start, end - start);
 }

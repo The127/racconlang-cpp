@@ -28,16 +28,17 @@ public:
 
     Source(std::string fileName, std::string text, uint64_t offset);
 
-    Source(const Source&) = delete;
-    Source& operator=(const Source&) = delete;
-    Source(Source&&) noexcept;
-    Source& operator=(Source&&) noexcept;
+    Source(const Source &) = delete;
+    Source &operator=(const Source &) = delete;
+    Source(Source &&) noexcept;
+    Source &operator=(Source &&) noexcept;
     ~Source();
 
     void addLineBreak(uint32_t position);
-    void addLineComment(uint32_t line, const Token& comment);
+    void addLineComment(uint32_t line, const Token &comment);
     void addError(CompilerError error);
 
     [[nodiscard]] Location getLocation(uint32_t position) const;
     [[nodiscard]] std::string_view getText(uint32_t start, uint32_t end) const;
+    [[nodiscard]] std::string_view getLine(uint32_t position) const;
 };

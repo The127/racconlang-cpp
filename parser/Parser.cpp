@@ -9,7 +9,7 @@
 #include <utility>
 
 #include "sourceMap/Source.h"
-#include "InternalError.h"
+#include "../errors/InternalError.h"
 #include "ast/AliasDeclaration.h"
 #include "ast/ConstraintDeclaration.h"
 #include "ast/EnumDeclaration.h"
@@ -29,7 +29,8 @@
 #include "ast/TupleSignature.h"
 #include "ast/UseNode.h"
 
-Parser::Parser(std::shared_ptr<Source> source): source(std::move(source)) {
+Parser::Parser(const std::shared_ptr<Source>& source)
+    : source(source) {
     modules.emplace_back();
     uses = std::make_shared<FileUses>();
 }
@@ -314,6 +315,7 @@ void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<
         while (auto member = enumMemberRule(bodyStart, bodyEnd)) {
             decl.memberDeclarations.emplace_back(std::move(*member));
         }
+        start += 1;
     }
 
     modules.back().enumDeclarations.emplace_back(std::move(decl));
@@ -344,6 +346,7 @@ std::optional<EnumMemberDeclaration> Parser::enumMemberRule(treeIterator &start,
     if (start->isTokenTree(TokenType::OpenParen)) {
         decl.endPos = start->getEnd();
         decl.values = signatureListRule(*start, TokenType::OpenParen);
+        start += 1;
     }
 
     if (start != end) {
@@ -351,7 +354,7 @@ std::optional<EnumMemberDeclaration> Parser::enumMemberRule(treeIterator &start,
             start += 1;
         } else {
             auto error = CompilerError(MissingComma, start->getStart());
-            error.addLabel("expected: `,``}`", *start);
+            error.addLabel("expected: `,` or `}`", *start);
             addError(std::move(error));
             recoverUntil(start, end, TokenType::Identifier, false);
         }
@@ -529,6 +532,22 @@ std::optional<InterfaceGetter> Parser::interfaceGetterRule(treeIterator &start, 
     }
     decl.endPos = decl.name->end();
 
+    if (start == end || !start->isTokenTree(TokenType::OpenParen)) {
+        auto error = CompilerError(MissingSetterParam, (start - 1)->getStart());
+        error.setNote("unexpected end of setter declaration, expected `(`");
+        addError(std::move(error));
+        return std::move(decl);
+    }
+
+    decl.endPos = start->getEnd();
+    auto params = parameterListRule(*start, TokenType::OpenParen);
+
+    if (!params.empty()) {
+        auto error = CompilerError(TooManySetterParams, params[1].start());
+        error.setNote("getters cannot have parameters");
+        addError(std::move(error));
+    }
+
     if (start == end) {
         auto error = CompilerError(MissingGetterReturnType, (start - 1)->getStart());
         error.setNote("unexpected end of getter declaration, expected return type`->`");
@@ -607,16 +626,9 @@ std::optional<InterfaceSetter> Parser::interfaceSetterRule(treeIterator &start, 
     }
     decl.endPos = decl.name->end();
 
-    if (start == end) {
+    if (start == end || !start->isTokenTree(TokenType::OpenParen)) {
         auto error = CompilerError(MissingSetterParam, (start - 1)->getStart());
-        error.setNote("unexpected end of setter declaration, expected parameter: `(`");
-        addError(std::move(error));
-        return std::move(decl);
-    }
-
-    if (!start->isTokenTree(TokenType::OpenParen)) {
-        auto error = CompilerError(MissingSetterParam, decl.startPos);
-        error.addLabel("unexpected end of setter declaration, expected parameter: `(`", *start);
+        error.setNote("unexpected end of setter declaration, expected `(`");
         addError(std::move(error));
         return std::move(decl);
     }
@@ -702,7 +714,7 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
         return;
     }
 
-    if (!start->isTokenTree(TokenType::Colon)
+    if (!start->isToken(TokenType::Colon)
         && !start->isToken(TokenType::Where)
         && !start->isTokenTree(TokenType::OpenCurly)) {
         auto error = CompilerError(UnexpectedToken, decl.startPos);
@@ -733,7 +745,6 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
         decl.endPos = start->getEnd();
         start += 1;
 
-
         while (start != end) {
             auto signature = typeSignatureRule(start, end);
 
@@ -753,7 +764,8 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
                     start += 1;
                     continue;
                 }
-                if (start != end && start->isTopLevelStarter()) {
+                if (start == end || start->isTopLevelStarter()) {
+                    addError(CompilerError(MissingInterfaceBody, (start-1)->getStart()));
                     modules.back().interfaceDeclarations.emplace_back(std::move(decl));
                     return;
                 }
@@ -762,13 +774,20 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
 
             decl.requiredInterfaces.emplace_back(std::move(*signature));
 
-            if (start != end && start->isToken(TokenType::Comma)) {
+            if (start == end) {
+                addError(CompilerError(MissingInterfaceBody, (start-1)->getStart()));
+                modules.back().interfaceDeclarations.emplace_back(std::move(decl));
+                return;
+            }
+            if (start->isToken(TokenType::Comma)) {
                 decl.endPos = start->getEnd();
                 start += 1;
-            } else {
+            } else if (start->isSignatureStarter())  {
                 auto error = CompilerError(MissingComma, decl.startPos);
                 error.addLabel("missing comma", *start);
                 addError(std::move(error));
+            } else {
+                break;
             }
         }
     }
@@ -1822,7 +1841,7 @@ std::vector<Parameter> Parser::parameterListRule(const TokenTreeNode &node, Toke
         }
 
         if (current != end) {
-            if (node.isToken(TokenType::Comma)) {
+            if (current->isToken(TokenType::Comma)) {
                 current += 1;
             } else {
                 auto error = CompilerError(MissingComma, list.left);

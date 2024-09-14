@@ -4,30 +4,31 @@
 
 #include "CompilerError.h"
 
-ErrorLabel::ErrorLabel(std::string text, const uint64_t start, const uint64_t end): text(std::move(text)), start(start), end(end) {
+CompilerError::CompilerError(const ErrorCode code, const uint64_t position)
+    : code(code),
+      position(position) {
 }
 
-CompilerError::CompilerError(const ErrorCode code, const uint64_t position): code(code), position(position) {
-}
-
-CompilerError::CompilerError(const ErrorCode code, const Token &token): code(code), position(token.start) {
+CompilerError::CompilerError(const ErrorCode code, const Token &token)
+    : code(code),
+      position(token.start) {
 }
 
 CompilerError::CompilerError(CompilerError &&) noexcept = default;
-CompilerError & CompilerError::operator=(CompilerError &&) noexcept = default;
+CompilerError &CompilerError::operator=(CompilerError &&) noexcept = default;
 
 CompilerError::~CompilerError() = default;
 
 void CompilerError::addLabel(const ErrorLabel &label) {
-    labels.push_back(label);
+    //labels.push_back(label);
 }
 
 void CompilerError::addLabel(const std::string &text, const uint64_t start, const uint64_t end) {
-    labels.emplace_back(text, start, end);
+    //addLabel(SimpleErrorLabel(text, start, end));
 }
 
 void CompilerError::addLabel(const std::string &text, const Token &startToken, const Token &endToken) {
-    labels.emplace_back(text, startToken.start, endToken.end);
+    //addLabel(SimpleErrorLabel(text, startToken.start, endToken.end));
 }
 
 void CompilerError::addLabel(const std::string &text, const Token &token) {

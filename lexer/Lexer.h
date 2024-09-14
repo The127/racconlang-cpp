@@ -20,7 +20,7 @@ public:
     Lexer& operator=(Lexer&&) noexcept;
     ~Lexer();
 
-    TokenTree tokenize();
+    void tokenize();
 
 private:
     uint32_t position = 0;

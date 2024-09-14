@@ -60,10 +60,10 @@ add_executable(RaccoonLang main.cpp
         ast/Identifier.h
         parser/Parser.cpp
         parser/Parser.h
-        CompilerError.cpp
-        CompilerError.h
-        InternalError.cpp
-        InternalError.h
+        errors/CompilerError.cpp
+        errors/CompilerError.h
+        errors/InternalError.cpp
+        errors/InternalError.h
         lexer/TokenTreeNode.cpp
         lexer/TokenTreeNode.h
         lexer/TokenResult.cpp
@@ -83,6 +83,18 @@ add_executable(RaccoonLang main.cpp
         ast/InterfaceSetter.cpp
         ast/InterfaceSetter.h
         ast/ReturnType.cpp
-        ast/ReturnType.h)
+        ast/ReturnType.h
+        errors/ErrorHandler.cpp
+        errors/ErrorHandler.h
+        errors/ErrorCode.cpp
+        errors/ErrorCode.h
+        errors/ConsoleErrorHandler.cpp
+        errors/ConsoleErrorHandler.h
+        errors/ErrorLabelGroup.cpp
+        errors/ErrorLabelGroup.h
+        errors/SimpleErrorLabel.cpp
+        errors/SimpleErrorLabel.h
+        errors/ErrorLabel.cpp
+        errors/ErrorLabel.h)
 
 target_include_directories(RaccoonLang PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

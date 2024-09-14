@@ -31,7 +31,8 @@ public:
     [[nodiscard]] Location getLocation(uint64_t position) const;
     [[nodiscard]] std::string_view getText(uint64_t start, uint64_t end) const;
     [[nodiscard]] std::string_view getText(const Token& token) const;
+    [[nodiscard]] std::shared_ptr<Source> findSourceByPosition(uint64_t position) const;
+    [[nodiscard]] std::string_view getLine(uint64_t line) const;
 
 private:
-    [[nodiscard]] std::shared_ptr<Source> findEntryByPosition(uint64_t position) const;
 };

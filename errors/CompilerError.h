@@ -10,56 +10,11 @@
 #include <utility>
 #include <vector>
 
-#include "lexer/Token.h"
-#include "lexer/TokenResult.h"
-#include "lexer/TokenTree.h"
-
-
-enum ErrorCode {
-    MissingSemicolon,
-    MissingStructBody,
-    UseAfterMod,
-    UseIsMissingPath,
-    PathHasTrailingSeparator,
-    WrongOpener,
-    WrongCloser,
-    UnexpectedToken,
-    UnexpectedEndOfInput,
-    DuplicateModifier,
-    InvalidModifier,
-    MissingDeclarationName,
-    MissingPropertyName,
-    MissingPropertyType,
-    InvalidGenericConstraint,
-    MissingEnumBody,
-    EnumMemberExpected,
-    UnclosedEnumBody,
-    MissingComma,
-    MissingSignature,
-    FnSignatureMissingParams,
-    InvalidSignature,
-    ParameterNameMissing,
-    ParameterTypeMissing,
-    MissingInterfaceBody,
-    RefAlreadyImpliesMut,
-    MissingMethodName,
-    MissingMethodReturnType,
-    MissingGetterName,
-    MissingGetterReturnType,
-    MissingSetterName,
-    MissingSetterParam,
-    TooManySetterParams,
-    MissingVariableType,
-};
-
-class ErrorLabel {
-public:
-    std::string text;
-    uint64_t start;
-    uint64_t end;
-
-    ErrorLabel(std::string text, uint64_t start, uint64_t end);
-};
+#include "ErrorCode.h"
+#include "ErrorLabel.h"
+#include "../lexer/Token.h"
+#include "../lexer/TokenResult.h"
+#include "../lexer/TokenTree.h"
 
 class CompilerError {
 public:

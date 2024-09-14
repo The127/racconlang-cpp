@@ -1,4 +1,4 @@
-use std::foo::;
+use std::foo;
 
 mod main;
 
@@ -15,8 +15,8 @@ pub interface Foo<T> : Bar, Bar2<T> where T : Asdf {
     pub fn qux<T1, T2>(value: T1) where T1 : SomeInterface<T2>;
     pub fn qux2<T1, T2>(value: T1) -> T2 where T1 : SomeInterface<T2>;
 
-    pub get x -> u8;
-    pub mut get y -> mut Bar<T>;
+    pub get x() -> u8;
+    pub mut get y() -> mut Bar<T>;
 
     set x(value: u8);
 }
@@ -57,5 +57,5 @@ struct Bar {} foo destructures into (x, y);
 
 
 fn foo<T>(callback: fn(Foo<T>)){
-    123 asdf;
+    return fn(x) {};
 }

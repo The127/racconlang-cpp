@@ -27,7 +27,7 @@ std::shared_ptr<Source> SourceMap::addEntry(const std::string &fileName) {
     return std::move(source);
 }
 
-std::shared_ptr<Source> SourceMap::findEntryByPosition(const uint64_t position) const {
+std::shared_ptr<Source> SourceMap::findSourceByPosition(const uint64_t position) const {
     const auto it = std::lower_bound(entries.begin(), entries.end(), position,
         [](const std::shared_ptr<Source> &entry, const uint64_t pos) {
             return entry->offset <= pos;
@@ -36,13 +36,18 @@ std::shared_ptr<Source> SourceMap::findEntryByPosition(const uint64_t position) 
     return entries[index];
 }
 
+std::string_view SourceMap::getLine(const uint64_t position) const {
+    const auto entry = findSourceByPosition(position);
+    return entry->getLine(position - entry->offset);
+}
+
 Location SourceMap::getLocation(const uint64_t position) const {
-    const auto entry = findEntryByPosition(position);
+    const auto entry = findSourceByPosition(position);
     return entry->getLocation(position - entry->offset);
 }
 
 std::string_view SourceMap::getText(const uint64_t start, const uint64_t end) const {
-    const auto entry = findEntryByPosition(start);
+    const auto entry = findSourceByPosition(start);
     return entry->getText(start - entry->offset, end - entry->offset);
 }
 
