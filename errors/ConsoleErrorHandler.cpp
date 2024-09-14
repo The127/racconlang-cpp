@@ -11,16 +11,16 @@ void ConsoleErrorHandler::handleError(const CompilerError &error, const SourceMa
     const auto &[code, name] = ErrorInfo(error.code);
     std::cout << "[" << code << "] Error: " << name << std::endl;
 
-    const auto& loc = sources.getLocation(error.position);
-    const auto lineNum = std::format(" {} ", loc.line);
-    std::cout << std::string(lineNum.size(), ' ') << "╭─[" << loc.fileName << ":" << loc.line << ":" << loc.column << "]" << std::endl;
+    const auto& errorLocation = sources.getLocation(error.position);
+    const auto errorLineText = std::format(" {} ", errorLocation.line);
+    std::cout << std::string(errorLineText.size(), ' ') << "╭─[" << errorLocation.fileName << ":" << errorLocation.line << ":" << errorLocation.column << "]" << std::endl;
 
     const auto source = sources.findSourceByPosition(error.position);
-        const auto line = source->getLine(loc.line);
-        std::cout << lineNum  << "│ " << line << std::endl;
-        std::cout << std::string(lineNum.size(), ' ') << "┊ " << std::string(loc.column - 1, ' ') << "^" << std::endl;
+        const auto line = source->getLine(error.position);
+        std::cout << errorLineText  << "│ " << line << std::endl;
+        std::cout << std::string(errorLineText.size(), ' ') << "┊ " << std::string(errorLocation.column - 1, ' ') << "^" << std::endl;
 
-    std::cout << std::string(lineNum.size(), ' ') << "╯";
+    std::cout << std::string(errorLineText.size(), ' ') << "╯";
     if (error.note) {
         std::cout << " Note: " << *error.note;
     }
