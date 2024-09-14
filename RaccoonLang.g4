@@ -31,6 +31,7 @@ topLevelDeclaration
     | functionDeclaration
     | aliasDeclaration
     | moduleVariableDeclaration
+    | implBlock
     ;
 
 enumDeclaration
@@ -89,6 +90,30 @@ aliasDeclaration
 
 moduleVariableDeclaration
     : 'pub'? 'mut'? 'let' Identifier ':' type ';'
+    ;
+
+implBlock
+    : 'impl' (genericParams? typeName 'on') typeName genericArguments? '{' (implConstructor | implDestructor | implMethod | implSetter | implGetter)* '}'
+    ;
+
+implConstructor
+    : 'pub'? Identifier '(' parameterList? ')' blockStatement
+    ;
+
+implDestructor
+    : '~' Identifier '(' ')' blockStatement
+    ;
+
+implMethod
+    : 'pub'? 'mut'? 'static'? 'fn' Identifier genericParams '(' ')' ('->' type)  constraintDeclaration* (blockExpression | lambdaBody)
+    ;
+
+implSetter
+    : 'pub'? 'set' Identifier '(' parameter ')' (blockExpression | lambdaBody)
+    ;
+
+implGetter
+    : 'pub'? 'mut'? Identifier '(' ')' ('->' type) (blockExpression | lambdaBody)
     ;
 
 constraintDeclaration
@@ -151,6 +176,10 @@ parameterList
 
 parameter
     : ('mut' | 'ref')? Identifier ':' type
+    ;
+
+blockStatement
+    : '{' '}'
     ;
 
 blockExpression
