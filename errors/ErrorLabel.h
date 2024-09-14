@@ -14,6 +14,12 @@ class ErrorLabel {
 public:
     explicit(false) ErrorLabel(SimpleErrorLabel label);
     explicit(false) ErrorLabel(ErrorLabelGroup group);
+
+    [[nodiscard]] bool isSimpleLabel() const;
+    [[nodiscard]] bool isLabelGroup() const;
+
+    [[nodiscard]] const SimpleErrorLabel &simpleLabel() const;
+    [[nodiscard]] const ErrorLabelGroup &labelGroup() const;
 private:
     std::variant<SimpleErrorLabel, ErrorLabelGroup> item;
 };

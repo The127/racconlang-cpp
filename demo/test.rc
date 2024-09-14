@@ -7,7 +7,7 @@ pub enum Option<T>{
     None
 }
 
-pub interface Foo<T> : Bar, Bar2<T> where T : Asdf {
+pub interface Foo<T> : Bar, Bar2<T> blub where T : Asdf {
     pub fn foo();
     pub fn foo3() -> mut u8;
     mut pub fn foo2(a: u8, b: (u8, u8));
@@ -17,6 +17,9 @@ pub interface Foo<T> : Bar, Bar2<T> where T : Asdf {
 
     pub get x() -> u8;
     pub mut get y() -> mut Bar<T>;
+
+    pub set x(x: u8);
+    pub set xy(y: u8);
 
     set x(value: u8);
 }
@@ -35,13 +38,6 @@ pub struct Foo<T> where T : Foobar {
     pub y: T;
 } destructures into (x, y);
 
-impl<T> for Foo<T> {
-    Foo(x: T, y: T) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
 pub struct Foo(x: int, y: int);
 
 fn foo(f: Foo) -> Foo {
@@ -54,8 +50,3 @@ fn foo(f: Foo) -> Foo {
 }
 
 struct Bar {} foo destructures into (x, y);
-
-
-fn foo<T>(callback: fn(Foo<T>)){
-    return fn(x) {};
-}

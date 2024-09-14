@@ -38,6 +38,8 @@ enum ErrorCode {
     MissingMethodReturnType,
     MissingGetterName,
     MissingGetterReturnType,
+    MissingGetterParam,
+    TooManyGetterParams,
     MissingSetterName,
     MissingSetterParam,
     TooManySetterParams,

@@ -20,15 +20,15 @@ CompilerError &CompilerError::operator=(CompilerError &&) noexcept = default;
 CompilerError::~CompilerError() = default;
 
 void CompilerError::addLabel(const ErrorLabel &label) {
-    //labels.push_back(label);
+    labels.push_back(label);
 }
 
 void CompilerError::addLabel(const std::string &text, const uint64_t start, const uint64_t end) {
-    //addLabel(SimpleErrorLabel(text, start, end));
+    addLabel(SimpleErrorLabel(text, start, end));
 }
 
 void CompilerError::addLabel(const std::string &text, const Token &startToken, const Token &endToken) {
-    //addLabel(SimpleErrorLabel(text, startToken.start, endToken.end));
+    addLabel(SimpleErrorLabel(text, startToken.start, endToken.end));
 }
 
 void CompilerError::addLabel(const std::string &text, const Token &token) {

@@ -38,6 +38,8 @@ static std::map<ErrorCode, std::pair<std::string, std::string> > ErrorInfos = {
     {MissingSetterName, {"EME0005", "missing setter name"}},
     {MissingSetterParam, {"EME0006", "missing setter parameter"}},
     {TooManySetterParams, {"EME0007", "too many setter parameters"}},
+    {MissingSetterParam, {"EME0008", "missing getter parameter"}},
+    {TooManySetterParams, {"EME0009", "too many getter parameters"}},
 
     {MissingDeclarationName, {"EDE0001", "missing declaration name"}},
 

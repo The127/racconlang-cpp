@@ -533,7 +533,7 @@ std::optional<InterfaceGetter> Parser::interfaceGetterRule(treeIterator &start, 
     decl.endPos = decl.name->end();
 
     if (start == end || !start->isTokenTree(TokenType::OpenParen)) {
-        auto error = CompilerError(MissingSetterParam, (start - 1)->getStart());
+        auto error = CompilerError(MissingGetterParam, (start - 1)->getStart());
         error.setNote("unexpected end of setter declaration, expected `(`");
         addError(std::move(error));
         return std::move(decl);
@@ -541,9 +541,10 @@ std::optional<InterfaceGetter> Parser::interfaceGetterRule(treeIterator &start, 
 
     decl.endPos = start->getEnd();
     auto params = parameterListRule(*start, TokenType::OpenParen);
+    start += 1;
 
     if (!params.empty()) {
-        auto error = CompilerError(TooManySetterParams, params[1].start());
+        auto error = CompilerError(TooManyGetterParams, params[1].start());
         error.setNote("getters cannot have parameters");
         addError(std::move(error));
     }
@@ -579,15 +580,13 @@ std::optional<InterfaceGetter> Parser::interfaceGetterRule(treeIterator &start, 
         addError(std::move(error));
     }
 
-    if (!start->isToken(TokenType::Semicolon)) {
-        if (start == end) {
-            auto error = CompilerError(MissingSemicolon, start->getStart());
-            error.setNote("expected a semicolon");
-            addError(std::move(error));
-        }
-    } else {
+    if (start->isToken(TokenType::Semicolon)) {
         decl.endPos = start->getEnd();
         start += 1;
+    } else {
+        auto error = CompilerError(MissingSemicolon, start->getStart());
+        error.setNote("expected a semicolon");
+        addError(std::move(error));
     }
 
     return std::move(decl);
@@ -635,6 +634,7 @@ std::optional<InterfaceSetter> Parser::interfaceSetterRule(treeIterator &start, 
 
     decl.endPos = start->getEnd();
     auto params = parameterListRule(*start, TokenType::OpenParen);
+    start += 1;
 
     if (params.size() > 1) {
         auto error = CompilerError(TooManySetterParams, params[1].start());
@@ -656,15 +656,13 @@ std::optional<InterfaceSetter> Parser::interfaceSetterRule(treeIterator &start, 
         addError(std::move(error));
     }
 
-    if (!start->isToken(TokenType::Semicolon)) {
-        if (start == end) {
-            auto error = CompilerError(MissingSemicolon, start->getStart());
-            error.setNote("expected a semicolon");
-            addError(std::move(error));
-        }
-    } else {
+    if (start->isToken(TokenType::Semicolon)) {
         decl.endPos = start->getEnd();
         start += 1;
+    } else {
+        auto error = CompilerError(MissingSemicolon, start->getStart());
+        error.setNote("expected a semicolon");
+        addError(std::move(error));
     }
 
     return std::move(decl);
