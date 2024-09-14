@@ -26,11 +26,12 @@ mut let foo: u8;
 pub let x: Foo<T>;
 
 pub struct Foo<T> {
-
+    foo: int;
+    pub mut bar: int;
 } where T : Foobar;
 
 pub struct Foo<T> where T : Foobar {
-    pub x: T;
+    pub mut x: T;
     pub y: T;
 } destructures into (x, y);
 

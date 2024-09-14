@@ -18,7 +18,7 @@ public:
     uint64_t startPos{};
     uint64_t endPos{};
     bool isPublic = false;
-    bool isMut = false;
+    bool isMutable = false;
     Identifier name;
     std::optional<std::unique_ptr<SignatureBase>> type;
 

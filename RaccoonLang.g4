@@ -68,7 +68,7 @@ longStructBody
     ;
 
 propertyDeclaration
-    : 'pub'? Identifier ':' type ';'
+    : 'pub'? 'mut'? Identifier ':' type ';'
     ;
 
 structDestructure

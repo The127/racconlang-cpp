@@ -28,6 +28,8 @@ enum ErrorCode {
     DuplicateModifier,
     InvalidModifier,
     MissingDeclarationName,
+    MissingPropertyName,
+    MissingPropertyType,
     InvalidGenericConstraint,
     MissingEnumBody,
     EnumMemberExpected,

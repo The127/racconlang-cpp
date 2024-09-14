@@ -91,9 +91,9 @@ bool TokenTreeNode::isTopLevelStarter() const {
 }
 
 bool TokenTreeNode::isModifier() const {
-    return isToken() && getToken().isTopLevelStarter();
+    return isToken() && getToken().isModifier();
 }
 
 bool TokenTreeNode::isDeclaratorKeyword() const {
-    return isToken() && getToken().isTopLevelStarter();
+    return isToken() && getToken().isDeclaratorKeyword();
 }

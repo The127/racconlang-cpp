@@ -71,7 +71,7 @@ private:
 
     void structRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
 
-    std::optional<PropertyDeclaration> propertyDeclarationRule(treeIterator& tree_iterator, const treeIterator& iterator);
+    std::optional<PropertyDeclaration> propertyDeclarationRule(treeIterator& start, const treeIterator& end);
 
     void functionRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
 
