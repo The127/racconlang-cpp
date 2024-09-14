@@ -904,6 +904,8 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
         }
     }
 
+    start += 1;
+
 
     modules.back().interfaceDeclarations.emplace_back(std::move(decl));
 }
@@ -1061,6 +1063,7 @@ void Parser::structRule(treeIterator &start, const treeIterator &end, std::vecto
             auto error = CompilerError(MissingSemicolon, (start - 1)->getStart());
             addError(std::move(error));
         }
+        start += 1;
     } else if (start->isTokenTree(TokenType::OpenCurly)) {
         const auto &body = start->getTokenTree();
         treeIterator bodyStart = body.tokens.begin(); // NOLINT(*-use-auto)
@@ -1089,6 +1092,8 @@ void Parser::structRule(treeIterator &start, const treeIterator &end, std::vecto
                 return;
             }
             decl.destructureProperties = identifierListRule(*start, TokenType::OpenParen);
+            start += 1;
+
 
             beforeRecover = start;
             recoverUntil(start, end, [](const TokenTreeNode &node) {

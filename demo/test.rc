@@ -7,7 +7,7 @@ pub enum Option<T>{
     None
 }
 
-pub interface Foo<T> : Bar, Bar2<T> blub where T : Asdf {
+pub interface Foo<T> : Bar, Bar2<T> where T : Asdf {
     pub fn foo();
     pub fn foo3() -> mut u8;
     mut pub fn foo2(a: u8, b: (u8, u8));
@@ -39,14 +39,5 @@ pub struct Foo<T> where T : Foobar {
 } destructures into (x, y);
 
 pub struct Foo(x: int, y: int);
-
-fn foo(f: Foo) -> Foo {
-    /*
-    let g = Foo(1,2);
-    return f with {
-        x: 12,
-    };
-    */
-}
 
 struct Bar {} foo destructures into (x, y);
