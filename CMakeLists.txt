@@ -95,6 +95,18 @@ add_executable(RaccoonLang main.cpp
         errors/SimpleErrorLabel.cpp
         errors/SimpleErrorLabel.h
         errors/ErrorLabel.cpp
-        errors/ErrorLabel.h)
+        errors/ErrorLabel.h
+        ast/ImplBlock.cpp
+        ast/ImplBlock.h
+        ast/DestructureDeclaration.cpp
+        ast/DestructureDeclaration.h
+        ast/ConstructorDeclaration.cpp
+        ast/ConstructorDeclaration.h
+        ast/ImplGetter.cpp
+        ast/ImplGetter.h
+        ast/ImplSetter.cpp
+        ast/ImplSetter.h
+        ast/ImplMethod.cpp
+        ast/ImplMethod.h)
 
 target_include_directories(RaccoonLang PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
