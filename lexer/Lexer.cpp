@@ -212,6 +212,9 @@ const TokenResult& Lexer::peekToken() {
         case ',':
             peeked = Token(TokenType::Comma, source->offset + position, source->offset + position + 1);
             return *peeked;
+        case '~':
+            peeked = Token(TokenType::Tilde, source->offset + position, source->offset + position + 1);
+            return *peeked;
         case ':':
             peeked = colonRule();
             return *peeked;
@@ -350,6 +353,12 @@ TokenResult Lexer::identifierRule() const {
             tokenType = TokenType::Mut;
         } else if (text == "ref") {
             tokenType = TokenType::Ref;
+        } else if (text == "impl") {
+            tokenType = TokenType::Impl;
+        } else if (text == "on") {
+            tokenType = TokenType::On;
+        } else if (text == "static") {
+            tokenType = TokenType::Static;
         }
 
         return Token(tokenType, source->offset + position, source->offset + position + offset);

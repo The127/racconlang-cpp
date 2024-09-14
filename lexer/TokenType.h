@@ -30,11 +30,16 @@ enum class TokenType {
     Set,            // set
     Mut,            // mut
     Ref,            // ref
+    Impl,           // impl
+    On,             // on
+    Static,         // static
 
     Colon,          // :
     PathSeparator,  // ::
 
     DashArrow,      // ->
+
+    Tilde,         // ~
 
     Equals,         // =
     EqualArrow,     // =>
