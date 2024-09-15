@@ -19,7 +19,7 @@ bool TokenTreeNode::isTokenTree() const {
     return std::holds_alternative<TokenTree>(value);
 }
 
-bool TokenTreeNode::isTokenTree(TokenType type) const {
+bool TokenTreeNode::isTokenTree(const TokenType type) const {
     DEBUG_ASSERT(Token(type, 0, 0).isOpening(), "called isTokenTree with a non-opener token type, use isToken instead!");
     return isTokenTree() && getTokenTree().left.type == type;
 }
@@ -82,12 +82,12 @@ std::string TokenTreeNode::toString(const SourceMap &sources, uint32_t indent) c
 
 std::string TokenTreeNode::debugString() const {
     if(isTokenTree()) {
-        return std::format("TokenTree[{}]", TokenTypeString(getTokenTree().left.type));
+        return std::format("TokenTree[{}]", TokenTypeName(getTokenTree().left.type));
     }
     if(isError()) {
-        return std::format("Error[{}]", TokenTypeString(getTokenResult().getOrErrorToken().type));
+        return std::format("Error[{}]", TokenTypeName(getTokenResult().getOrErrorToken().type));
     }
-    return std::string(TokenTypeString(getToken().type));
+    return std::string(TokenTypeName(getToken().type));
 }
 
 bool TokenTreeNode::isConstraintBreakout() const {

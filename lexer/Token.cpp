@@ -58,7 +58,6 @@ bool Token::isClosing() const {
 
 bool Token::isTopLevelStarter() const {
     return isDeclaratorKeyword()
-           || type == TokenType::Pub
            || type == TokenType::Mod
            || type == TokenType::Use;
 }

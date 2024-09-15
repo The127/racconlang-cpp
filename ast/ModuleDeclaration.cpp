@@ -38,8 +38,7 @@ uint64_t ModuleDeclaration::end() const {
 std::string ModuleDeclaration::toString(const SourceMap &sources, const int indent, const bool verbose) const {
     std::string result = NodeUtils::nameString(*this, "ModuleDeclaration", verbose) + "{\n";
 
-    if (path)
-        result += std::string(indent, ' ') + "path: " + path->toString(sources, indent, verbose) + ",\n";
+    result += std::string(indent, ' ') + "path: " + path.toString(sources, indent, verbose) + ",\n";
 
     if (!uses->uses.empty())
         result += std::string(indent, ' ') + "uses: " + NodeUtils::nodeListString(
