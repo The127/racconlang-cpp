@@ -7,12 +7,14 @@
 #include <string>
 #include <utility>
 
-enum ErrorCode {
+enum class ErrorCode {
     MissingSemicolon,
     MissingStructBody,
     UseAfterMod,
     UseIsMissingPath,
-    PathHasTrailingSeparator,
+    EmptyPath, //TODO: add
+    MissingPathSeparator,
+    MissingModulePath,
     WrongOpener,
     WrongCloser,
     UnexpectedToken,

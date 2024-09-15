@@ -1,4 +1,10 @@
 use std::foo;
+use foo 123;
+
+use ::;
+
+mod main;
+
 
 
 use mod::{foo}; // missing use path // unexpected `{` // invalid module path `::`
@@ -77,8 +83,9 @@ pub enum Option<T>{
     None
 }
 
-pub interface Foo<T> : Bar, Bar2<T> where T : Asdf {
-    pub fn foo();
+
+pub interface Foo<T> : Bar::123::foo, Bar2<T> where T : Asdf {
+    pub fn foo(a: foo::bar::, foo: int);
     pub fn foo3() -> mut u8;
     mut pub fn foo2(a: u8, b: (u8, u8));
     pub fn bar<T>(t: T);
@@ -113,3 +120,11 @@ pub struct Foo(x: int, y: int);
 struct Bar {} foo destructures into (x, y);
 
 alias bar<T> = (foo, std::map<asdf, T>) where T : numeric;
+
+let foo = 1;
+let foo: int = 0;
+foo = 1;
+
+<,foo>
+unexpected comma
+missing comma

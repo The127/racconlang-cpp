@@ -5,6 +5,7 @@
 
 #pragma once
 #include "Parameter.h"
+#include "ReturnType.h"
 #include "SignatureBase.h"
 
 
@@ -16,7 +17,7 @@ public:
     uint64_t endPos{};
 
     std::vector<std::unique_ptr<SignatureBase>> parameterTypes;
-    std::optional<std::unique_ptr<SignatureBase>> returnType;
+    std::optional<ReturnType> returnType;
 
     FunctionSignature();
     FunctionSignature(FunctionSignature&&) noexcept;

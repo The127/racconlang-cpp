@@ -12,6 +12,7 @@
 #include "ast/FileUses.h"
 #include "TokenTreeIterator.h"
 
+class ErrorContext;
 class Parameter;
 class TupleSignature;
 class FunctionSignature;
@@ -32,6 +33,7 @@ class ConstraintDeclaration;
 using treeIterator = std::vector<TokenTreeNode>::const_iterator;
 
 class Parser {
+    using RecoverPredicate = std::function<bool(const TokenTreeNode &)>;
 public:
     std::shared_ptr<Source> source;
 
@@ -57,22 +59,22 @@ private:
 
     void modRule(treeIterator &start, const treeIterator &end);
 
-    std::vector<Token> modifierRule(treeIterator &start, const treeIterator &end);
+    std::vector<Token> modifierRule(treeIterator &start, const treeIterator &end, const RecoverPredicate& recoverPredicate);
 
     void validateModifiers(std::vector<Token> &modifiers, const std::vector<TokenType> &validTokenTypes);
 
     void enumRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
     std::optional<EnumMemberDeclaration> enumMemberRule(treeIterator &start, const treeIterator &end);
 
+    void interfaceRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
     std::optional<InterfaceMethodDeclaration> interfaceMethodRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
     std::optional<InterfaceGetter> interfaceGetterRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
     std::optional<InterfaceSetter> interfaceSetterRule(treeIterator &tart, const treeIterator &end, std::vector<Token> modifiers);
 
-    void interfaceRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
 
     void structRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
     std::vector<ConstraintDeclaration> genericConstraintListRule(treeIterator &start, const treeIterator &end,
-                                    const std::function<bool(const TokenTreeNode &)> &recoverPredicate);
+                                    const RecoverPredicate &recoverPredicate);
 
     std::optional<PropertyDeclaration> propertyDeclarationRule(treeIterator& start, const treeIterator& end);
 
@@ -84,31 +86,39 @@ private:
 
     void declarationRule(treeIterator &start, const treeIterator &end);
 
-    std::optional<Path> pathRule(treeIterator &start, const treeIterator &end, bool allowTrailing);
+    Path Parser::pathRule(treeIterator &start, const treeIterator &end, bool allowTrailing);
 
     std::optional<ConstraintDeclaration> genericConstraintRule(treeIterator &start, const treeIterator &end);
 
     std::optional<InterfaceConstraint> interfaceConstraintRule(treeIterator &start, const treeIterator &end);
 //    std::unique_ptr<GenericConstraintBase> defaultConstraintRule(treeIterator &start, const treeIterator &end);
 
-    [[nodiscard]] std::optional<Identifier> identifierRule(treeIterator &start, const treeIterator &end) const;
+    [[nodiscard]] Identifier identifierRule(treeIterator &start, const treeIterator &end) const;
 
-    [[nodiscard]] std::optional<std::unique_ptr<SignatureBase>> signatureRule(treeIterator &start, const treeIterator &end);
-    [[nodiscard]] std::optional<TypeSignature> typeSignatureRule(treeIterator &start, const treeIterator &end);
-    [[nodiscard]] std::optional<FunctionSignature> functionSignatureRule(treeIterator &start, const treeIterator &end);
-    [[nodiscard]] std::optional<TupleSignature> tupleSignatureRule(treeIterator &start, const treeIterator &end);
+    [[nodiscard]] std::unique_ptr<SignatureBase> signatureRule(treeIterator &start, const treeIterator &end);
+    [[nodiscard]] TypeSignature typeSignatureRule(treeIterator &start, const treeIterator &end);
+    [[nodiscard]] FunctionSignature functionSignatureRule(treeIterator &start, const treeIterator &end);
+    [[nodiscard]] TupleSignature tupleSignatureRule(treeIterator &start, const treeIterator &end);
 
-    [[nodiscard]] std::optional<ReturnType> returnTypeRule(treeIterator &start, const treeIterator &end);
+    [[nodiscard]] ReturnType returnTypeRule(treeIterator &start, const treeIterator &end);
 
-    [[nodiscard]] std::vector<Identifier> identifierListRule(const TokenTreeNode &node, TokenType opener);
-    [[nodiscard]] std::vector<Parameter> parameterListRule(const TokenTreeNode &node, TokenType opener);
-    [[nodiscard]] std::vector<std::unique_ptr<SignatureBase>> signatureListRule(const TokenTreeNode &node, TokenType opener);
+    [[nodiscard]] std::vector<Identifier> identifierListRule(const TokenTree &list);
+    [[nodiscard]] std::vector<Parameter> parameterListRule(const TokenTree &list);
+    [[nodiscard]] std::vector<std::unique_ptr<SignatureBase>> signatureListRule(const TokenTree &list);
 
-    static void recoverTopLevel(treeIterator &start, const treeIterator &end);
+    void recoverTopLevel(treeIterator &start, const treeIterator &end);
 
-    static void recoverUntil(treeIterator &start, const treeIterator &end, TokenType type, bool consume);
+    void recoverUntil(treeIterator &start, const treeIterator &end, TokenType type);
 
-    static void recoverUntil(treeIterator &start, const treeIterator &end, std::vector<TokenType> oneOf, bool consume);
+    void recoverUntil(treeIterator &start, const treeIterator &end, std::vector<TokenType> oneOf);
 
-    static void recoverUntil(treeIterator &start, const treeIterator &end, const std::function<bool(const TokenTreeNode &)> &predicate, bool consume);
+    void recoverUntil(treeIterator &start, const treeIterator &end, const RecoverPredicate &predicate);
+
+    static void recoverUntil(treeIterator &start, const treeIterator &end, const RecoverPredicate &predicate, ErrorContext& errCtx);
+
+    static const Token& consumeToken(treeIterator &start, const treeIterator &end, TokenType type);
+    static std::optional<const Token&> tryConsumeToken(treeIterator &start, const treeIterator &end, TokenType type);
+
+    const TokenTree& consumeTokenTree(treeIterator &start, const treeIterator &end, TokenType type);
+    std::optional<const TokenTree&> tryConsumeTokenTree(treeIterator &start, const treeIterator &end, TokenType type);
 };

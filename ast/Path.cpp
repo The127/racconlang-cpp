@@ -29,13 +29,23 @@ uint64_t Path::start() const {
 }
 
 uint64_t Path::end() const {
-    if(isTrailing()) {
+    if (parts.empty()) {
+        COMPILER_ASSERT(rooted, "non-rooted path parts is empty");
+    }
+    if (isTrailing()) {
         return trailer->end;
     }
-    COMPILER_ASSERT(!parts.empty(), "path parts is empty");
     return parts.back().end();
 }
 
 std::string Path::toString(const SourceMap &sources, const int indent, const bool verbose) const {
-    return StringUtils::join(parts, "::");
+    std::string result;
+    if (isRooted()) {
+        result += "::";
+    }
+    result += StringUtils::join(parts, "::");
+    if (isTrailing()) {
+        result += "::";
+    }
+    return result;
 }

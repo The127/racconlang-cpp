@@ -34,6 +34,7 @@ public:
     [[nodiscard]] bool isModifier() const;
     [[nodiscard]] bool isConstraintBreakout() const;
     [[nodiscard]] bool isSignatureStarter() const;
+    [[nodiscard]] bool isPathStarter() const;
 
     [[nodiscard]] TokenType expectedClosing() const;
 
