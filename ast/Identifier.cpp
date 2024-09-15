@@ -12,7 +12,7 @@ Identifier::Identifier(Identifier &&) noexcept = default;
 Identifier & Identifier::operator=(Identifier &&) noexcept = default;
 
 Identifier Identifier::make(const Token &identifier, const std::shared_ptr<Source> &source) {
-    auto name = source->getText(identifier.start, identifier.end);
+    auto name = source->getText(identifier.start - source->offset, identifier.end - source->offset);
     if (name.starts_with('@'))
         name = name.substr(1);
     return Identifier(identifier, name);

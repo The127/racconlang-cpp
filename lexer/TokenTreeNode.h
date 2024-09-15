@@ -31,6 +31,7 @@ public:
 
     [[nodiscard]] bool isConstraintBreakout() const;
     [[nodiscard]] bool isSignatureStarter() const;
+    [[nodiscard]] bool isPathStarter() const;
     [[nodiscard]] bool isTopLevelStarter() const;
     [[nodiscard]] bool isModifier() const;
     [[nodiscard]] bool isDeclaratorKeyword() const;
@@ -45,4 +46,5 @@ public:
     [[nodiscard]] const LexerErr &getError() const;
 
     [[nodiscard]] std::string toString(const SourceMap & sources, uint32_t indent) const;
+    [[nodiscard]] std::string debugString() const;
 };

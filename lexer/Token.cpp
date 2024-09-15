@@ -16,8 +16,8 @@ Token::Token(TokenType type, u_int64_t start, u_int64_t end): type(type),
 
 Token::Token(const Token &) = default;
 Token::Token(Token &&) noexcept = default;
-Token & Token::operator=(const Token &) = default;
-Token & Token::operator=(Token &&) noexcept = default;
+Token &Token::operator=(const Token &) = default;
+Token &Token::operator=(Token &&) noexcept = default;
 
 bool Token::isComment() const {
     return type == TokenType::LineComment
@@ -65,8 +65,8 @@ bool Token::isTopLevelStarter() const {
 
 bool Token::isModifier() const {
     return type == TokenType::Pub
-    || type == TokenType::Mut
-    || type == TokenType::Ref;
+           || type == TokenType::Mut
+           || type == TokenType::Ref;
 }
 
 bool Token::isConstraintBreakout() const {
@@ -77,8 +77,13 @@ bool Token::isConstraintBreakout() const {
 
 bool Token::isSignatureStarter() const {
     return type == TokenType::Identifier
-        || type == TokenType::PathSeparator
-        || type == TokenType::Fn;
+           || type == TokenType::PathSeparator
+           || type == TokenType::Fn;
+}
+
+bool Token::isPathStarter() const {
+    return type == TokenType::Identifier
+           || type == TokenType::PathSeparator;
 }
 
 TokenType Token::expectedClosing() const {

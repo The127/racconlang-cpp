@@ -80,12 +80,26 @@ std::string TokenTreeNode::toString(const SourceMap &sources, uint32_t indent) c
     return std::string(indent, ' ') + getTokenResult().toString(sources) + "\n";
 }
 
+std::string TokenTreeNode::debugString() const {
+    if(isTokenTree()) {
+        return std::format("TokenTree[{}]", TokenTypeString(getTokenTree().left.type));
+    }
+    if(isError()) {
+        return std::format("Error[{}]", TokenTypeString(getTokenResult().getOrErrorToken().type));
+    }
+    return std::string(TokenTypeString(getToken().type));
+}
+
 bool TokenTreeNode::isConstraintBreakout() const {
     return isTokenTree(TokenType::OpenCurly) || (isToken() && getToken().isConstraintBreakout());
 }
 
 bool TokenTreeNode::isSignatureStarter() const {
     return isTokenTree(TokenType::OpenParen) || isToken() && getToken().isSignatureStarter();
+}
+
+bool TokenTreeNode::isPathStarter() const {
+    return isToken() && getToken().isPathStarter();
 }
 
 bool TokenTreeNode::isTopLevelStarter() const {

@@ -28,7 +28,7 @@ std::string FunctionSignature::toString(const SourceMap &sources, int indent, bo
     }
 
     if(returnType) {
-        result += (*returnType)->toString(sources, indent + 1, verbose) + "\n";
+        result += (*returnType).toString(sources, indent + 1, verbose) + "\n";
     }
 
     result += std::string(indent - 1, ' ') + "}";

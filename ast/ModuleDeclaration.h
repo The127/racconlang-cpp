@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <functional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -24,7 +25,7 @@ class ModuleDeclaration final : public Node {
 public:
     uint64_t startPos{};
     uint64_t endPos{};
-    std::optional<Path> path;
+    Path path;
     std::shared_ptr<FileUses> uses;
     std::vector<EnumDeclaration> enumDeclarations;
     std::vector<InterfaceDeclaration> interfaceDeclarations;
