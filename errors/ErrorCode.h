@@ -27,6 +27,7 @@ enum ErrorCode {
     EnumMemberExpected,
     UnclosedEnumBody,
     MissingComma,
+    MissingEquals,
     MissingSignature,
     FnSignatureMissingParams,
     InvalidSignature,
@@ -44,6 +45,8 @@ enum ErrorCode {
     MissingSetterParam,
     TooManySetterParams,
     MissingVariableType,
+    MissingAliasType,
+    MissingColon,
 };
 
 const std::pair<std::string, std::string>& ErrorInfo(ErrorCode code);

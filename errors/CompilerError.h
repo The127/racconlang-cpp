@@ -22,6 +22,9 @@ public:
     uint64_t position;
     std::vector<ErrorLabel> labels;
     std::optional<std::string> note;
+#ifndef NDEBUG
+    std::stacktrace stacktrace;
+#endif
 
 
     CompilerError(ErrorCode code, uint64_t position);

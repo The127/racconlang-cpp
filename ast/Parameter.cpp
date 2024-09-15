@@ -7,16 +7,12 @@
 
 #include "utils/NodeUtils.h"
 
-Parameter::Parameter(const bool isMut, const bool isRef, Identifier name,
-                     std::unique_ptr<SignatureBase> type)
-    : isMut(isMut),
-      isRef(isRef),
-      name(std::move(name)),
-      type(std::move(type)) {
+Parameter::Parameter(Identifier name)
+    : name(std::move(name)) {
 }
 
 Parameter::Parameter(Parameter &&) noexcept = default;
-Parameter & Parameter::operator=(Parameter &&) noexcept = default;
+Parameter &Parameter::operator=(Parameter &&) noexcept = default;
 
 Parameter::~Parameter() = default;
 
@@ -34,7 +30,10 @@ std::string Parameter::toString(const SourceMap &sources, const int indent, cons
     result += std::string(indent, ' ') + "isMut: " + std::to_string(isMut) + ",\n";
     result += std::string(indent, ' ') + "isRef: " + std::to_string(isRef) + ",\n";
     result += std::string(indent, ' ') + "name: " + name.toString(sources, indent + 1, verbose) + ",\n";
-    result += std::string(indent, ' ') + "type: " + type->toString(sources, indent + 1, verbose) + ",\n";
+    result += std::string(indent, ' ') + "type: ";
+    if (type) {
+        result += std::string(indent, ' ') + "type: " + (*type)->toString(sources, indent + 1, verbose) + ",\n";
+    }
 
     result += std::string(indent - 1, ' ') + "}";
     return std::move(result);

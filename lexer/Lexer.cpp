@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "../errors/InternalError.h"
+#include "errors/InternalError.h"
 
 Lexer::Lexer(std::shared_ptr<Source> source): source(std::move(source)) {
 }

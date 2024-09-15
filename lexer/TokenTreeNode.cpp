@@ -20,6 +20,7 @@ bool TokenTreeNode::isTokenTree() const {
 }
 
 bool TokenTreeNode::isTokenTree(TokenType type) const {
+    DEBUG_ASSERT(Token(type, 0, 0).isOpening(), "called isTokenTree with a non-opener token type, use isToken instead!");
     return isTokenTree() && getTokenTree().left.type == type;
 }
 
@@ -32,6 +33,7 @@ bool TokenTreeNode::isToken() const {
 }
 
 bool TokenTreeNode::isToken(TokenType type) const {
+    DEBUG_ASSERT(!Token(type, 0, 0).isOpening(), "called isToken with an opener token type, use isTokenTree instead!");
     return isTokenResult() && getTokenResult().isToken(type);
 }
 

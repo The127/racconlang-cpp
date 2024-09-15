@@ -8,6 +8,9 @@
 #include "Node.h"
 #include "SignatureBase.h"
 
+#include <optional>
+#include <memory>
+
 
 class Parameter final : Node {
 public:
@@ -16,9 +19,9 @@ public:
     bool isMut{};
     bool isRef{};
     Identifier name;
-    std::unique_ptr<SignatureBase> type;
+    std::optional<std::unique_ptr<SignatureBase>> type;
 
-    explicit Parameter(bool isMut, bool isRef, Identifier name, std::unique_ptr<SignatureBase> type);
+    explicit Parameter(Identifier name);
     Parameter(Parameter&&) noexcept;
     Parameter& operator=(Parameter&&) noexcept;
     ~Parameter() override;

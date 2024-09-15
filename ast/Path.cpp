@@ -4,7 +4,7 @@
 
 #include "Path.h"
 
-#include "../errors/InternalError.h"
+#include "errors/InternalError.h"
 #include "utils/StringUtils.h"
 
 Path::Path() = default;

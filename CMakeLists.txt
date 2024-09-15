@@ -110,3 +110,5 @@ add_executable(RaccoonLang main.cpp
         ast/ImplMethod.h)
 
 target_include_directories(RaccoonLang PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_link_libraries(RaccoonLang PRIVATE stdc++exp)

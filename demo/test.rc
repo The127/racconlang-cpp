@@ -18,10 +18,10 @@ pub interface Foo<T> : Bar, Bar2<T> where T : Asdf {
     pub get x() -> u8;
     pub mut get y() -> mut Bar<T>;
 
-    pub set x(x: u8);
+    pub set x(a, b c);
     pub set xy(y: u8);
 
-    set x(value: u8);
+    #[foo] set x(value: u8);
 }
 
 let bar: T;
@@ -41,3 +41,5 @@ pub struct Foo<T> where T : Foobar {
 pub struct Foo(x: int, y: int);
 
 struct Bar {} foo destructures into (x, y);
+
+alias bar<T> = (foo, std::map<asdf, T>) where T : numeric;

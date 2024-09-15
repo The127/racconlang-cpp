@@ -70,6 +70,8 @@ private:
     void interfaceRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
 
     void structRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
+    std::vector<ConstraintDeclaration> genericConstraintListRule(treeIterator &start, const treeIterator &end,
+                                    const std::function<bool(const TokenTreeNode &)> &recoverPredicate);
 
     std::optional<PropertyDeclaration> propertyDeclarationRule(treeIterator& start, const treeIterator& end);
 
@@ -83,7 +85,7 @@ private:
 
     std::optional<Path> pathRule(treeIterator &start, const treeIterator &end, bool allowTrailing);
 
-    ConstraintDeclaration genericConstraintRule(treeIterator &start, const treeIterator &end);
+    std::optional<ConstraintDeclaration> genericConstraintRule(treeIterator &start, const treeIterator &end);
 
     std::optional<InterfaceConstraint> interfaceConstraintRule(treeIterator &start, const treeIterator &end);
 //    std::unique_ptr<GenericConstraintBase> defaultConstraintRule(treeIterator &start, const treeIterator &end);

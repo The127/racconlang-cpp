@@ -3,8 +3,8 @@
 //
 
 #include "Source.h"
-#include "../errors/InternalError.h"
-#include "../errors/CompilerError.h"
+#include "errors/InternalError.h"
+#include "errors/CompilerError.h"
 
 Source::Source(std::string fileName, std::string text, const uint64_t offset): fileName(std::move(fileName)),
                                                                                text(std::move(text)),

@@ -32,6 +32,9 @@ void ConsoleErrorHandler::handleError(const CompilerError &error, const SourceMa
         std::cout << " Note: " << *error.note;
     }
     std::cout << std::endl;
+#ifndef NDEBUG
+    std::cout << error.stacktrace << std::endl;
+#endif
 }
 
 ConsoleErrorHandler::~ConsoleErrorHandler() = default;

@@ -17,8 +17,10 @@ static std::map<ErrorCode, std::pair<std::string, std::string> > ErrorInfos = {
     {UnexpectedEndOfInput, {"EXX0006", "unexpected end of input"}},
     {DuplicateModifier, {"EXX0007", "duplicate modifier"}},
     {InvalidModifier, {"EXX0008", "invalid modifier"}},
-    {PathHasTrailingSeparator, {"EXX0009", "invalid trailing path separatr"}},
+    {PathHasTrailingSeparator, {"EXX0009", "invalid trailing path separator"}},
     {InvalidGenericConstraint, {"EXX0010", "invalid generic constraint"}},
+    {MissingEquals, {"EXX0011", "missing equals"}},
+    {MissingColon, {"EXX0012", "missing colon"}},
 
     {UseAfterMod, {"EUS0001", "use declaration after module declaration"}},
     {UseIsMissingPath, {"EUS0002", "use is missing path"}},
@@ -54,6 +56,8 @@ static std::map<ErrorCode, std::pair<std::string, std::string> > ErrorInfos = {
     {MissingInterfaceBody, {"EIN0001", "missing interface body"}},
 
     {MissingVariableType, {"EVA0001", "missing variable type"}},
+
+    {MissingAliasType, {"EAL0001", "missing alias type"}},
 };
 
 const std::pair<std::string, std::string> & ErrorInfo(ErrorCode code) {

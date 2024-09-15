@@ -6,7 +6,11 @@
 
 CompilerError::CompilerError(const ErrorCode code, const uint64_t position)
     : code(code),
-      position(position) {
+      position(position)
+#ifndef NDEBUG
+      , stacktrace(std::stacktrace::current())
+#endif
+{
 }
 
 CompilerError::CompilerError(const ErrorCode code, const Token &token)

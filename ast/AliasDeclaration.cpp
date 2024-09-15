@@ -5,6 +5,7 @@
 #include "AliasDeclaration.h"
 #include "ConstraintDeclaration.h"
 #include "GenericConstraintBase.h"
+#include "SignatureBase.h"
 
 #include "utils/NodeUtils.h"
 
@@ -35,6 +36,10 @@ std::string AliasDeclaration::toString(const SourceMap &sources, const int inden
 
     if(!genericConstraints.empty())
         result += std::string(indent, ' ') + "genericConstraints: " + NodeUtils::nodeListString(sources, genericConstraints, indent + 1, verbose) + "\n";
+
+    if(signature) {
+        result += std::string(indent, ' ') + "signature: " + (*signature)->toString(sources, indent+1, verbose) + "\n";
+    }
 
     result += std::string(indent - 1, ' ') + "}";
     return std::move(result);

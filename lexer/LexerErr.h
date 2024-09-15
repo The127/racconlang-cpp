@@ -9,7 +9,7 @@
 #include <map>
 
 #include "Token.h"
-#include "../errors/InternalError.h"
+#include "errors/InternalError.h"
 
 enum class LexerErrReason {
     UnclosedTokenTree,
