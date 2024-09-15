@@ -1,7 +1,4 @@
 use std::foo;
-use foo 123;
-
-use ::;
 
 mod main;
 
@@ -14,8 +11,8 @@ pub enum Option<T>{
 }
 
 
-pub interface Foo<T> : Bar::123::foo, Bar2<T> where T : Asdf {
-    pub fn foo(a: foo::bar::, foo: int);
+pub interface Foo<T> : Bar::foo, Bar2<T> where T : Asdf {
+    pub fn foo(a: foo::bar, foo: int);
     pub fn foo3() -> mut u8;
     mut pub fn foo2(a: u8, b: (u8, u8));
     pub fn bar<T>(t: T);
@@ -25,7 +22,7 @@ pub interface Foo<T> : Bar::123::foo, Bar2<T> where T : Asdf {
     pub get x() -> u8;
     pub mut get y() -> mut Bar<T>;
 
-    pub set x(a, b c);
+    pub set x(a: int);
     pub set xy(y: u8);
 
     #[foo] set x(value: u8);
@@ -33,12 +30,12 @@ pub interface Foo<T> : Bar::123::foo, Bar2<T> where T : Asdf {
 
 let bar: T;
 mut let foo: u8;
-pub let x: Foo<T>;
+let x: Foo<T>;
 
-pub struct Foo<T> {
+pub struct Foo<T>  where T : Foobar {
     foo: int;
     pub mut bar: int;
-} where T : Foobar;
+}
 
 pub struct Foo<T> where T : Foobar {
     pub mut x: T;
@@ -47,14 +44,6 @@ pub struct Foo<T> where T : Foobar {
 
 pub struct Foo(x: int, y: int);
 
-struct Bar {} foo destructures into (x, y);
+struct Bar {} destructures into (x, y);
 
 alias bar<T> = (foo, std::map<asdf, T>) where T : numeric;
-
-let foo = 1;
-let foo: int = 0;
-foo = 1;
-
-<,foo>
-unexpected comma
-missing comma

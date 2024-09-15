@@ -85,7 +85,7 @@ private:
 
     void declarationRule(treeIterator &start, const treeIterator &end);
 
-    Path Parser::pathRule(treeIterator &start, const treeIterator &end, bool allowTrailing);
+    Path pathRule(treeIterator &start, const treeIterator &end, bool allowTrailing);
 
     std::optional<ConstraintDeclaration> genericConstraintRule(treeIterator &start, const treeIterator &end);
 
@@ -115,9 +115,9 @@ private:
 
     static void recoverUntil(treeIterator &start, const treeIterator &end, const RecoverPredicate &predicate, ErrorContext& errCtx);
 
-    static const Token& consumeToken(treeIterator &start, const treeIterator &end, TokenType type);
-    static std::optional<const Token&> tryConsumeToken(treeIterator &start, const treeIterator &end, TokenType type);
+    static Token consumeToken(treeIterator &start, const treeIterator &end, TokenType type);
+    static std::optional<Token> tryConsumeToken(treeIterator &start, const treeIterator &end, TokenType type);
 
     const TokenTree& consumeTokenTree(treeIterator &start, const treeIterator &end, TokenType type);
-    std::optional<const TokenTree&> tryConsumeTokenTree(treeIterator &start, const treeIterator &end, TokenType type);
+    std::optional<const TokenTree*> tryConsumeTokenTree(treeIterator &start, const treeIterator &end, TokenType type);
 };
