@@ -8,8 +8,9 @@
 #include <functional>
 #include <memory>
 
-#include "../errors/CompilerError.h"
+#include "errors/CompilerError.h"
 #include "ast/FileUses.h"
+#include "TokenTreeIterator.h"
 
 class Parameter;
 class TupleSignature;

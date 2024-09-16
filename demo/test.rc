@@ -1,6 +1,76 @@
 use std::foo;
 
+
+use mod::{foo}; // missing use path // unexpected `{` // invalid module path `::`
+
+use mod::{foo}; // `mod` is not a valid module name
+
 mod main;
+
+enum Foo {
+    Asdf,, // unexpected `,`
+    bla
+}
+
+enum Foo {
+    (int,int), // missing enum member name
+    bla
+}
+
+enum Foo {
+    Asdf,
+    (int,int), // missing enum member name
+    bla
+}
+
+enum Foo {
+    Asdf,
+    =, // unexpected `=`
+    bla
+}
+
+enum Foo {
+    Asdf,
+    =foo, // unexpected `=` // (foo gets parsed as a member)
+    bla
+}
+
+enum Foo {
+    Asdf,
+    =(int,int), // unexpected `=` // missing enum member name
+    bla
+}
+
+enum Foo {
+    Asdf,
+    foo=112, // unexpected `=`
+    bla
+}
+
+enum Foo {
+    Asdf,
+    foo(int)=112, // unexpected `=`
+    bla
+}
+
+enum Foo {
+    Asdf // missing comma
+    foo(int)=112, // unexpected `=`
+    bla
+}
+
+enum Foo {
+    Asdf; // unexpected `;` // missing comma
+    foo(int)=112, // unexpected `=`
+    bla
+}
+
+enum Foo {
+    Asdf,
+    foo(int)(123), // unexpected `(`
+    bla
+}
+
 
 pub enum Option<T>{
     Some(T),
