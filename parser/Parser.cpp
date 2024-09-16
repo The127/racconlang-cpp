@@ -390,8 +390,8 @@ void Parser::interfaceRule(TokenTreeIterator& it, std::vector<Token> modifiers) 
         return n.isTopLevelStarter()
                || n.isToken(TokenType::Identifier)
                || n.isTokenTree(TokenType::OpenAngle)
-               || n.isTokenTree(TokenType::Colon)
-               || n.isTokenTree(TokenType::Where)
+               || n.isToken(TokenType::Colon)
+               || n.isToken(TokenType::Where)
                || n.isTokenTree(TokenType::OpenCurly);
     });
 
@@ -409,8 +409,8 @@ void Parser::interfaceRule(TokenTreeIterator& it, std::vector<Token> modifiers) 
         recoverUntil(it, [](const auto &n) {
             return n.isTopLevelStarter()
                    || n.isTokenTree(TokenType::OpenAngle)
-                   || n.isTokenTree(TokenType::Colon)
-                   || n.isTokenTree(TokenType::Where)
+                   || n.isToken(TokenType::Colon)
+                   || n.isToken(TokenType::Where)
                    || n.isTokenTree(TokenType::OpenCurly);
         });
 
@@ -485,7 +485,7 @@ void Parser::interfaceRule(TokenTreeIterator& it, std::vector<Token> modifiers) 
     }
 
 
-    if (it->isToken(TokenType::Where)) {
+    while (it->isToken(TokenType::Where)) {
         decl.genericConstraints = genericConstraintListRule(it, [](const TokenTreeNode &node) {
             return node.isTopLevelStarter() || node.isTokenTree(TokenType::OpenCurly);
         });
@@ -494,7 +494,9 @@ void Parser::interfaceRule(TokenTreeIterator& it, std::vector<Token> modifiers) 
         }
 
         recoverUntil(it, [](const auto &n) {
-            return n.isTopLevelStarter() || n.isTokenTree(TokenType::OpenCurly);
+            return n.isTopLevelStarter()
+                || n.isTokenTree(TokenType::OpenCurly)
+                || n.isToken(TokenType::Where);
         });
 
         if (it.isEnd() || it->isTopLevelStarter()) {
@@ -504,70 +506,17 @@ void Parser::interfaceRule(TokenTreeIterator& it, std::vector<Token> modifiers) 
     }
 
 
-    // here
-    if (!it->isToken(TokenType::Where)
-        && !it->isTokenTree(TokenType::OpenCurly)) {
-        auto error = CompilerError(ErrorCode::UnexpectedToken, decl.startPos);
-        error.addLabel(
-            "unexpected token, expected: constraints (`where`), interface body (`{`)",
-            *it);
-        addError(std::move(error));
-
-        recoverUntil(it, [](const TokenTreeNode &node) {
-            return node.isTopLevelStarter()
-                   || node.isToken(TokenType::Where)
-                   || node.isTokenTree(TokenType::OpenCurly);
-        });
-
-        if (it.isEnd()) {
-            modules.back().interfaceDeclarations.emplace_back(std::move(decl));
-            return;
-        }
-    }
-
-
-    if (it->isTopLevelStarter()) {
-        modules.back().interfaceDeclarations.emplace_back(std::move(decl));
-        return;
-    }
-
-
-    decl.genericConstraints = genericConstraintListRule(it, [](const TokenTreeNode &node) {
-        return node.isTokenTree(TokenType::OpenCurly)
-               || node.isTopLevelStarter();
-    });
-
-    if (!decl.genericConstraints.empty()) {
-        decl.endPos = decl.genericConstraints.back().end();
-    }
-
-    if (it.isEnd() || !it->isTokenTree(TokenType::OpenCurly)) {
-        auto error = CompilerError(ErrorCode::MissingInterfaceBody, decl.startPos);
-        error.addLabel("missing interface body", *(it - 1));
-        addError(std::move(error));
-        modules.back().interfaceDeclarations.emplace_back(std::move(decl));
-        return;
-    }
-
-    decl.endPos = it->getEnd();
-
-    const auto &tokenTree = it->getTokenTree();
-    if (tokenTree.right.isError()) {
-        auto error = CompilerError(ErrorCode::WrongCloser, tokenTree.left);
-        error.addLabel(
-            "wrong closer for interface body, expected: " + TokenTypeStringQuoted(tokenTree.left.expectedClosing()),
-            tokenTree.right.getError().got);
-        addError(std::move(error));
-    }
-
-    auto bodyIt = TokenTreeIterator(tokenTree.tokens);
+    const auto &bodyTree = consumeTokenTree(it, TokenType::OpenCurly);
+    auto bodyIt = TokenTreeIterator(bodyTree.tokens);
 
     while (bodyIt) {
         auto originalIt = bodyIt;
         std::vector<Token> memberModifiers;
         if (bodyIt->isModifier()) {
             memberModifiers = modifierRule(bodyIt, [](const auto &n) {
-                return n.isToken(TokenType::Fn);
+                return n.isToken(TokenType::Fn)
+                    || n.isToken(TokenType::Get)
+                    || n.isToken(TokenType::Set);
             });
             validateModifiers(memberModifiers, {TokenType::Pub, TokenType::Mut});
         }
@@ -602,11 +551,6 @@ void Parser::interfaceRule(TokenTreeIterator& it, std::vector<Token> modifiers) 
             });
         }
     }
-
-    it += 1;
-
-
-    modules.back().interfaceDeclarations.emplace_back(std::move(decl));
 }
 
 
@@ -909,8 +853,7 @@ std::optional<InterfaceSetter> Parser::interfaceSetterRule(TokenTreeIterator& it
 
 
 void Parser::structRule(TokenTreeIterator& it, std::vector<Token> modifiers) {
-    COMPILER_ASSERT(it->isToken(TokenType::Struct),
-                    "structRule called with non-struct starting token");
+    COMPILER_ASSERT(it->isToken(TokenType::Struct), "structRule called with non-struct starting token");
 
     auto decl = StructDeclaration();
     if (!modifiers.empty()) {

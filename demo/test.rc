@@ -23,12 +23,14 @@ pub interface Foo<T> : Bar::foo, Bar2<T> where T : Asdf {
     pub set x(a: int);
     pub set xy(y: u8);
 
-    #[foo] set x(value: u8);
+    set x(value: u8);
 }
 
 let bar: T;
 mut let foo: u8;
 let x: Foo<T>;
+
+pub struct Foo(x: int, y: int);
 
 pub struct Foo<T>  where T : Foobar {
     foo: int;
@@ -39,8 +41,6 @@ pub struct Foo<T> where T : Foobar {
     pub mut x: T;
     pub y: T;
 } destructures into (x, y);
-
-pub struct Foo(x: int, y: int);
 
 struct Bar {} destructures into (x, y);
 
