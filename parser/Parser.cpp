@@ -62,66 +62,65 @@ void Parser::parseFile() {
     COMPILER_ASSERT(tokenTree.left.type == TokenType::Bof, "Token tree did not start with BOF: " + source->fileName);
     COMPILER_ASSERT(tokenTree.right.isToken(TokenType::Eof), "Token tree did not end with an EOF: " + source->fileName);
 
-    treeIterator start = tokenTree.tokens.begin(); // NOLINT(*-use-auto)
-    const auto end = tokenTree.tokens.end();
+    auto it = TokenTreeIterator(tokenTree.tokens);
 
-    while (start != end) {
-        recoverTopLevel(start, end);
-        if (start == end) {
+    while (it) {
+        recoverTopLevel(it);
+        if (it.isEnd()) {
             break;
         }
-        if (start->isToken(TokenType::Use)) {
-            useRule(start, end);
-        } else if (start->isToken(TokenType::Mod)) {
-            modRule(start, end);
-        } else if (start->isModifier() || start->isDeclaratorKeyword()) {
-            declarationRule(start, end);
+        if (it->isToken(TokenType::Use)) {
+            useRule(it);
+        } else if (it->isToken(TokenType::Mod)) {
+            modRule(it);
+        } else if (it->isModifier() || it->isDeclaratorKeyword()) {
+            declarationRule(it);
         } else {
-            COMPILER_ASSERT(false, std::format("unhandled top level declaration, got {}", start->debugString()));
+            COMPILER_ASSERT(false, std::format("unhandled top level declaration, got {}", it->debugString()));
         }
     }
 }
 
-void Parser::useRule(treeIterator &start, const treeIterator &end) {
+void Parser::useRule(TokenTreeIterator& it) {
     if (modules.size() > 1) {
-        auto error = CompilerError(ErrorCode::UseAfterMod, start->getStart());
+        auto error = CompilerError(ErrorCode::UseAfterMod, it->getStart());
         error.setNote("uses need to be declared before any modules");
         addError(std::move(error));
     }
 
-    const auto &useToken = consumeToken(start, end, TokenType::Use);
+    const auto &useToken = consumeToken(it, TokenType::Use);
 
 
-    recoverUntil(start, end, [](const auto &ttn) {
+    recoverUntil(it, [](const auto &ttn) {
         return ttn.isTopLevelStarter()
                || ttn.isPathStarter();
     });
 
-    if (start == end || start->isTopLevelStarter()) {
-        addError(CompilerError(ErrorCode::UseIsMissingPath, (start - 1)->getEnd()));
+    if (it.isEnd() || it->isTopLevelStarter()) {
+        addError(CompilerError(ErrorCode::UseIsMissingPath, (it - 1)->getEnd()));
         return;
     }
 
     auto &use = uses->uses.emplace_back();
     use.startPos = useToken.start;
 
-    use.path = pathRule(start, end, true);
+    use.path = pathRule(it, true);
     use.endPos = use.path.end();
 
-    recoverUntil(start, end, [](const auto &n) {
+    recoverUntil(it, [](const auto &n) {
         return n.isTopLevelStarter() || n.isToken(TokenType::Semicolon) || n.isTokenTree(TokenType::OpenCurly);
     });
 
-    if (start == end || start->isTopLevelStarter()) {
-        addError(CompilerError(ErrorCode::MissingSemicolon, (start - 1)->getEnd()));
+    if (it.isEnd() || it->isTopLevelStarter()) {
+        addError(CompilerError(ErrorCode::MissingSemicolon, (it - 1)->getEnd()));
         return;
     }
-    if (const auto semicolon = tryConsumeToken(start, end, TokenType::Semicolon)) {
+    if (const auto semicolon = tryConsumeToken(it, TokenType::Semicolon)) {
         use.endPos = semicolon->end;
         return;
     }
 
-    if (const auto tree = tryConsumeTokenTree(start, end, TokenType::OpenCurly)) {
+    if (const auto tree = tryConsumeTokenTree(it, TokenType::OpenCurly)) {
         if (!use.path.isTrailing()) {
             addError(CompilerError(ErrorCode::MissingPathSeparator, (*tree)->left.start));
         }
@@ -130,79 +129,79 @@ void Parser::useRule(treeIterator &start, const treeIterator &end) {
     }
 
 
-    recoverUntil(start, end, [](const auto &n) {
+    recoverUntil(it, [](const auto &n) {
         return n.isTopLevelStarter() || n.isToken(TokenType::Semicolon);
     });
 
-    if (start == end || start->isTopLevelStarter()) {
-        addError(CompilerError(ErrorCode::MissingSemicolon, (start - 1)->getEnd()));
+    if (it.isEnd() || it->isTopLevelStarter()) {
+        addError(CompilerError(ErrorCode::MissingSemicolon, (it - 1)->getEnd()));
         return;
     }
-    const auto semicolon = consumeToken(start, end, TokenType::Semicolon);
+    const auto semicolon = consumeToken(it, TokenType::Semicolon);
     use.endPos = semicolon.end;
 }
 
-void Parser::modRule(treeIterator &start, const treeIterator &end) {
-    const auto modToken = consumeToken(start, end, TokenType::Mod);
+void Parser::modRule(TokenTreeIterator& it) {
+    const auto modToken = consumeToken(it, TokenType::Mod);
 
-    recoverUntil(start, end, [](const auto &n) {
+    recoverUntil(it, [](const auto &n) {
         return n.isTopLevelStarter() || n.isPathStarter() || n.isToken(TokenType::Semicolon);
     });
-    if (start == end || start->isTopLevelStarter() || start->isToken(TokenType::Semicolon)) {
-        auto error = CompilerError(ErrorCode::MissingModulePath, start->getStart());
+    if (it.isEnd() || it->isTopLevelStarter() || it->isToken(TokenType::Semicolon)) {
+        auto error = CompilerError(ErrorCode::MissingModulePath, it->getStart());
         addError(std::move(error));
-        tryConsumeToken(start, end, TokenType::Semicolon);
+        tryConsumeToken(it, TokenType::Semicolon);
         return;
     }
 
     auto &mod = modules.emplace_back();
     mod.startPos = modToken.start;
 
-    mod.path = pathRule(start, end, false);
+    mod.path = pathRule(it, false);
 
     mod.endPos = mod.path.end();
-    recoverUntil(start, end, [](const auto &n) {
+    recoverUntil(it, [](const auto &n) {
         return n.isTopLevelStarter() || n.isToken(TokenType::Semicolon);
     });
 
-    if (start == end || !start->isToken(TokenType::Semicolon)) {
-        addError(CompilerError(ErrorCode::MissingSemicolon, start->getStart()));
+    if (it.isEnd() || !it->isToken(TokenType::Semicolon)) {
+        addError(CompilerError(ErrorCode::MissingSemicolon, it->getStart()));
     } else {
-        mod.endPos = start->getEnd();
-        consumeToken(start, end, TokenType::Semicolon);
+        mod.endPos = it->getEnd();
+        consumeToken(it, TokenType::Semicolon);
     }
 }
 
-std::vector<Token> Parser::modifierRule(treeIterator &start, const treeIterator &end,
+std::vector<Token> Parser::modifierRule(TokenTreeIterator& it,
                                         const RecoverPredicate &recoverPredicate) {
     std::vector<Token> result;
 
-    while (start != end) {
-        recoverUntil(start, end, [&recoverPredicate](const auto &n) {
+    while (it) {
+        recoverUntil(it, [&recoverPredicate](const auto &n) {
             return n.isModifier() || recoverPredicate(n);
         });
-        if (start == end || !start->isModifier()) {
+        if (it.isEnd() || !it->isModifier()) {
             break;
         }
 
-        COMPILER_ASSERT(start->isToken(), "current node is not a token");
-        const auto &token = start->getToken();
+        COMPILER_ASSERT(it->isToken(), "current node is not a token");
+        const auto &token = it->getToken();
 
         auto alreadyContained = std::ranges::find_if(result, [&token](auto &t) {
             return t.type == token.type;
         });
 
         if (alreadyContained != result.end()) {
-            auto error = CompilerError(ErrorCode::DuplicateModifier, start->getStart());
-            error.addLabel("duplicate use of this modifier", *start);
+            auto error = CompilerError(ErrorCode::DuplicateModifier, it->getStart());
+            error.addLabel("duplicate use of this modifier", *it);
             error.addLabel("modifier is already present here", *alreadyContained);
             error.setNote("a modifier is only allowed once per declaration");
             addError(std::move(error));
         } else {
-            result.emplace_back(start->getToken());
+            result.emplace_back(it->getToken());
         }
 
-        start += 1;
+        it += 1;
     }
 
     return result;
@@ -242,9 +241,9 @@ inline bool containsModifier(const std::vector<Token> &modifiers, const TokenTyp
     return std::ranges::any_of(modifiers, [type](auto &m) { return m.type == type; });
 }
 
-void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+void Parser::enumRule(TokenTreeIterator& it, std::vector<Token> modifiers) {
     auto &decl = modules.back().enumDeclarations.emplace_back();
-    const auto enumToken = consumeToken(start, end, TokenType::Enum);
+    const auto enumToken = consumeToken(it, TokenType::Enum);
 
     if (!modifiers.empty()) {
         decl.startPos = modifiers.front().start;
@@ -256,7 +255,7 @@ void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<
     validateModifiers(modifiers, {TokenType::Pub});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
 
-    recoverUntil(start, end, [](const auto &n) {
+    recoverUntil(it, [](const auto &n) {
         return n.isTopLevelStarter()
                || n.isToken(TokenType::Identifier)
                || n.isTokenTree(TokenType::OpenAngle)
@@ -264,109 +263,108 @@ void Parser::enumRule(treeIterator &start, const treeIterator &end, std::vector<
                || n.isTokenTree(TokenType::OpenCurly);
     });
 
-    if (start == end || start->isTopLevelStarter()) {
-        addError(CompilerError(ErrorCode::MissingDeclarationName, (start - 1)->getEnd()));
+    if (it.isEnd() || it->isTopLevelStarter()) {
+        addError(CompilerError(ErrorCode::MissingDeclarationName, (it - 1)->getEnd()));
         return;
     }
 
-    if (!start->isToken(TokenType::Identifier)) {
-        addError(CompilerError(ErrorCode::MissingDeclarationName, (start - 1)->getEnd()));
+    if (!it->isToken(TokenType::Identifier)) {
+        addError(CompilerError(ErrorCode::MissingDeclarationName, (it - 1)->getEnd()));
     } else {
-        decl.name = identifierRule(start, end);
+        decl.name = identifierRule(it);
         decl.endPos = decl.name->end();
 
-        recoverUntil(start, end, [](const auto &n) {
+        recoverUntil(it, [](const auto &n) {
             return n.isTopLevelStarter() || n.isTokenTree(TokenType::OpenAngle) || n.isToken(TokenType::Where) || n.
                    isTokenTree(TokenType::OpenCurly);
         });
 
-        if (start == end || start->isTopLevelStarter()) {
-            addError(CompilerError(ErrorCode::MissingEnumBody, (start - 1)->getEnd()));
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            addError(CompilerError(ErrorCode::MissingEnumBody, (it - 1)->getEnd()));
             return;
         }
     }
 
 
-    if (const auto generics = tryConsumeTokenTree(start, end, TokenType::OpenAngle)) {
+    if (const auto generics = tryConsumeTokenTree(it, TokenType::OpenAngle)) {
         decl.endPos = (*generics)->right.getEnd();
         decl.genericParams = identifierListRule(**generics);
 
-        recoverUntil(start, end, [](const auto &n) {
+        recoverUntil(it, [](const auto &n) {
             return n.isTopLevelStarter() || n.isToken(TokenType::Where) || n.isTokenTree(TokenType::OpenCurly);
         });
 
-        if (start == end || start->isTopLevelStarter()) {
-            addError(CompilerError(ErrorCode::MissingEnumBody, (start - 1)->getEnd()));
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            addError(CompilerError(ErrorCode::MissingEnumBody, (it - 1)->getEnd()));
             return;
         }
     }
 
 
     // wrong
-    if (start->isToken(TokenType::Where)) {
-        decl.genericConstraints = genericConstraintListRule(start, end, [](const TokenTreeNode &node) {
+    if (it->isToken(TokenType::Where)) {
+        decl.genericConstraints = genericConstraintListRule(it, [](const TokenTreeNode &node) {
             return node.isTopLevelStarter() || node.isTokenTree(TokenType::OpenCurly);
         });
         if (!decl.genericConstraints.empty()) {
             decl.endPos = decl.genericConstraints.back().end();
         }
 
-        recoverUntil(start, end, [](const auto &n) {
+        recoverUntil(it, [](const auto &n) {
             return n.isTopLevelStarter() || n.isTokenTree(TokenType::OpenCurly);
         });
 
-        if (start == end || start->isTopLevelStarter()) {
-            addError(CompilerError(ErrorCode::MissingEnumBody, (start - 1)->getEnd()));
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            addError(CompilerError(ErrorCode::MissingEnumBody, (it - 1)->getEnd()));
             return;
         }
     }
 
 
-    COMPILER_ASSERT(start->isTokenTree(TokenType::OpenCurly), "unexpected token");
+    COMPILER_ASSERT(it->isTokenTree(TokenType::OpenCurly), "unexpected token");
 
-    decl.endPos = start->getEnd();
-    const auto &body = start->getTokenTree();
+    decl.endPos = it->getEnd();
+    const auto &body = it->getTokenTree();
 
     if (body.right.isError()) {
         addError(CompilerError(ErrorCode::UnclosedEnumBody, body.right.getStart()));
     }
 
-    treeIterator bodyStart = body.tokens.begin(); // NOLINT(*-use-auto)
-    const auto bodyEnd = body.tokens.end();
+    auto bodyIt = TokenTreeIterator(body.tokens);
 
-    while (bodyStart != bodyEnd) {
-        auto member = enumMemberRule(bodyStart, bodyEnd);
+    while (bodyIt) {
+        auto member = enumMemberRule(bodyIt);
         if (member) {
             decl.memberDeclarations.emplace_back(std::move(*member));
-            recoverUntil(bodyStart, bodyEnd, {TokenType::Identifier, TokenType::Comma});
-            if (start != end && start->isToken(TokenType::Identifier)) {
-                addError(CompilerError(ErrorCode::MissingComma, start->getStart()));
+            recoverUntil(bodyIt, {TokenType::Identifier, TokenType::Comma});
+            if (it && it->isToken(TokenType::Identifier)) {
+                addError(CompilerError(ErrorCode::MissingComma, it->getStart()));
             } else {
-                tryConsumeToken(start, end, TokenType::Comma);
+                tryConsumeToken(it, TokenType::Comma);
             }
         }
     }
 
-    start += 1;
+    it += 1;
 }
 
-std::optional<EnumMemberDeclaration> Parser::enumMemberRule(treeIterator &start, const treeIterator &end) {
-    recoverUntil(start, end, {TokenType::Identifier, TokenType::Comma});
+std::optional<EnumMemberDeclaration> Parser::enumMemberRule(TokenTreeIterator& it) {
+    recoverUntil(it, {TokenType::Identifier, TokenType::Comma});
 
-    if (start == end || tryConsumeToken(start, end, TokenType::Comma)) {
+    if (it.isEnd() || tryConsumeToken(it, TokenType::Comma)) {
         return std::nullopt;
     }
 
-    auto decl = EnumMemberDeclaration(identifierRule(start, end));
+    auto decl = EnumMemberDeclaration(identifierRule(it));
 
     decl.startPos = decl.name.start();
     decl.endPos = decl.name.end();
 
-    if (start == end) {
+    if (it.isEnd()) {
         return std::move(decl);
     }
 
-    if (const auto &tree = tryConsumeTokenTree(start, end, TokenType::OpenParen)) {
+    if (const auto &tree = tryConsumeTokenTree(it, TokenType::OpenParen)) {
         decl.endPos = (*tree)->right.getEnd();
         decl.values = signatureListRule(**tree);
     }
@@ -374,9 +372,9 @@ std::optional<EnumMemberDeclaration> Parser::enumMemberRule(treeIterator &start,
 }
 
 
-void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
+void Parser::interfaceRule(TokenTreeIterator& it, std::vector<Token> modifiers) {
     auto &decl = modules.back().interfaceDeclarations.emplace_back();
-    auto interfaceToken = consumeToken(start, end, TokenType::Interface);
+    auto interfaceToken = consumeToken(it, TokenType::Interface);
 
     if (!modifiers.empty()) {
         decl.startPos = modifiers.front().start;
@@ -388,7 +386,7 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
     validateModifiers(modifiers, {TokenType::Pub});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
 
-    recoverUntil(start, end, [](const auto &n) {
+    recoverUntil(it, [](const auto &n) {
         return n.isTopLevelStarter()
                || n.isToken(TokenType::Identifier)
                || n.isTokenTree(TokenType::OpenAngle)
@@ -397,18 +395,18 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
                || n.isTokenTree(TokenType::OpenCurly);
     });
 
-    if (start == end || start->isTopLevelStarter()) {
-        addError(CompilerError(ErrorCode::MissingDeclarationName, (start - 1)->getEnd()));
+    if (it.isEnd() || it->isTopLevelStarter()) {
+        addError(CompilerError(ErrorCode::MissingDeclarationName, (it - 1)->getEnd()));
         return;
     }
 
-    if (!start->isToken(TokenType::Identifier)) {
-        addError(CompilerError(ErrorCode::MissingDeclarationName, (start - 1)->getEnd()));
+    if (!it->isToken(TokenType::Identifier)) {
+        addError(CompilerError(ErrorCode::MissingDeclarationName, (it - 1)->getEnd()));
     } else {
-        decl.name = identifierRule(start, end);
+        decl.name = identifierRule(it);
         decl.endPos = decl.name->end();
 
-        recoverUntil(start, end, [](const auto &n) {
+        recoverUntil(it, [](const auto &n) {
             return n.isTopLevelStarter()
                    || n.isTokenTree(TokenType::OpenAngle)
                    || n.isTokenTree(TokenType::Colon)
@@ -416,125 +414,125 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
                    || n.isTokenTree(TokenType::OpenCurly);
         });
 
-        if (start == end || start->isTopLevelStarter()) {
-            addError(CompilerError(ErrorCode::MissingInterfaceBody, (start - 1)->getEnd()));
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            addError(CompilerError(ErrorCode::MissingInterfaceBody, (it - 1)->getEnd()));
             return;
         }
     }
 
 
-    if (const auto &generics = tryConsumeTokenTree(start, end, TokenType::OpenAngle)) {
+    if (const auto &generics = tryConsumeTokenTree(it, TokenType::OpenAngle)) {
         decl.endPos = (*generics)->right.getEnd();
         decl.genericParams = identifierListRule(**generics);
 
-        recoverUntil(start, end, [](const auto &n) {
+        recoverUntil(it, [](const auto &n) {
             return n.isTopLevelStarter()
                    || n.isToken(TokenType::Colon)
                    || n.isToken(TokenType::Where)
                    || n.isTokenTree(TokenType::OpenCurly);
         });
 
-        if (start == end || start->isTopLevelStarter()) {
-            addError(CompilerError(ErrorCode::MissingInterfaceBody, (start - 1)->getEnd()));
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            addError(CompilerError(ErrorCode::MissingInterfaceBody, (it - 1)->getEnd()));
             return;
         }
     }
 
-    if (const auto &colon = tryConsumeToken(start, end, TokenType::Colon)) {
+    if (const auto &colon = tryConsumeToken(it, TokenType::Colon)) {
         decl.endPos = colon->end;
 
-        while (start != end) {
-            recoverUntil(start, end, [](const auto &n) {
+        while (it) {
+            recoverUntil(it, [](const auto &n) {
                 return n.isTopLevelStarter()
                        || n.isPathStarter()
                        || n.isTokenTree(TokenType::Where)
                        || n.isTokenTree(TokenType::OpenCurly);
             });
 
-            if (start == end || !start->isPathStarter()) {
+            if (it.isEnd() || !it->isPathStarter()) {
                 break;
             }
 
-            const auto &signature = decl.requiredInterfaces.emplace_back(typeSignatureRule(start, end));
+            const auto &signature = decl.requiredInterfaces.emplace_back(typeSignatureRule(it));
             decl.endPos = signature.end();
 
-            recoverUntil(start, end, [](const auto &n) {
+            recoverUntil(it, [](const auto &n) {
                 return n.isTopLevelStarter()
                        || n.isToken(TokenType::Comma)
                        || n.isPathStarter()
                        || n.isToken(TokenType::Where)
                        || n.isTokenTree(TokenType::OpenCurly);
             });
-            if (auto tok = tryConsumeToken(start, end, TokenType::Comma)) {
+            if (auto tok = tryConsumeToken(it, TokenType::Comma)) {
                 decl.endPos = tok->end;
-            } else if (start->isPathStarter()) {
-                addError(CompilerError(ErrorCode::MissingComma, (start - 1)->getEnd()));
+            } else if (it->isPathStarter()) {
+                addError(CompilerError(ErrorCode::MissingComma, (it - 1)->getEnd()));
             } else {
                 break;
             }
         }
 
-        recoverUntil(start, end, [](const auto &n) {
+        recoverUntil(it, [](const auto &n) {
             return n.isTopLevelStarter()
                    || n.isToken(TokenType::Where)
                    || n.isTokenTree(TokenType::OpenCurly);
         });
 
-        if (start == end || start->isTopLevelStarter()) {
-            addError(CompilerError(ErrorCode::MissingInterfaceBody, (start - 1)->getEnd()));
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            addError(CompilerError(ErrorCode::MissingInterfaceBody, (it - 1)->getEnd()));
             return;
         }
     }
 
 
-    if (start->isToken(TokenType::Where)) {
-        decl.genericConstraints = genericConstraintListRule(start, end, [](const TokenTreeNode &node) {
+    if (it->isToken(TokenType::Where)) {
+        decl.genericConstraints = genericConstraintListRule(it, [](const TokenTreeNode &node) {
             return node.isTopLevelStarter() || node.isTokenTree(TokenType::OpenCurly);
         });
         if (!decl.genericConstraints.empty()) {
             decl.endPos = decl.genericConstraints.back().end();
         }
 
-        recoverUntil(start, end, [](const auto &n) {
+        recoverUntil(it, [](const auto &n) {
             return n.isTopLevelStarter() || n.isTokenTree(TokenType::OpenCurly);
         });
 
-        if (start == end || start->isTopLevelStarter()) {
-            addError(CompilerError(ErrorCode::MissingEnumBody, (start - 1)->getEnd()));
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            addError(CompilerError(ErrorCode::MissingEnumBody, (it - 1)->getEnd()));
             return;
         }
     }
 
 
     // here
-    if (!start->isToken(TokenType::Where)
-        && !start->isTokenTree(TokenType::OpenCurly)) {
+    if (!it->isToken(TokenType::Where)
+        && !it->isTokenTree(TokenType::OpenCurly)) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, decl.startPos);
         error.addLabel(
             "unexpected token, expected: constraints (`where`), interface body (`{`)",
-            *start);
+            *it);
         addError(std::move(error));
 
-        recoverUntil(start, end, [](const TokenTreeNode &node) {
+        recoverUntil(it, [](const TokenTreeNode &node) {
             return node.isTopLevelStarter()
                    || node.isToken(TokenType::Where)
                    || node.isTokenTree(TokenType::OpenCurly);
         });
 
-        if (start == end) {
+        if (it.isEnd()) {
             modules.back().interfaceDeclarations.emplace_back(std::move(decl));
             return;
         }
     }
 
 
-    if (start->isTopLevelStarter()) {
+    if (it->isTopLevelStarter()) {
         modules.back().interfaceDeclarations.emplace_back(std::move(decl));
         return;
     }
 
 
-    decl.genericConstraints = genericConstraintListRule(start, end, [](const TokenTreeNode &node) {
+    decl.genericConstraints = genericConstraintListRule(it, [](const TokenTreeNode &node) {
         return node.isTokenTree(TokenType::OpenCurly)
                || node.isTopLevelStarter();
     });
@@ -543,17 +541,17 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
         decl.endPos = decl.genericConstraints.back().end();
     }
 
-    if (start == end || !start->isTokenTree(TokenType::OpenCurly)) {
+    if (it.isEnd() || !it->isTokenTree(TokenType::OpenCurly)) {
         auto error = CompilerError(ErrorCode::MissingInterfaceBody, decl.startPos);
-        error.addLabel("missing interface body", *(start - 1));
+        error.addLabel("missing interface body", *(it - 1));
         addError(std::move(error));
         modules.back().interfaceDeclarations.emplace_back(std::move(decl));
         return;
     }
 
-    decl.endPos = start->getEnd();
+    decl.endPos = it->getEnd();
 
-    const auto &tokenTree = start->getTokenTree();
+    const auto &tokenTree = it->getTokenTree();
     if (tokenTree.right.isError()) {
         auto error = CompilerError(ErrorCode::WrongCloser, tokenTree.left);
         error.addLabel(
@@ -562,43 +560,42 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
         addError(std::move(error));
     }
 
-    treeIterator bodyStart = tokenTree.tokens.begin(); // NOLINT(*-use-auto)
-    auto bodyEnd = tokenTree.tokens.end();
+    auto bodyIt = TokenTreeIterator(tokenTree.tokens);
 
-    while (bodyStart != bodyEnd) {
-        auto originalStart = bodyStart;
+    while (bodyIt) {
+        auto originalIt = bodyIt;
         std::vector<Token> memberModifiers;
-        if (bodyStart->isModifier()) {
-            memberModifiers = modifierRule(bodyStart, bodyEnd, [](const auto &n) {
+        if (bodyIt->isModifier()) {
+            memberModifiers = modifierRule(bodyIt, [](const auto &n) {
                 return n.isToken(TokenType::Fn);
             });
             validateModifiers(memberModifiers, {TokenType::Pub, TokenType::Mut});
         }
-        if (bodyStart == bodyEnd) {
-            auto error = CompilerError(ErrorCode::UnexpectedToken, originalStart->getStart());
-            error.addLabel("unexpected token here", *originalStart);
+        if (bodyIt.isEnd()) {
+            auto error = CompilerError(ErrorCode::UnexpectedToken, originalIt->getStart());
+            error.addLabel("unexpected token here", *originalIt);
             break;
         }
 
-        if (bodyStart->isToken(TokenType::Fn)) {
-            auto method = interfaceMethodRule(bodyStart, bodyEnd, std::move(memberModifiers));
+        if (bodyIt->isToken(TokenType::Fn)) {
+            auto method = interfaceMethodRule(bodyIt, std::move(memberModifiers));
             if (method) {
                 decl.methods.emplace_back(std::move(*method));
             }
-        } else if (bodyStart->isToken(TokenType::Get)) {
-            auto getter = interfaceGetterRule(bodyStart, bodyEnd, std::move(memberModifiers));
+        } else if (bodyIt->isToken(TokenType::Get)) {
+            auto getter = interfaceGetterRule(bodyIt, std::move(memberModifiers));
             if (getter) {
                 decl.getters.emplace_back(std::move(*getter));
             }
-        } else if (bodyStart->isToken(TokenType::Set)) {
-            auto setter = interfaceSetterRule(bodyStart, bodyEnd, std::move(memberModifiers));
+        } else if (bodyIt->isToken(TokenType::Set)) {
+            auto setter = interfaceSetterRule(bodyIt, std::move(memberModifiers));
             if (setter) {
                 decl.setters.emplace_back(std::move(*setter));
             }
         } else {
-            auto error = CompilerError(ErrorCode::UnexpectedToken, originalStart->getStart());
-            error.addLabel("unexpected token here", *bodyStart);
-            recoverUntil(bodyStart, bodyEnd, [](const TokenTreeNode &node) {
+            auto error = CompilerError(ErrorCode::UnexpectedToken, originalIt->getStart());
+            error.addLabel("unexpected token here", *bodyIt);
+            recoverUntil(bodyIt, [](const TokenTreeNode &node) {
                 return node.isModifier()
                        || node.isToken(TokenType::Get)
                        || node.isToken(TokenType::Set);
@@ -606,24 +603,24 @@ void Parser::interfaceRule(treeIterator &start, const treeIterator &end, std::ve
         }
     }
 
-    start += 1;
+    it += 1;
 
 
     modules.back().interfaceDeclarations.emplace_back(std::move(decl));
 }
 
 
-std::optional<InterfaceMethodDeclaration> Parser::interfaceMethodRule(treeIterator &start, const treeIterator &end,
+std::optional<InterfaceMethodDeclaration> Parser::interfaceMethodRule(TokenTreeIterator& it,
                                                                       std::vector<Token> modifiers) {
-    if (start == end) {
+    if (it.isEnd()) {
         return std::nullopt;
     }
-    COMPILER_ASSERT(start->isToken(TokenType::Fn),
+    COMPILER_ASSERT(it->isToken(TokenType::Fn),
                     "interfaceMethodRule called with non-fn starting token");
 
     auto decl = InterfaceMethodDeclaration();
-    decl.startPos = start->getStart();
-    start += 1;
+    decl.startPos = it->getStart();
+    it += 1;
 
     validateModifiers(modifiers, {TokenType::Pub, TokenType::Mut});
     if (!modifiers.empty()) {
@@ -631,95 +628,95 @@ std::optional<InterfaceMethodDeclaration> Parser::interfaceMethodRule(treeIterat
         decl.isMut = containsModifier(modifiers, TokenType::Mut);
     }
 
-    if (start == end) {
-        auto error = CompilerError(ErrorCode::MissingMethodName, (start - 1)->getEnd());
+    if (it.isEnd()) {
+        auto error = CompilerError(ErrorCode::MissingMethodName, (it - 1)->getEnd());
         error.setNote("unexpected end of method declaration");
         addError(std::move(error));
         return std::nullopt;
     }
 
-    decl.name = identifierRule(start, end);
+    decl.name = identifierRule(it);
     if (!decl.name) {
         auto error = CompilerError(ErrorCode::MissingMethodName, decl.startPos);
-        error.addLabel("expected method name", *start);
+        error.addLabel("expected method name", *it);
         addError(std::move(error));
         return std::nullopt;
     }
     decl.endPos = decl.name->end();
 
-    if (start == end) {
-        auto error = CompilerError(ErrorCode::UnexpectedToken, (start - 1)->getEnd());
+    if (it.isEnd()) {
+        auto error = CompilerError(ErrorCode::UnexpectedToken, (it - 1)->getEnd());
         error.setNote("unexpected end of method declaration");
         addError(std::move(error));
         return std::nullopt;
     }
 
-    if (!start->isTokenTree(TokenType::OpenAngle) && !start->isTokenTree(TokenType::OpenParen)) {
+    if (!it->isTokenTree(TokenType::OpenAngle) && !it->isTokenTree(TokenType::OpenParen)) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, decl.start());
-        error.addLabel("expected generic parameters or method parameters", *start);
+        error.addLabel("expected generic parameters or method parameters", *it);
         addError(std::move(error));
-        recoverUntil(start, end, [](const TokenTreeNode &node) {
+        recoverUntil(it, [](const TokenTreeNode &node) {
             return node.isTokenTree(TokenType::OpenParen)
                    || node.isTokenTree(TokenType::OpenAngle)
                    || node.isToken(TokenType::Semicolon);
         });
-        if (start->isToken(TokenType::Semicolon)) {
-            start += 1;
+        if (it->isToken(TokenType::Semicolon)) {
+            it += 1;
             return std::nullopt;
         }
-        if (start == end) {
+        if (it.isEnd()) {
             return std::nullopt;
         }
     }
 
-    if (const auto tree = tryConsumeTokenTree(start, end, TokenType::OpenAngle)) {
+    if (const auto tree = tryConsumeTokenTree(it, TokenType::OpenAngle)) {
         decl.endPos = (*tree)->right.getEnd();
         decl.genericParams = std::move(identifierListRule(**tree));
     }
 
-    if (start == end) {
-        auto error = CompilerError(ErrorCode::UnexpectedToken, (start - 1)->getEnd());
+    if (it.isEnd()) {
+        auto error = CompilerError(ErrorCode::UnexpectedToken, (it - 1)->getEnd());
         error.setNote("unexpected end of method declaration, expected method parameters");
         addError(std::move(error));
         return std::nullopt;
     }
 
-    if (!start->isTokenTree(TokenType::OpenParen)) {
+    if (!it->isTokenTree(TokenType::OpenParen)) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, decl.start());
-        error.addLabel("expected method parameters", *start);
+        error.addLabel("expected method parameters", *it);
         addError(std::move(error));
         return std::nullopt;
     }
-    const auto &tree = consumeTokenTree(start, end, TokenType::OpenParen);
+    const auto &tree = consumeTokenTree(it, TokenType::OpenParen);
     decl.parameters = parameterListRule(tree);
 
-    if (start == end) {
-        auto error = CompilerError(ErrorCode::UnexpectedToken, (start - 1)->getEnd());
+    if (it.isEnd()) {
+        auto error = CompilerError(ErrorCode::UnexpectedToken, (it - 1)->getEnd());
         error.setNote("unexpected end of method declaration, expected return type, generic constraints or `;`");
         addError(std::move(error));
         return std::make_optional(std::move(decl));
     }
 
-    if (start->isToken(TokenType::DashArrow)) {
-        start += 1;
-        if (start == end) {
-            auto error = CompilerError(ErrorCode::UnexpectedToken, (start - 1)->getEnd());
+    if (it->isToken(TokenType::DashArrow)) {
+        it += 1;
+        if (it.isEnd()) {
+            auto error = CompilerError(ErrorCode::UnexpectedToken, (it - 1)->getEnd());
             error.setNote("unexpected end of method declaration, expected return type, generic constraints or `;`");
             addError(std::move(error));
             return std::nullopt;
         }
 
-        decl.returnType = returnTypeRule(start, end);
+        decl.returnType = returnTypeRule(it);
         if (!decl.returnType) {
             auto error = CompilerError(ErrorCode::MissingMethodReturnType, decl.start());
-            error.addLabel("expected method return type", *start);
+            error.addLabel("expected method return type", *it);
             addError(std::move(error));
             return std::nullopt;
         }
     }
 
 
-    decl.genericConstraints = genericConstraintListRule(start, end, [](const TokenTreeNode &node) {
+    decl.genericConstraints = genericConstraintListRule(it, [](const TokenTreeNode &node) {
         return node.isToken(TokenType::Semicolon)
                || node.isTopLevelStarter();
     });
@@ -728,29 +725,29 @@ std::optional<InterfaceMethodDeclaration> Parser::interfaceMethodRule(treeIterat
         decl.endPos = decl.genericConstraints.back().end();
     }
 
-    if (start == end || !start->isToken(TokenType::Semicolon)) {
-        auto error = CompilerError(ErrorCode::MissingSemicolon, (start - 1)->getEnd());
+    if (it.isEnd() || !it->isToken(TokenType::Semicolon)) {
+        auto error = CompilerError(ErrorCode::MissingSemicolon, (it - 1)->getEnd());
         addError(std::move(error));
         return std::move(decl);
     }
 
-    decl.endPos = start->getEnd();
-    start += 1;
+    decl.endPos = it->getEnd();
+    it += 1;
 
     return std::move(decl);
 }
 
-std::optional<InterfaceGetter> Parser::interfaceGetterRule(treeIterator &start, const treeIterator &end,
+std::optional<InterfaceGetter> Parser::interfaceGetterRule(TokenTreeIterator& it,
                                                            std::vector<Token> modifiers) {
-    if (start == end) {
+    if (it.isEnd()) {
         return std::nullopt;
     }
-    COMPILER_ASSERT(start->isToken(TokenType::Get),
+    COMPILER_ASSERT(it->isToken(TokenType::Get),
                     "interfaceGetterRule called with non-get starting token");
 
     auto decl = InterfaceGetter();
-    decl.startPos = start->getStart();
-    start += 1;
+    decl.startPos = it->getStart();
+    it += 1;
 
     validateModifiers(modifiers, {TokenType::Pub, TokenType::Mut});
     if (!modifiers.empty()) {
@@ -758,29 +755,29 @@ std::optional<InterfaceGetter> Parser::interfaceGetterRule(treeIterator &start, 
         decl.isMut = containsModifier(modifiers, TokenType::Mut);
     }
 
-    if (start == end) {
-        auto error = CompilerError(ErrorCode::MissingGetterName, (start - 1)->getEnd());
+    if (it.isEnd()) {
+        auto error = CompilerError(ErrorCode::MissingGetterName, (it - 1)->getEnd());
         error.setNote("unexpected end of getter declaration");
         addError(std::move(error));
         return std::nullopt;
     }
 
-    decl.name = identifierRule(start, end);
+    decl.name = identifierRule(it);
     if (!decl.name) {
         auto error = CompilerError(ErrorCode::MissingGetterName, decl.startPos);
-        error.addLabel("expected getter name", *start);
+        error.addLabel("expected getter name", *it);
         addError(std::move(error));
     }
     decl.endPos = decl.name->end();
 
-    if (start == end || !start->isTokenTree(TokenType::OpenParen)) {
-        auto error = CompilerError(ErrorCode::MissingGetterParam, (start - 1)->getEnd());
+    if (it.isEnd() || !it->isTokenTree(TokenType::OpenParen)) {
+        auto error = CompilerError(ErrorCode::MissingGetterParam, (it - 1)->getEnd());
         error.setNote("unexpected end of setter declaration, expected `(`");
         addError(std::move(error));
         return std::move(decl);
     }
 
-    const auto &tree = consumeTokenTree(start, end, TokenType::OpenParen);
+    const auto &tree = consumeTokenTree(it, TokenType::OpenParen);
     decl.endPos = tree.right.getEnd();
     auto params = parameterListRule(tree);
 
@@ -790,42 +787,42 @@ std::optional<InterfaceGetter> Parser::interfaceGetterRule(treeIterator &start, 
         addError(std::move(error));
     }
 
-    if (start == end) {
-        auto error = CompilerError(ErrorCode::MissingGetterReturnType, (start - 1)->getEnd());
+    if (it.isEnd()) {
+        auto error = CompilerError(ErrorCode::MissingGetterReturnType, (it - 1)->getEnd());
         error.setNote("unexpected end of getter declaration, expected return type`->`");
         addError(std::move(error));
         return std::move(decl);
     }
 
-    if (!start->isToken(TokenType::DashArrow)) {
+    if (!it->isToken(TokenType::DashArrow)) {
         auto error = CompilerError(ErrorCode::MissingGetterReturnType, decl.startPos);
-        error.addLabel("unexpected end of getter declaration, expected return type: `->`", *start);
+        error.addLabel("unexpected end of getter declaration, expected return type: `->`", *it);
         addError(std::move(error));
         return std::move(decl);
     }
 
-    decl.endPos = start->getEnd();
-    start += 1;
+    decl.endPos = it->getEnd();
+    it += 1;
 
-    decl.returnType = returnTypeRule(start, end);
+    decl.returnType = returnTypeRule(it);
     if (!decl.returnType) {
         auto error = CompilerError(ErrorCode::MissingGetterReturnType, decl.startPos);
-        error.addLabel("unexpected end of getter declaration, expected return type", *start);
+        error.addLabel("unexpected end of getter declaration, expected return type", *it);
         addError(std::move(error));
         return std::move(decl);
     }
 
-    if (start == end) {
-        auto error = CompilerError(ErrorCode::MissingSemicolon, (start - 1)->getEnd());
+    if (it.isEnd()) {
+        auto error = CompilerError(ErrorCode::MissingSemicolon, (it - 1)->getEnd());
         error.setNote("expected a semicolon");
         addError(std::move(error));
     }
 
-    if (start->isToken(TokenType::Semicolon)) {
-        decl.endPos = start->getEnd();
-        start += 1;
+    if (it->isToken(TokenType::Semicolon)) {
+        decl.endPos = it->getEnd();
+        it += 1;
     } else {
-        auto error = CompilerError(ErrorCode::MissingSemicolon, start->getStart());
+        auto error = CompilerError(ErrorCode::MissingSemicolon, it->getStart());
         error.setNote("expected a semicolon");
         addError(std::move(error));
     }
@@ -833,47 +830,47 @@ std::optional<InterfaceGetter> Parser::interfaceGetterRule(treeIterator &start, 
     return std::move(decl);
 }
 
-std::optional<InterfaceSetter> Parser::interfaceSetterRule(treeIterator &start, const treeIterator &end,
+std::optional<InterfaceSetter> Parser::interfaceSetterRule(TokenTreeIterator& it,
                                                            std::vector<Token> modifiers) {
-    if (start == end) {
+    if (it.isEnd()) {
         return std::nullopt;
     }
-    COMPILER_ASSERT(start->isToken(TokenType::Set),
+    COMPILER_ASSERT(it->isToken(TokenType::Set),
                     "interfaceSetterRule called with non-set starting token");
 
     auto decl = InterfaceSetter();
-    decl.startPos = start->getStart();
-    start += 1;
+    decl.startPos = it->getStart();
+    it += 1;
 
     validateModifiers(modifiers, {TokenType::Pub});
     if (!modifiers.empty()) {
         decl.startPos = modifiers.front().start;
     }
 
-    if (start == end) {
-        auto error = CompilerError(ErrorCode::MissingSetterName, (start - 1)->getEnd());
+    if (it.isEnd()) {
+        auto error = CompilerError(ErrorCode::MissingSetterName, (it - 1)->getEnd());
         error.setNote("unexpected end of setter declaration");
         addError(std::move(error));
         return std::nullopt;
     }
 
-    decl.name = identifierRule(start, end);
+    decl.name = identifierRule(it);
     if (!decl.name) {
         auto error = CompilerError(ErrorCode::MissingSetterName, decl.startPos);
-        error.addLabel("expected setter name", *start);
+        error.addLabel("expected setter name", *it);
         addError(std::move(error));
         return std::nullopt;
     }
     decl.endPos = decl.name->end();
 
-    if (start == end || !start->isTokenTree(TokenType::OpenParen)) {
-        auto error = CompilerError(ErrorCode::MissingSetterParam, (start - 1)->getEnd());
+    if (it.isEnd() || !it->isTokenTree(TokenType::OpenParen)) {
+        auto error = CompilerError(ErrorCode::MissingSetterParam, (it - 1)->getEnd());
         error.setNote("unexpected end of setter declaration, expected `(`");
         addError(std::move(error));
         return std::move(decl);
     }
 
-    const auto &tree = consumeTokenTree(start, end, TokenType::OpenParen);
+    const auto &tree = consumeTokenTree(it, TokenType::OpenParen);
 
     decl.endPos = tree.right.getEnd();
     auto params = parameterListRule(tree);
@@ -885,24 +882,24 @@ std::optional<InterfaceSetter> Parser::interfaceSetterRule(treeIterator &start, 
     }
 
     if (params.empty()) {
-        auto error = CompilerError(ErrorCode::MissingSetterParam, (start - 1)->getEnd());
+        auto error = CompilerError(ErrorCode::MissingSetterParam, (it - 1)->getEnd());
         error.setNote("setters must have exactly 1 parameter");
         addError(std::move(error));
     } else {
         decl.parameter = std::move(params[0]);
     }
 
-    if (start == end) {
-        auto error = CompilerError(ErrorCode::MissingSemicolon, (start - 1)->getEnd());
+    if (it.isEnd()) {
+        auto error = CompilerError(ErrorCode::MissingSemicolon, (it - 1)->getEnd());
         error.setNote("expected a semicolon");
         addError(std::move(error));
     }
 
-    if (start->isToken(TokenType::Semicolon)) {
-        decl.endPos = start->getEnd();
-        start += 1;
+    if (it->isToken(TokenType::Semicolon)) {
+        decl.endPos = it->getEnd();
+        it += 1;
     } else {
-        auto error = CompilerError(ErrorCode::MissingSemicolon, start->getStart());
+        auto error = CompilerError(ErrorCode::MissingSemicolon, it->getStart());
         error.setNote("expected a semicolon");
         addError(std::move(error));
     }
@@ -911,79 +908,79 @@ std::optional<InterfaceSetter> Parser::interfaceSetterRule(treeIterator &start, 
 }
 
 
-void Parser::structRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
-    COMPILER_ASSERT(start->isToken(TokenType::Struct),
+void Parser::structRule(TokenTreeIterator& it, std::vector<Token> modifiers) {
+    COMPILER_ASSERT(it->isToken(TokenType::Struct),
                     "structRule called with non-struct starting token");
 
     auto decl = StructDeclaration();
     if (!modifiers.empty()) {
         decl.startPos = modifiers.begin()->start;
     } else {
-        decl.startPos = start->getStart();
+        decl.startPos = it->getStart();
     }
-    decl.endPos = start->getEnd();
-    start += 1;
+    decl.endPos = it->getEnd();
+    it += 1;
 
     validateModifiers(modifiers, {TokenType::Pub});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
 
-    if (start == end) {
+    if (it.isEnd()) {
         auto error = CompilerError(ErrorCode::MissingDeclarationName, decl.startPos);
-        error.addLabel("expected struct name", *start);
+        error.addLabel("expected struct name", *it);
         addError(std::move(error));
         modules.back().structDeclarations.emplace_back(std::move(decl));
         return;
     }
 
-    decl.name = identifierRule(start, end);
+    decl.name = identifierRule(it);
     if (!decl.name) {
         auto error = CompilerError(ErrorCode::MissingDeclarationName, decl.startPos);
-        error.addLabel("expected struct name", *start);
+        error.addLabel("expected struct name", *it);
         addError(std::move(error));
     }
     decl.endPos = decl.name->end();
 
-    if (start == end) {
+    if (it.isEnd()) {
         auto error = CompilerError(ErrorCode::MissingSemicolon, decl.startPos);
-        error.addLabel("expected semicolon", *start);
+        error.addLabel("expected semicolon", *it);
         modules.back().structDeclarations.emplace_back(std::move(decl));
         return;
     }
 
-    if (const auto tree = tryConsumeTokenTree(start, end, TokenType::OpenAngle)) {
+    if (const auto tree = tryConsumeTokenTree(it, TokenType::OpenAngle)) {
         decl.endPos = (*tree)->right.getEnd();
         decl.genericParams = std::move(identifierListRule(**tree));
     }
 
-    if (start == end) {
+    if (it.isEnd()) {
         auto error = CompilerError(ErrorCode::MissingStructBody, decl.startPos);
-        error.addLabel("expected struct body", *start);
+        error.addLabel("expected struct body", *it);
         addError(std::move(error));
         modules.back().structDeclarations.emplace_back(std::move(decl));
         return;
     }
 
-    auto beforeRecover = start;
-    recoverUntil(start, end, [](const TokenTreeNode &node) {
+    auto beforeRecover = it;
+    recoverUntil(it, [](const TokenTreeNode &node) {
         return node.isTokenTree(TokenType::OpenCurly)
                || node.isTokenTree(TokenType::OpenParen)
                || node.isToken(TokenType::Where)
                || node.isTopLevelStarter();
     });
-    if (beforeRecover != start) {
+    if (beforeRecover != it) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
         addError(std::move(error));
     }
-    if (start == end || start->isTopLevelStarter()) {
+    if (it.isEnd() || it->isTopLevelStarter()) {
         auto error = CompilerError(ErrorCode::MissingStructBody, decl.startPos);
-        error.addLabel("expected struct body", *(start - 1));
+        error.addLabel("expected struct body", *(it - 1));
         addError(std::move(error));
         modules.back().structDeclarations.emplace_back(std::move(decl));
         return;
     }
 
 
-    decl.genericConstraints = genericConstraintListRule(start, end, [](const TokenTreeNode &node) {
+    decl.genericConstraints = genericConstraintListRule(it, [](const TokenTreeNode &node) {
         return node.isTokenTree(TokenType::OpenCurly)
                || node.isTokenTree(TokenType::OpenParen)
                || node.isTopLevelStarter();
@@ -993,15 +990,15 @@ void Parser::structRule(treeIterator &start, const treeIterator &end, std::vecto
         decl.endPos = decl.genericConstraints.back().end();
     }
 
-    if (start == end || start->isTopLevelStarter()) {
+    if (it.isEnd() || it->isTopLevelStarter()) {
         auto error = CompilerError(ErrorCode::MissingStructBody, decl.startPos);
-        error.addLabel("expected struct body", *(start - 1));
+        error.addLabel("expected struct body", *(it - 1));
         addError(std::move(error));
         modules.back().structDeclarations.emplace_back(std::move(decl));
         return;
     }
 
-    if (const auto tree = tryConsumeTokenTree(start, end, TokenType::OpenParen)) {
+    if (const auto tree = tryConsumeTokenTree(it, TokenType::OpenParen)) {
         auto parameters = parameterListRule(**tree);
         for (auto &parameter: parameters) {
             if (parameter.isMut || parameter.isRef) {
@@ -1022,78 +1019,77 @@ void Parser::structRule(treeIterator &start, const treeIterator &end, std::vecto
         }
         decl.endPos = (*tree)->right.getEnd();
 
-        beforeRecover = start;
-        recoverUntil(start, end, [](const TokenTreeNode &node) {
+        beforeRecover = it;
+        recoverUntil(it, [](const TokenTreeNode &node) {
             return node.isTopLevelStarter()
                    || node.isToken(TokenType::Semicolon)
                    || node.isToken(TokenType::Where);
         });
-        if (beforeRecover != start) {
+        if (beforeRecover != it) {
             auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
             addError(std::move(error));
         }
-        if (start == end || start->isTopLevelStarter()) {
-            auto error = CompilerError(ErrorCode::MissingSemicolon, (start - 1)->getEnd());
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            auto error = CompilerError(ErrorCode::MissingSemicolon, (it - 1)->getEnd());
             addError(std::move(error));
             modules.back().structDeclarations.emplace_back(std::move(decl));
             return;
         }
 
-        decl.genericConstraints = genericConstraintListRule(start, end, [](const TokenTreeNode &node) {
+        decl.genericConstraints = genericConstraintListRule(it, [](const TokenTreeNode &node) {
             return node.isToken(TokenType::Semicolon)
                    || node.isTopLevelStarter();
         });
 
-        if (start == end || !start->isToken(TokenType::Semicolon)) {
-            auto error = CompilerError(ErrorCode::MissingSemicolon, (start - 1)->getEnd());
+        if (it.isEnd() || !it->isToken(TokenType::Semicolon)) {
+            auto error = CompilerError(ErrorCode::MissingSemicolon, (it - 1)->getEnd());
             addError(std::move(error));
         }
-        start += 1;
-    } else if (start->isTokenTree(TokenType::OpenCurly)) {
-        const auto &body = start->getTokenTree();
-        treeIterator bodyStart = body.tokens.begin(); // NOLINT(*-use-auto)
-        auto bodyEnd = body.tokens.end();
+        it += 1;
+    } else if (it->isTokenTree(TokenType::OpenCurly)) {
+        const auto &body = it->getTokenTree();
+        auto bodyIt = TokenTreeIterator(body.tokens);
 
-        while (bodyStart != bodyEnd) {
-            auto prop = propertyDeclarationRule(bodyStart, bodyEnd);
+        while (bodyIt) {
+            auto prop = propertyDeclarationRule(bodyIt);
             if (prop) {
                 decl.propertyDeclarations.emplace_back(std::move(*prop));
             }
         }
 
-        start += 1;
-        beforeRecover = start;
-        recoverUntil(start, end, [](const TokenTreeNode &node) {
+        it += 1;
+        beforeRecover = it;
+        recoverUntil(it, [](const TokenTreeNode &node) {
             return node.isTopLevelStarter()
                    || node.isToken(TokenType::DestructuresInto);
         });
-        if (start != end && start->isToken(TokenType::DestructuresInto)) {
-            decl.endPos = start->getEnd();
-            start += 1;
-            if (start == end) {
-                auto error = CompilerError(ErrorCode::UnexpectedEndOfInput, (start - 1)->getEnd());
+        if (it && it->isToken(TokenType::DestructuresInto)) {
+            decl.endPos = it->getEnd();
+            it += 1;
+            if (it.isEnd()) {
+                auto error = CompilerError(ErrorCode::UnexpectedEndOfInput, (it - 1)->getEnd());
                 addError(std::move(error));
                 modules.back().structDeclarations.emplace_back(std::move(decl));
                 return;
             }
-            decl.destructureProperties = identifierListRule(consumeTokenTree(start, end, TokenType::OpenParen));
+            decl.destructureProperties = identifierListRule(consumeTokenTree(it, TokenType::OpenParen));
 
 
-            beforeRecover = start;
-            recoverUntil(start, end, [](const TokenTreeNode &node) {
+            beforeRecover = it;
+            recoverUntil(it, [](const TokenTreeNode &node) {
                 return node.isTopLevelStarter()
                        || node.isToken(TokenType::Semicolon);
             });
 
-            if (beforeRecover != start) {
+            if (beforeRecover != it) {
                 auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
                 addError(std::move(error));
             }
-            if (start == end || !start->isToken(TokenType::Semicolon)) {
+            if (it.isEnd() || !it->isToken(TokenType::Semicolon)) {
                 auto error = CompilerError(ErrorCode::MissingSemicolon, beforeRecover->getStart());
                 addError(std::move(error));
             }
-            start += 1;
+            it += 1;
         }
     } else {
         COMPILER_ASSERT(false, "unreachable");
@@ -1102,19 +1098,19 @@ void Parser::structRule(treeIterator &start, const treeIterator &end, std::vecto
     modules.back().structDeclarations.emplace_back(std::move(decl));
 }
 
-std::vector<ConstraintDeclaration> Parser::genericConstraintListRule(treeIterator &start, const treeIterator &end,
+std::vector<ConstraintDeclaration> Parser::genericConstraintListRule(TokenTreeIterator& it,
                                                                      const RecoverPredicate &recoverPredicate) {
     std::vector<ConstraintDeclaration> result;
-    while (start != end && start->isToken(TokenType::Where)) {
-        auto constraint = genericConstraintRule(start, end);
+    while (it && it->isToken(TokenType::Where)) {
+        auto constraint = genericConstraintRule(it);
         if (constraint) {
             result.emplace_back(std::move(*constraint));
         }
-        auto beforeRecover = start;
-        recoverUntil(start, end, [&recoverPredicate](const TokenTreeNode &node) {
+        auto beforeRecover = it;
+        recoverUntil(it, [&recoverPredicate](const TokenTreeNode &node) {
             return node.isToken(TokenType::Where) || recoverPredicate(node);
         });
-        if (beforeRecover != start) {
+        if (beforeRecover != it) {
             auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
             addError(std::move(error));
         }
@@ -1123,55 +1119,55 @@ std::vector<ConstraintDeclaration> Parser::genericConstraintListRule(treeIterato
 }
 
 
-std::optional<PropertyDeclaration> Parser::propertyDeclarationRule(treeIterator &start, const treeIterator &end) {
-    auto beforeRecover = start;
-    recoverUntil(start, end, [](const TokenTreeNode &node) {
+std::optional<PropertyDeclaration> Parser::propertyDeclarationRule(TokenTreeIterator& it) {
+    auto beforeRecover = it;
+    recoverUntil(it, [](const TokenTreeNode &node) {
         return node.isModifier() || node.isToken(TokenType::Identifier) || node.isToken(TokenType::Semicolon);
     });
-    if (beforeRecover != start) {
+    if (beforeRecover != it) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
         addError(std::move(error));
     }
-    if (start == end) {
+    if (it.isEnd()) {
         //BEAN
         return std::nullopt;
     }
-    if (start->isToken(TokenType::Semicolon)) {
-        if (beforeRecover == start) {
-            auto error = CompilerError(ErrorCode::UnexpectedToken, start->getStart());
+    if (it->isToken(TokenType::Semicolon)) {
+        if (beforeRecover == it) {
+            auto error = CompilerError(ErrorCode::UnexpectedToken, it->getStart());
             addError(std::move(error));
         }
-        start += 1;
+        it += 1;
         return std::nullopt;
     }
 
-    auto modifiers = modifierRule(start, end, [](const auto &) { return true; });
+    auto modifiers = modifierRule(it, [](const auto &) { return true; });
     validateModifiers(modifiers, {TokenType::Pub, TokenType::Mut});
 
-    beforeRecover = start;
-    recoverUntil(start, end, {TokenType::Identifier, TokenType::Semicolon});
-    if (beforeRecover != start) {
+    beforeRecover = it;
+    recoverUntil(it, {TokenType::Identifier, TokenType::Semicolon});
+    if (beforeRecover != it) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
         addError(std::move(error));
     }
-    if (start == end) {
+    if (it.isEnd()) {
         return std::nullopt;
     }
-    if (start->isToken(TokenType::Semicolon)) {
-        if (beforeRecover == start) {
-            auto error = CompilerError(ErrorCode::MissingPropertyName, start->getStart());
+    if (it->isToken(TokenType::Semicolon)) {
+        if (beforeRecover == it) {
+            auto error = CompilerError(ErrorCode::MissingPropertyName, it->getStart());
             addError(std::move(error));
         }
-        start += 1;
+        it += 1;
         return std::nullopt;
     }
-    if (!start->isToken(TokenType::Identifier)) {
-        auto error = CompilerError(ErrorCode::MissingPropertyName, start->getStart());
+    if (!it->isToken(TokenType::Identifier)) {
+        auto error = CompilerError(ErrorCode::MissingPropertyName, it->getStart());
         addError(std::move(error));
         return std::nullopt;
     }
 
-    PropertyDeclaration prop(identifierRule(start, end));
+    PropertyDeclaration prop(identifierRule(it));
     if (!modifiers.empty()) {
         prop.startPos = modifiers.front().start;
     } else {
@@ -1182,96 +1178,96 @@ std::optional<PropertyDeclaration> Parser::propertyDeclarationRule(treeIterator 
 
     prop.endPos = prop.name.start();
 
-    beforeRecover = start;
-    recoverUntil(start, end, [&](const TokenTreeNode &node) {
+    beforeRecover = it;
+    recoverUntil(it, [&](const TokenTreeNode &node) {
         return node.isSignatureStarter() || node.isToken(TokenType::Colon) || node.isToken(TokenType::Semicolon);
     });
-    if (beforeRecover != start) {
+    if (beforeRecover != it) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
         addError(std::move(error));
     }
-    if (start == end) {
-        auto error = CompilerError(ErrorCode::MissingPropertyType, start->getStart());
+    if (it.isEnd()) {
+        auto error = CompilerError(ErrorCode::MissingPropertyType, it->getStart());
         addError(std::move(error));
         return std::move(prop);
     }
-    if (start->isToken(TokenType::Colon)) {
-        prop.endPos = start->getEnd();
-        start += 1;
-        beforeRecover = start;
-        recoverUntil(start, end, [&](const TokenTreeNode &node) {
+    if (it->isToken(TokenType::Colon)) {
+        prop.endPos = it->getEnd();
+        it += 1;
+        beforeRecover = it;
+        recoverUntil(it, [&](const TokenTreeNode &node) {
             return node.isSignatureStarter() || node.isToken(TokenType::Semicolon);
         });
-        if (beforeRecover != start) {
+        if (beforeRecover != it) {
             auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
             addError(std::move(error));
         }
-        if (start == end) {
-            auto error = CompilerError(ErrorCode::MissingPropertyType, start->getStart());
+        if (it.isEnd()) {
+            auto error = CompilerError(ErrorCode::MissingPropertyType, it->getStart());
             addError(std::move(error));
             return std::nullopt;
         }
     }
-    if (!start->isSignatureStarter()) {
-        auto error = CompilerError(ErrorCode::MissingPropertyType, start->getStart());
+    if (!it->isSignatureStarter()) {
+        auto error = CompilerError(ErrorCode::MissingPropertyType, it->getStart());
         addError(std::move(error));
         return std::move(prop);
     }
 
-    auto signature = signatureRule(start, end);
+    auto signature = signatureRule(it);
 
     prop.endPos = signature->end();
     prop.type = std::move(signature);
 
-    beforeRecover = start;
-    recoverUntil(start, end, [&](const TokenTreeNode &node) {
+    beforeRecover = it;
+    recoverUntil(it, [&](const TokenTreeNode &node) {
         return node.isModifier() || node.isToken(TokenType::Identifier) || node.isToken(TokenType::Semicolon);
     });
 
-    if (beforeRecover != start) {
+    if (beforeRecover != it) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
         addError(std::move(error));
     }
-    if (start == end || !start->isToken(TokenType::Semicolon)) {
-        auto error = CompilerError(ErrorCode::MissingSemicolon, (start - 1)->getEnd());
+    if (it.isEnd() || !it->isToken(TokenType::Semicolon)) {
+        auto error = CompilerError(ErrorCode::MissingSemicolon, (it - 1)->getEnd());
         addError(std::move(error));
     }
-    prop.endPos = start->getEnd();
-    start += 1;
+    prop.endPos = it->getEnd();
+    it += 1;
     return std::move(prop);
 }
 
-void Parser::functionRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
-    COMPILER_ASSERT(start->isToken(TokenType::Fn),
+void Parser::functionRule(TokenTreeIterator& it, std::vector<Token> modifiers) {
+    COMPILER_ASSERT(it->isToken(TokenType::Fn),
                     "functionRule called with non-fn starting token");
 
     auto decl = FunctionDeclaration();
     if (!modifiers.empty()) {
         decl.startPos = modifiers.begin()->start;
     } else {
-        decl.startPos = start->getStart();
+        decl.startPos = it->getStart();
     }
-    decl.endPos = start->getEnd();
-    start += 1;
+    decl.endPos = it->getEnd();
+    it += 1;
 
     validateModifiers(modifiers, {TokenType::Pub});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
 
-    if (start == end) {
+    if (it.isEnd()) {
         auto error = CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start());
         modules.back().functionDeclarations.emplace_back(std::move(decl));
         return;
     }
 
-    decl.name = identifierRule(start, end);
+    decl.name = identifierRule(it);
     if (!decl.name) {
         auto error = CompilerError(ErrorCode::MissingDeclarationName, decl.startPos);
-        error.addLabel("expected function name", *start);
+        error.addLabel("expected function name", *it);
         addError(std::move(error));
     }
     decl.endPos = decl.name->end();
 
-    if (start == end) {
+    if (it.isEnd()) {
         auto error = CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start());
         modules.back().functionDeclarations.emplace_back(std::move(decl));
         return;
@@ -1287,92 +1283,92 @@ void Parser::functionRule(treeIterator &start, const treeIterator &end, std::vec
     // genericConstraint*
 }
 
-void Parser::aliasRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
-    COMPILER_ASSERT(start->isToken(TokenType::Alias),
+void Parser::aliasRule(TokenTreeIterator& it, std::vector<Token> modifiers) {
+    COMPILER_ASSERT(it->isToken(TokenType::Alias),
                     "aliasRule called with non-alias starting token");
 
     auto decl = AliasDeclaration();
     if (!modifiers.empty()) {
         decl.startPos = modifiers.begin()->start;
     } else {
-        decl.startPos = start->getStart();
+        decl.startPos = it->getStart();
     }
-    decl.endPos = start->getEnd();
-    start += 1;
+    decl.endPos = it->getEnd();
+    it += 1;
 
     validateModifiers(modifiers, {TokenType::Pub});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
 
-    auto beforeRecover = start;
-    recoverUntil(start, end, [](const TokenTreeNode &node) {
+    auto beforeRecover = it;
+    recoverUntil(it, [](const TokenTreeNode &node) {
         return node.isTopLevelStarter() || node.isToken(TokenType::Identifier);
     });
 
-    if (start == end || start->isTopLevelStarter()) {
-        addError(CompilerError(ErrorCode::MissingDeclarationName, (start - 1)->getEnd()));
+    if (it.isEnd() || it->isTopLevelStarter()) {
+        addError(CompilerError(ErrorCode::MissingDeclarationName, (it - 1)->getEnd()));
         return;
     }
 
-    if (beforeRecover != start) {
+    if (beforeRecover != it) {
         addError(CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart()));
     }
 
-    decl.name = identifierRule(start, end);
+    decl.name = identifierRule(it);
     if (!decl.name) {
         auto error = CompilerError(ErrorCode::MissingDeclarationName, decl.startPos);
-        error.addLabel("expected alias name", *start);
+        error.addLabel("expected alias name", *it);
         addError(std::move(error));
         return;
     }
     decl.endPos = decl.name->end();
 
-    beforeRecover = start;
-    recoverUntil(start, end, [](const TokenTreeNode &node) {
+    beforeRecover = it;
+    recoverUntil(it, [](const TokenTreeNode &node) {
         return node.isTopLevelStarter() || node.isSignatureStarter() || node.isToken(TokenType::Equals) || node.
                isTokenTree(TokenType::OpenAngle);
     });
 
-    if (start == end || start->isTopLevelStarter()) {
+    if (it.isEnd() || it->isTopLevelStarter()) {
         auto error = CompilerError(ErrorCode::MissingAliasType, decl.start());
         addError(std::move(error));
         modules.back().aliasDeclarations.emplace_back(std::move(decl));
         return;
     }
-    if (start != beforeRecover) {
+    if (it != beforeRecover) {
         addError(CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart()));
     }
-    if (const auto tree = tryConsumeTokenTree(start, end, TokenType::OpenAngle)) {
+    if (const auto tree = tryConsumeTokenTree(it, TokenType::OpenAngle)) {
         decl.genericParams = identifierListRule(**tree);
 
-        beforeRecover = start;
-        recoverUntil(start, end, [](const TokenTreeNode &node) {
+        beforeRecover = it;
+        recoverUntil(it, [](const TokenTreeNode &node) {
             return node.isTopLevelStarter() || node.isSignatureStarter() || node.isToken(TokenType::Equals);
         });
 
-        if (start == end || start->isTopLevelStarter()) {
+        if (it.isEnd() || it->isTopLevelStarter()) {
             auto error = CompilerError(ErrorCode::MissingAliasType, decl.start());
             addError(std::move(error));
             modules.back().aliasDeclarations.emplace_back(std::move(decl));
             return;
         }
-        if (start != beforeRecover) {
+        if (it != beforeRecover) {
             addError(CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart()));
         }
     }
-    if (start->isToken(TokenType::Equals)) {
-        start += 1;
-        beforeRecover = start;
-        recoverUntil(start, end, [](const TokenTreeNode &node) {
+    if (it->isToken(TokenType::Equals)) {
+        it += 1;
+        beforeRecover = it;
+        recoverUntil(it, [](const TokenTreeNode &node) {
             return node.isTopLevelStarter() || node.isSignatureStarter();
         });
 
-        if (start == end || start->isTopLevelStarter()) {
+        if (it.isEnd() || it->isTopLevelStarter()) {
             auto error = CompilerError(ErrorCode::MissingAliasType, decl.start());
             addError(std::move(error));
             modules.back().aliasDeclarations.emplace_back(std::move(decl));
             return;
         }
-        if (start != beforeRecover) {
+        if (it != beforeRecover) {
             addError(CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart()));
         }
     } else {
@@ -1381,7 +1377,7 @@ void Parser::aliasRule(treeIterator &start, const treeIterator &end, std::vector
     }
 
 
-    auto signature = signatureRule(start, end);
+    auto signature = signatureRule(it);
     if (!signature) {
         modules.back().aliasDeclarations.emplace_back(std::move(decl));
         return;
@@ -1390,7 +1386,7 @@ void Parser::aliasRule(treeIterator &start, const treeIterator &end, std::vector
     decl.endPos = (*decl.signature)->end();
 
 
-    decl.genericConstraints = genericConstraintListRule(start, end, [](const TokenTreeNode &node) {
+    decl.genericConstraints = genericConstraintListRule(it, [](const TokenTreeNode &node) {
         return node.isToken(TokenType::Semicolon)
                || node.isTopLevelStarter();
     });
@@ -1398,192 +1394,192 @@ void Parser::aliasRule(treeIterator &start, const treeIterator &end, std::vector
         decl.endPos = decl.genericConstraints.back().end();
     }
 
-    if (start == end || start->isTopLevelStarter()) {
-        auto error = CompilerError(ErrorCode::MissingSemicolon, (start - 1)->getEnd());
+    if (it.isEnd() || it->isTopLevelStarter()) {
+        auto error = CompilerError(ErrorCode::MissingSemicolon, (it - 1)->getEnd());
     } else {
-        COMPILER_ASSERT(start->isToken(TokenType::Semicolon), "unexpected token type");
-        start += 1;
+        COMPILER_ASSERT(it->isToken(TokenType::Semicolon), "unexpected token type");
+        it += 1;
     }
 
     modules.back().aliasDeclarations.emplace_back(std::move(decl));
 }
 
-void Parser::moduleVariableRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers) {
-    COMPILER_ASSERT(start->isToken(TokenType::Let),
+void Parser::moduleVariableRule(TokenTreeIterator& it, std::vector<Token> modifiers) {
+    COMPILER_ASSERT(it->isToken(TokenType::Let),
                     "moduleVariableRule called with non-let starting token");
 
     auto decl = ModuleVariableDeclaration();
     if (!modifiers.empty()) {
         decl.startPos = modifiers.begin()->start;
     } else {
-        decl.startPos = start->getStart();
+        decl.startPos = it->getStart();
     }
-    decl.endPos = start->getEnd();
-    start += 1;
+    decl.endPos = it->getEnd();
+    it += 1;
 
     validateModifiers(modifiers, {TokenType::Pub, TokenType::Mut});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
     decl.isMut = containsModifier(modifiers, TokenType::Mut);
 
-    if (start == end) {
+    if (it.isEnd()) {
         auto error = CompilerError(ErrorCode::MissingDeclarationName, decl.startPos);
-        error.addLabel("expected variable name", *(start - 1));
+        error.addLabel("expected variable name", *(it - 1));
         addError(std::move(error));
         modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
         return;
     }
 
-    decl.name = identifierRule(start, end);
+    decl.name = identifierRule(it);
     if (!decl.name) {
         auto error = CompilerError(ErrorCode::MissingDeclarationName, decl.startPos);
-        error.addLabel("expected variable name", *start);
+        error.addLabel("expected variable name", *it);
         addError(std::move(error));
     }
     decl.endPos = decl.name->end();
 
-    if (start == end) {
+    if (it.isEnd()) {
         auto error = CompilerError(ErrorCode::MissingSemicolon, decl.startPos);
-        error.addLabel("missing semicolon", *(start - 1));
+        error.addLabel("missing semicolon", *(it - 1));
         addError(std::move(error));
         modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
         return;
     }
 
-    if (!start->isToken(TokenType::Colon)) {
+    if (!it->isToken(TokenType::Colon)) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, decl.startPos);
-        error.addLabel("expected colon: `:`", *start);
+        error.addLabel("expected colon: `:`", *it);
         addError(std::move(error));
         modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
         return;
     }
 
-    decl.endPos = start->getEnd();
-    start += 1;
+    decl.endPos = it->getEnd();
+    it += 1;
 
-    if (start == end) {
+    if (it.isEnd()) {
         auto error = CompilerError(ErrorCode::MissingVariableType, decl.startPos);
-        error.addLabel("expected a type signature", *(start - 1));
+        error.addLabel("expected a type signature", *(it - 1));
         addError(std::move(error));
         modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
         return;
     }
 
-    decl.type = signatureRule(start, end);
+    decl.type = signatureRule(it);
 
     if (!decl.type) {
         auto error = CompilerError(ErrorCode::MissingVariableType, decl.startPos);
-        error.addLabel("expected a type signature", *start);
+        error.addLabel("expected a type signature", *it);
         addError(std::move(error));
         modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
         return;
     }
 
-    if (start == end) {
-        auto error = CompilerError(ErrorCode::UnexpectedToken, (start - 1)->getEnd());
+    if (it.isEnd()) {
+        auto error = CompilerError(ErrorCode::UnexpectedToken, (it - 1)->getEnd());
         error.setNote("unexpected end of method declaration, expected `;`");
         addError(std::move(error));
         modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
         return;
     }
 
-    if (!start->isToken(TokenType::Semicolon)) {
+    if (!it->isToken(TokenType::Semicolon)) {
         auto error = CompilerError(ErrorCode::MissingSemicolon, decl.start());
-        error.addLabel("Missing semicolon", *start);
+        error.addLabel("Missing semicolon", *it);
         addError(std::move(error));
     } else {
-        decl.endPos = start->getEnd();
-        start += 1;
+        decl.endPos = it->getEnd();
+        it += 1;
     }
 
     modules.back().moduleVariableDeclarations.emplace_back(std::move(decl));
 }
 
-void Parser::declarationRule(treeIterator &start, const treeIterator &end) {
-    COMPILER_ASSERT(start->isModifier() || start->isDeclaratorKeyword(),
+void Parser::declarationRule(TokenTreeIterator& it) {
+    COMPILER_ASSERT(it->isModifier() || it->isDeclaratorKeyword(),
                     "declarationRule called with non-declaration starting token");
 
-    auto modifiers = modifierRule(start, end, [](const auto &) { return true; });
+    auto modifiers = modifierRule(it, [](const auto &) { return true; });
 
-    const auto &currentTokenTree = *start;
+    const auto &currentTokenTree = *it;
     if (currentTokenTree.isTokenResult()) {
         const auto &tokenResult = currentTokenTree.getTokenResult();
         if (tokenResult.isError()) {
-            auto error = CompilerError(ErrorCode::UnexpectedToken, start->getStart());
-            error.addLabel("expected a top level declaration", *start);
+            auto error = CompilerError(ErrorCode::UnexpectedToken, it->getStart());
+            error.addLabel("expected a top level declaration", *it);
             addError(std::move(error));
-            recoverTopLevel(start, end);
+            recoverTopLevel(it);
             return;
         }
         auto &token = tokenResult.get();
 
         if (token.type == TokenType::Enum) {
-            enumRule(start, end, std::move(modifiers));
+            enumRule(it, std::move(modifiers));
         } else if (token.type == TokenType::Interface) {
-            interfaceRule(start, end, std::move(modifiers));
+            interfaceRule(it, std::move(modifiers));
         } else if (token.type == TokenType::Struct) {
-            structRule(start, end, std::move(modifiers));
+            structRule(it, std::move(modifiers));
         } else if (token.type == TokenType::Fn) {
-            functionRule(start, end, std::move(modifiers));
+            functionRule(it, std::move(modifiers));
         } else if (token.type == TokenType::Alias) {
-            aliasRule(start, end, std::move(modifiers));
+            aliasRule(it, std::move(modifiers));
         } else if (token.type == TokenType::Let) {
-            moduleVariableRule(start, end, std::move(modifiers));
+            moduleVariableRule(it, std::move(modifiers));
         } else {
-            auto error = CompilerError(ErrorCode::UnexpectedToken, start->getStart());
-            error.addLabel("expected a top level declaration", *start);
+            auto error = CompilerError(ErrorCode::UnexpectedToken, it->getStart());
+            error.addLabel("expected a top level declaration", *it);
             addError(std::move(error));
-            recoverTopLevel(start, end);
+            recoverTopLevel(it);
         }
     } else {
-        auto error = CompilerError(ErrorCode::UnexpectedToken, start->getStart());
-        error.addLabel("expected a top level declaration", *start);
+        auto error = CompilerError(ErrorCode::UnexpectedToken, it->getStart());
+        error.addLabel("expected a top level declaration", *it);
         addError(std::move(error));
-        recoverTopLevel(start, end);
+        recoverTopLevel(it);
     }
 }
 
-Path Parser::pathRule(treeIterator &start, const treeIterator &end, const bool allowTrailing) {
+Path Parser::pathRule(TokenTreeIterator& it, const bool allowTrailing) {
     Path path{};
 
-    if ((path.rooted = tryConsumeToken(start, end, TokenType::PathSeparator))) {
-        recoverUntil(start, end, TokenType::Identifier);
-        if (start == end) {
+    if ((path.rooted = tryConsumeToken(it, TokenType::PathSeparator))) {
+        recoverUntil(it, TokenType::Identifier);
+        if (it.isEnd()) {
             addError(CompilerError(ErrorCode::EmptyPath, path.rooted->start));
             return path;
         }
     }
 
-    path.parts.push_back(identifierRule(start, end));
+    path.parts.push_back(identifierRule(it));
 
-    while (start != end && start->isToken(TokenType::PathSeparator)) {
-        const auto fallback = start;
-        auto trailer = consumeToken(start, end, TokenType::PathSeparator);
-        if (start == end || !start->isToken(TokenType::Identifier)) {
+    while (it && it->isToken(TokenType::PathSeparator)) {
+        const auto fallback = it;
+        auto trailer = consumeToken(it, TokenType::PathSeparator);
+        if (it.isEnd() || !it->isToken(TokenType::Identifier)) {
             if (allowTrailing) {
                 path.trailer = trailer;
             } else {
-                start = fallback;
+                it = fallback;
             }
             break;
         }
 
-        path.parts.push_back(identifierRule(start, end));
+        path.parts.push_back(identifierRule(it));
     }
     return path;
 }
 
-std::optional<ConstraintDeclaration> Parser::genericConstraintRule(treeIterator &start, const treeIterator &end) {
-    COMPILER_ASSERT(start != end && start->isToken(TokenType::Where),
+std::optional<ConstraintDeclaration> Parser::genericConstraintRule(TokenTreeIterator& it) {
+    COMPILER_ASSERT(it && it->isToken(TokenType::Where),
                     "constraint rule called but start token is not a `where`");
-    start += 1;
+    it += 1;
     auto decl = ConstraintDeclaration();
 
     // TODO: error recovery?
 
-    decl.name = std::move(identifierRule(start, end));
+    decl.name = std::move(identifierRule(it));
     if (!decl.name) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, decl.startPos);
-        error.addLabel("expected generic parameter name", *start);
+        error.addLabel("expected generic parameter name", *it);
         addError(std::move(error));
         return std::nullopt;
     }
@@ -1591,81 +1587,81 @@ std::optional<ConstraintDeclaration> Parser::genericConstraintRule(treeIterator 
     decl.endPos = decl.name->end();
 
     // TODO: error recovery and end checking
-    if (!start->isToken(TokenType::Colon)) {
+    if (!it->isToken(TokenType::Colon)) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, decl.startPos);
-        error.addLabel("expected `:`", *start);
+        error.addLabel("expected `:`", *it);
         addError(std::move(error));
     } else {
-        start += 1;
+        it += 1;
     }
 
-    while (start != end) {
-        if (auto c1 = interfaceConstraintRule(start, end)) {
+    while (it) {
+        if (auto c1 = interfaceConstraintRule(it)) {
             decl.constraints.emplace_back(std::make_unique<InterfaceConstraint>(std::move(*c1)));
-        } /* else if (auto c2 = defaultConstraintRule(start, end)) {
+        } /* else if (auto c2 = defaultConstraintRule(it)) {
             decl.constraints.push_back(std::move(c2));
         }*/
-        else if (start->isConstraintBreakout()) {
+        else if (it->isConstraintBreakout()) {
             break;
         } else {
             auto error = CompilerError(ErrorCode::InvalidGenericConstraint, decl.startPos);
-            error.addLabel("expected generic constraint", *start);
+            error.addLabel("expected generic constraint", *it);
             addError(std::move(error));
-            recoverUntil(start, end, [](const TokenTreeNode &node) {
+            recoverUntil(it, [](const TokenTreeNode &node) {
                 return node.isConstraintBreakout() || node.isToken(TokenType::Comma);
             });
         }
 
-        if (start != end && start->isToken(TokenType::Comma)) {
-            start += 1;
+        if (it && it->isToken(TokenType::Comma)) {
+            it += 1;
         } else {
             break;
         }
     }
 
 
-    decl.endPos = start->getEnd();
+    decl.endPos = it->getEnd();
     return decl;
 }
 
-std::optional<InterfaceConstraint> Parser::interfaceConstraintRule(treeIterator &start, const treeIterator &end) {
+std::optional<InterfaceConstraint> Parser::interfaceConstraintRule(TokenTreeIterator& it) {
     InterfaceConstraint constraint;
-    constraint.typeSignature = typeSignatureRule(start, end);
+    constraint.typeSignature = typeSignatureRule(it);
     return constraint;
 }
 
-Identifier Parser::identifierRule(treeIterator &start, const treeIterator &end) const {
-    return Identifier::make(consumeToken(start, end, TokenType::Identifier), source);
+Identifier Parser::identifierRule(TokenTreeIterator& it) const {
+    return Identifier::make(consumeToken(it, TokenType::Identifier), source);
 }
 
-std::unique_ptr<SignatureBase> Parser::signatureRule(treeIterator &start, const treeIterator &end) {
-    COMPILER_ASSERT(start != end && start->isSignatureStarter(), "signatureRule called with non signature starter");
+std::unique_ptr<SignatureBase> Parser::signatureRule(TokenTreeIterator& it) {
+    COMPILER_ASSERT(it && it->isSignatureStarter(), "signatureRule called with non signature starter");
 
-    if (start->isPathStarter()) {
-        return std::make_unique<TypeSignature>(typeSignatureRule(start, end));
+    if (it->isPathStarter()) {
+        return std::make_unique<TypeSignature>(typeSignatureRule(it));
     }
-    if (start->isToken(TokenType::Fn)) {
-        return std::make_unique<FunctionSignature>(functionSignatureRule(start, end));
+    if (it->isToken(TokenType::Fn)) {
+        return std::make_unique<FunctionSignature>(functionSignatureRule(it));
     }
-    if (start->isTokenTree(TokenType::OpenParen)) {
-        return std::make_unique<TupleSignature>(tupleSignatureRule(start, end));
+    if (it->isTokenTree(TokenType::OpenParen)) {
+        return std::make_unique<TupleSignature>(tupleSignatureRule(it));
     }
 
     COMPILER_ASSERT(false, "signature rule called with wrong input");
 }
 
-TypeSignature Parser::typeSignatureRule(treeIterator &start, const treeIterator &end) {
+TypeSignature Parser::typeSignatureRule(TokenTreeIterator& it) {
     auto decl = TypeSignature();
 
-    decl.path = std::move(pathRule(start, end, false));
+    decl.path = std::move(pathRule(it, false));
     decl.startPos = decl.path.start();
     decl.endPos = decl.path.end();
 
-    if (start == end) {
+    if (it.isEnd()) {
         return decl;
     }
 
-    if (const auto tree = tryConsumeTokenTree(start, end, TokenType::OpenAngle)) {
+    if (const auto tree = tryConsumeTokenTree(it, TokenType::OpenAngle)) {
         decl.genericArguments = std::move(signatureListRule(**tree));
         decl.endPos = (*tree)->right.getEnd();
     }
@@ -1673,34 +1669,34 @@ TypeSignature Parser::typeSignatureRule(treeIterator &start, const treeIterator 
     return decl;
 }
 
-FunctionSignature Parser::functionSignatureRule(treeIterator &start, const treeIterator &end) {
-    const auto fnToken = consumeToken(start, end, TokenType::Fn);
+FunctionSignature Parser::functionSignatureRule(TokenTreeIterator& it) {
+    const auto fnToken = consumeToken(it, TokenType::Fn);
     auto decl = FunctionSignature();
     decl.startPos = fnToken.start;
     decl.endPos = fnToken.end;
 
-    if (start == end) {
+    if (it.isEnd()) {
         addError(CompilerError(ErrorCode::FnSignatureMissingParams, decl.start()));
         return decl;
     }
 
-    if (const auto parens = tryConsumeTokenTree(start, end, TokenType::OpenParen)) {
+    if (const auto parens = tryConsumeTokenTree(it, TokenType::OpenParen)) {
         decl.parameterTypes = signatureListRule(**parens);
         decl.endPos = (*parens)->right.getEnd();
 
-        if (start == end) {
+        if (it.isEnd()) {
             addError(CompilerError(ErrorCode::FnSignatureMissingParams, decl.start()));
             return decl;
         }
     } else {
-        addError(CompilerError(ErrorCode::MissingMethodReturnType, start->getStart()));
+        addError(CompilerError(ErrorCode::MissingMethodReturnType, it->getStart()));
     }
 
-    if (const auto dashArrow = tryConsumeToken(start, end, TokenType::DashArrow)) {
+    if (const auto dashArrow = tryConsumeToken(it, TokenType::DashArrow)) {
         decl.endPos = dashArrow->end;
 
-        if (start->isSignatureStarter()) {
-            decl.returnType = returnTypeRule(start, end);
+        if (it->isSignatureStarter()) {
+            decl.returnType = returnTypeRule(it);
             decl.endPos = (*decl.returnType).end();
         } else {
             addError(CompilerError(ErrorCode::MissingMethodReturnType, dashArrow->start));
@@ -1710,10 +1706,10 @@ FunctionSignature Parser::functionSignatureRule(treeIterator &start, const treeI
     return decl;
 }
 
-TupleSignature Parser::tupleSignatureRule(treeIterator &start, const treeIterator &end) {
+TupleSignature Parser::tupleSignatureRule(TokenTreeIterator& it) {
     auto decl = TupleSignature();
 
-    auto const &list = consumeTokenTree(start, end, TokenType::OpenParen);
+    auto const &list = consumeTokenTree(it, TokenType::OpenParen);
     decl.startPos = list.left.start;
     decl.endPos = list.right.getEnd();
 
@@ -1722,10 +1718,10 @@ TupleSignature Parser::tupleSignatureRule(treeIterator &start, const treeIterato
     return decl;
 }
 
-ReturnType Parser::returnTypeRule(treeIterator &start, const treeIterator &end) {
+ReturnType Parser::returnTypeRule(TokenTreeIterator& it) {
     ReturnType result;
 
-    auto modifiers = modifierRule(start, end, [](const auto &n) {
+    auto modifiers = modifierRule(it, [](const auto &n) {
         return true;
     });
     validateModifiers(modifiers, {TokenType::Mut});
@@ -1736,12 +1732,12 @@ ReturnType Parser::returnTypeRule(treeIterator &start, const treeIterator &end) 
         result.endPos = modifiers.back().end;
     }
 
-    if (start == end || !start->isSignatureStarter()) {
-        addError(CompilerError(ErrorCode::MissingMethodReturnType, start->getStart()));
+    if (it.isEnd() || !it->isSignatureStarter()) {
+        addError(CompilerError(ErrorCode::MissingMethodReturnType, it->getStart()));
         return result;
     }
 
-    result.type = signatureRule(start, end);
+    result.type = signatureRule(it);
     if (modifiers.empty()) {
         result.startPos = result.type->start();
     }
@@ -1753,29 +1749,28 @@ ReturnType Parser::returnTypeRule(treeIterator &start, const treeIterator &end) 
 std::vector<Identifier> Parser::identifierListRule(const TokenTree &list) {
     std::vector<Identifier> result;
 
-    treeIterator start = list.tokens.begin(); // NOLINT(*-use-auto)
-    const auto end = list.tokens.end();
+    auto it = TokenTreeIterator(list.tokens);
 
-    while (start != end) {
-        recoverUntil(start, end, {TokenType::Identifier, TokenType::Comma});
-        if (start == end) {
+    while (it) {
+        recoverUntil(it, {TokenType::Identifier, TokenType::Comma});
+        if (it.isEnd()) {
             break;
         }
 
-        if (start->isToken(TokenType::Identifier)) {
-            result.emplace_back(identifierRule(start, end));
-            recoverUntil(start, end, {TokenType::Identifier, TokenType::Comma});
-            if (start == end) {
+        if (it->isToken(TokenType::Identifier)) {
+            result.emplace_back(identifierRule(it));
+            recoverUntil(it, {TokenType::Identifier, TokenType::Comma});
+            if (it.isEnd()) {
                 break;
             }
         } else {
-            addError(CompilerError(ErrorCode::UnexpectedToken, start->getStart()));
-            start += 1;
+            addError(CompilerError(ErrorCode::UnexpectedToken, it->getStart()));
+            it += 1;
             continue;
         }
 
-        if (!tryConsumeToken(start, end, TokenType::Comma)) {
-            addError(CompilerError(ErrorCode::MissingComma, start->getStart()));
+        if (!tryConsumeToken(it, TokenType::Comma)) {
+            addError(CompilerError(ErrorCode::MissingComma, it->getStart()));
         }
     }
 
@@ -1785,28 +1780,27 @@ std::vector<Identifier> Parser::identifierListRule(const TokenTree &list) {
 std::vector<Parameter> Parser::parameterListRule(const TokenTree &list) {
     std::vector<Parameter> result;
 
-    treeIterator current = list.tokens.begin(); // NOLINT(*-use-auto)
-    const auto end = list.tokens.end();
-    while (current != end) {
-        auto startPos = current->getStart();
-        auto modifiers = modifierRule(current, end, [](const auto &) { return true; });
+    auto it = TokenTreeIterator(list.tokens);
+    while (it) {
+        auto startPos = it->getStart();
+        auto modifiers = modifierRule(it, [](const auto &) { return true; });
         validateModifiers(modifiers, {TokenType::Mut, TokenType::Ref});
 
-        auto beforeRecover = current;
-        recoverUntil(current, end, [](const TokenTreeNode &node) {
+        auto beforeRecover = it;
+        recoverUntil(it, [](const TokenTreeNode &node) {
             return node.isToken(TokenType::Identifier) || node.isToken(TokenType::Comma);
         });
-        if (beforeRecover != current) {
+        if (beforeRecover != it) {
             auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
             error.addLabel("unexpected token", *beforeRecover);
             addError(std::move(error));
         }
-        if (current == end || !current->isToken(TokenType::Identifier)) {
-            addError(CompilerError(ErrorCode::ParameterNameMissing, (current - 1)->getEnd()));
+        if (it.isEnd() || !it->isToken(TokenType::Identifier)) {
+            addError(CompilerError(ErrorCode::ParameterNameMissing, (it - 1)->getEnd()));
             continue;
         }
 
-        auto identifier = identifierRule(current, end);
+        auto identifier = identifierRule(it);
 
         auto &param = result.emplace_back(identifier);
         param.startPos = startPos;
@@ -1819,68 +1813,66 @@ std::vector<Parameter> Parser::parameterListRule(const TokenTree &list) {
             addError(std::move(error));
         }
 
-        beforeRecover = current;
-        recoverUntil(current, end, [](const TokenTreeNode &n) {
+        beforeRecover = it;
+        recoverUntil(it, [](const TokenTreeNode &n) {
             return n.isSignatureStarter() || n.isToken(TokenType::Colon) || n.isToken(TokenType::Comma);
         });
-        if (beforeRecover != current) {
+        if (beforeRecover != it) {
             auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
             error.addLabel("unexpected token", *beforeRecover);
             addError(std::move(error));
         }
-        if (current == end) {
-            addError(CompilerError(ErrorCode::ParameterTypeMissing, (current - 1)->getEnd()));
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::ParameterTypeMissing, (it - 1)->getEnd()));
             continue;
         }
-        if (current->isToken(TokenType::Comma)) {
-            addError(CompilerError(ErrorCode::ParameterTypeMissing, current->getStart()));
-            param.endPos = current->getEnd();
-            current += 1;
+        if (it->isToken(TokenType::Comma)) {
+            addError(CompilerError(ErrorCode::ParameterTypeMissing, it->getStart()));
+            param.endPos = it->getEnd();
+            it += 1;
             continue;
         }
 
-        if (!current->isToken(TokenType::Colon)) {
-            auto error = CompilerError(ErrorCode::MissingColon, current->getStart());
-            error.addLabel("expected `:` to separate the parameter name and type", *current);
+        if (!it->isToken(TokenType::Colon)) {
+            auto error = CompilerError(ErrorCode::MissingColon, it->getStart());
+            error.addLabel("expected `:` to separate the parameter name and type", *it);
             addError(std::move(error));
         } else {
-            param.endPos = current->getEnd();
-            current += 1;
-            beforeRecover = current;
-            recoverUntil(current, end, [](const TokenTreeNode &node) {
+            param.endPos = it->getEnd();
+            it += 1;
+            beforeRecover = it;
+            recoverUntil(it, [](const TokenTreeNode &node) {
                 return node.isSignatureStarter() || node.isToken(TokenType::Comma);
             });
-            if (beforeRecover != current) {
+            if (beforeRecover != it) {
                 auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
                 error.addLabel("unexpected token", *beforeRecover);
                 addError(std::move(error));
             }
-            if (current == end || current->isToken(TokenType::Comma)) {
-                addError(CompilerError(ErrorCode::ParameterTypeMissing, (current - 1)->getEnd()));
+            if (it.isEnd() || it->isToken(TokenType::Comma)) {
+                addError(CompilerError(ErrorCode::ParameterTypeMissing, (it - 1)->getEnd()));
                 continue;
             }
         }
-        COMPILER_ASSERT(current != end && current->isSignatureStarter(),
-                        "current must be a signature starter at this point");
+        COMPILER_ASSERT(it && it->isSignatureStarter(),
+                        "it must be a signature starter at this point");
 
 
-        param.type = signatureRule(current, end);
+        param.type = signatureRule(it);
         if (param.type) {
             param.endPos = (*param.type)->end();
         }
-        beforeRecover = current;
-        recoverUntil(current, end, TokenType::Comma); // TODO: move unexpected token error into recoverUntil?
-        if (current != beforeRecover) {
+        beforeRecover = it;
+        recoverUntil(it, TokenType::Comma); // TODO: move unexpected token error into recoverUntil?
+        if (it != beforeRecover) {
             auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
             error.addLabel("unexpected token", *beforeRecover);
             addError(std::move(error));
         }
 
-        DEBUG_ASSERT(current == end || current->isToken(TokenType::Comma), "expeced end or comma");
+        DEBUG_ASSERT(it.isEnd() || it->isToken(TokenType::Comma), "expeced end or comma");
 
-        if (current != end) {
-            current += 1;
-        }
+        it += 1;
     }
 
     return std::move(result);
@@ -1889,27 +1881,27 @@ std::vector<Parameter> Parser::parameterListRule(const TokenTree &list) {
 std::vector<std::unique_ptr<SignatureBase> > Parser::signatureListRule(const TokenTree &list) {
     std::vector<std::unique_ptr<SignatureBase> > result;
 
-    treeIterator start = list.tokens.begin(); // NOLINT(*-use-auto)
+    auto it = TokenTreeIterator(list.tokens);
     const auto end = list.tokens.end();
 
-    while (start != end) {
-        if (start->isSignatureStarter()) {
-            result.emplace_back(signatureRule(start, end));
+    while (it) {
+        if (it->isSignatureStarter()) {
+            result.emplace_back(signatureRule(it));
         } else {
             auto error = CompilerError(ErrorCode::InvalidSignature, list.left);
-            error.addLabel("expected type, tuple or function signature", *start);
+            error.addLabel("expected type, tuple or function signature", *it);
             addError(std::move(error));
-            recoverUntil(start, end, [](const TokenTreeNode &node) {
+            recoverUntil(it, [](const TokenTreeNode &node) {
                 return node.isSignatureStarter() || node.isToken(TokenType::Comma);
             });
         }
 
-        if (start != end) {
-            if (start->isToken(TokenType::Comma)) {
-                start += 1;
+        if (it) {
+            if (it->isToken(TokenType::Comma)) {
+                it += 1;
             } else {
                 auto error = CompilerError(ErrorCode::MissingComma, list.left);
-                error.addLabel("expected a comma", *start);
+                error.addLabel("expected a comma", *it);
                 addError(std::move(error));
             }
         }
@@ -1918,84 +1910,84 @@ std::vector<std::unique_ptr<SignatureBase> > Parser::signatureListRule(const Tok
     return std::move(result);
 }
 
-void Parser::recoverTopLevel(treeIterator &start, const treeIterator &end) {
-    while (start != end) {
-        recoverUntil(start, end, [](const TokenTreeNode &node) {
+void Parser::recoverTopLevel(TokenTreeIterator& it) {
+    while (it) {
+        recoverUntil(it, [](const TokenTreeNode &node) {
             return node.isToken(TokenType::Semicolon)
                    || node.isTopLevelStarter()
                    || node.isModifier();
         });
-        if (!tryConsumeToken(start, end, TokenType::Semicolon)) {
+        if (!tryConsumeToken(it, TokenType::Semicolon)) {
             break;
         }
     }
 }
 
-void Parser::recoverUntil(treeIterator &start, const treeIterator &end, TokenType type) {
-    recoverUntil(start, end, [type](const TokenTreeNode &node) {
+void Parser::recoverUntil(TokenTreeIterator& it, TokenType type) {
+    recoverUntil(it, [type](const TokenTreeNode &node) {
         return node.isToken(type);
     });
 }
 
-void Parser::recoverUntil(treeIterator &start, const treeIterator &end, std::vector<TokenType> oneOf) {
-    recoverUntil(start, end, [&oneOf](const TokenTreeNode &node) {
+void Parser::recoverUntil(TokenTreeIterator& it, std::vector<TokenType> oneOf) {
+    recoverUntil(it, [&oneOf](const TokenTreeNode &node) {
         return node.isToken() && std::ranges::find(oneOf, node.getToken().type) != oneOf.end();
     });
 }
 
-void Parser::recoverUntil(treeIterator &start, const treeIterator &end, const RecoverPredicate &predicate) {
-    auto beforeRecover = start;
-    while (start != end && !predicate(*start)) {
-        start += 1;
+void Parser::recoverUntil(TokenTreeIterator& it, const RecoverPredicate &predicate) {
+    auto beforeRecover = it;
+    while (it && !predicate(*it)) {
+        it += 1;
     }
 
-    if (beforeRecover != start) {
+    if (beforeRecover != it) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
         addError(std::move(error));
     }
 }
 
-void Parser::recoverUntil(treeIterator &start, const treeIterator &end, const RecoverPredicate &predicate,
+void Parser::recoverUntil(TokenTreeIterator& it, const RecoverPredicate &predicate,
                           ErrorContext &errCtx) {
-    const auto beforeRecover = start;
-    while (start != end && !predicate(*start)) {
-        start += 1;
+    const auto beforeRecover = it;
+    while (it && !predicate(*it)) {
+        it += 1;
     }
 
-    if (beforeRecover != start) {
+    if (beforeRecover != it) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, beforeRecover->getStart());
         errCtx.addError(std::move(error));
     }
 }
 
-Token Parser::consumeToken(treeIterator &start, const treeIterator &end, const TokenType type) {
-    COMPILER_ASSERT(start != end, std::format("trying to consume {} on empty iterator", TokenTypeName(type)));
-    COMPILER_ASSERT(start->isToken(type),
-                    std::format("trying to consume {} but got {}", TokenTypeName(type), start->debugString()));
+Token Parser::consumeToken(TokenTreeIterator& it, const TokenType type) {
+    COMPILER_ASSERT(it, std::format("trying to consume {} on empty iterator", TokenTypeName(type)));
+    COMPILER_ASSERT(it->isToken(type),
+                    std::format("trying to consume {} but got {}", TokenTypeName(type), it->debugString()));
 
-    auto const token = start->getToken();
-    start += 1;
+    auto const token = it->getToken();
+    it += 1;
     return token;
 }
 
-std::optional<Token> Parser::tryConsumeToken(treeIterator &start, const treeIterator &end, const TokenType type) {
-    if (start == end || !start->isToken(type)) {
+std::optional<Token> Parser::tryConsumeToken(TokenTreeIterator& it, const TokenType type) {
+    if (it.isEnd() || !it->isToken(type)) {
         return std::nullopt;
     }
 
-    auto token = start->getToken();
-    start += 1;
+    auto token = it->getToken();
+    it += 1;
     return token;
 }
 
-auto Parser::consumeTokenTree(treeIterator &start, const treeIterator &end, TokenType type) -> const TokenTree & {
-    COMPILER_ASSERT(start != end,
+auto Parser::consumeTokenTree(TokenTreeIterator& it, TokenType type) -> const TokenTree & {
+    COMPILER_ASSERT(it,
                     std::format("trying to consume TokenTree[{}] on empty iterator", TokenTypeName(type)));
-    COMPILER_ASSERT(start->isTokenTree(type),
-                    std::format("trying to consume TokenTree[{}] but got {}", TokenTypeName(type), start->debugString()
+    COMPILER_ASSERT(it->isTokenTree(type),
+                    std::format("trying to consume TokenTree[{}] but got {}", TokenTypeName(type), it->debugString()
                     ));
 
-    auto const &tree = start->getTokenTree();
+    auto const &tree = it->getTokenTree();
 
     if (tree.right.isError()) {
         auto error = CompilerError(ErrorCode::WrongCloser, tree.right.getOrErrorToken());
@@ -2003,17 +1995,17 @@ auto Parser::consumeTokenTree(treeIterator &start, const treeIterator &end, Toke
         addError(std::move(error));
     }
 
-    start += 1;
+    it += 1;
     return tree;
 }
 
-std::optional<const TokenTree *> Parser::tryConsumeTokenTree(treeIterator &start, const treeIterator &end,
+std::optional<const TokenTree *> Parser::tryConsumeTokenTree(TokenTreeIterator& it,
                                                              const TokenType type) {
-    if (start == end || !start->isTokenTree(type)) {
+    if (it.isEnd() || !it->isTokenTree(type)) {
         return std::nullopt;
     }
 
-    auto const &tree = start->getTokenTree();
+    auto const &tree = it->getTokenTree();
 
     if (tree.right.isError()) {
         auto error = CompilerError(ErrorCode::WrongCloser, tree.right.getOrErrorToken());
@@ -2021,6 +2013,6 @@ std::optional<const TokenTree *> Parser::tryConsumeTokenTree(treeIterator &start
         addError(std::move(error));
     }
 
-    start += 1;
+    it += 1;
     return &tree;
 }

@@ -54,7 +54,14 @@ public:
         return *this;
     }
 
-    bool operator==(const TokenTreeIterator& other) {
+    bool operator==(const TokenTreeIterator& other) const {
         return current == other.current || isEnd() && other.isEnd();
+    }
+
+    bool operator!=(const TokenTreeIterator& other) const {
+        if (isEnd()) {
+            return !other.isEnd();
+        }
+        return current != other.current;
     }
 };

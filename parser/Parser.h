@@ -30,8 +30,6 @@ class EnumMemberDeclaration;
 class ConstraintDeclaration;
 
 
-using treeIterator = std::vector<TokenTreeNode>::const_iterator;
-
 class Parser {
     using RecoverPredicate = std::function<bool(const TokenTreeNode &)>;
 public:
@@ -55,70 +53,69 @@ private:
 
     void parseFile();
 
-    void useRule(treeIterator &start, const treeIterator &end);
+    void useRule(TokenTreeIterator& it);
 
-    void modRule(treeIterator &start, const treeIterator &end);
+    void modRule(TokenTreeIterator& it);
 
-    std::vector<Token> modifierRule(treeIterator &start, const treeIterator &end, const RecoverPredicate& recoverPredicate);
+    std::vector<Token> modifierRule(TokenTreeIterator& it, const RecoverPredicate& recoverPredicate);
 
     void validateModifiers(std::vector<Token> &modifiers, const std::vector<TokenType> &validTokenTypes);
 
-    void enumRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
-    std::optional<EnumMemberDeclaration> enumMemberRule(treeIterator &start, const treeIterator &end);
+    void enumRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    std::optional<EnumMemberDeclaration> enumMemberRule(TokenTreeIterator& it);
 
-    void interfaceRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
-    std::optional<InterfaceMethodDeclaration> interfaceMethodRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
-    std::optional<InterfaceGetter> interfaceGetterRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
-    std::optional<InterfaceSetter> interfaceSetterRule(treeIterator &tart, const treeIterator &end, std::vector<Token> modifiers);
+    void interfaceRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    std::optional<InterfaceMethodDeclaration> interfaceMethodRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    std::optional<InterfaceGetter> interfaceGetterRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    std::optional<InterfaceSetter> interfaceSetterRule(TokenTreeIterator& it, std::vector<Token> modifiers);
 
 
-    void structRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
-    std::vector<ConstraintDeclaration> genericConstraintListRule(treeIterator &start, const treeIterator &end,
-                                    const RecoverPredicate &recoverPredicate);
+    void structRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    std::vector<ConstraintDeclaration> genericConstraintListRule(TokenTreeIterator& it, const RecoverPredicate &recoverPredicate);
 
-    std::optional<PropertyDeclaration> propertyDeclarationRule(treeIterator& start, const treeIterator& end);
+    std::optional<PropertyDeclaration> propertyDeclarationRule(TokenTreeIterator& it);
 
-    void functionRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
+    void functionRule(TokenTreeIterator& it, std::vector<Token> modifiers);
 
-    void aliasRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
+    void aliasRule(TokenTreeIterator& it, std::vector<Token> modifiers);
 
-    void moduleVariableRule(treeIterator &start, const treeIterator &end, std::vector<Token> modifiers);
+    void moduleVariableRule(TokenTreeIterator& it, std::vector<Token> modifiers);
 
-    void declarationRule(treeIterator &start, const treeIterator &end);
+    void declarationRule(TokenTreeIterator& it);
 
-    Path pathRule(treeIterator &start, const treeIterator &end, bool allowTrailing);
+    Path pathRule(TokenTreeIterator& it, bool allowTrailing);
 
-    std::optional<ConstraintDeclaration> genericConstraintRule(treeIterator &start, const treeIterator &end);
+    std::optional<ConstraintDeclaration> genericConstraintRule(TokenTreeIterator& it);
 
-    std::optional<InterfaceConstraint> interfaceConstraintRule(treeIterator &start, const treeIterator &end);
-//    std::unique_ptr<GenericConstraintBase> defaultConstraintRule(treeIterator &start, const treeIterator &end);
+    std::optional<InterfaceConstraint> interfaceConstraintRule(TokenTreeIterator& it);
+//    std::unique_ptr<GenericConstraintBase> defaultConstraintRule(TokenTreeIterator& it);
 
-    [[nodiscard]] Identifier identifierRule(treeIterator &start, const treeIterator &end) const;
+    [[nodiscard]] Identifier identifierRule(TokenTreeIterator& it) const;
 
-    [[nodiscard]] std::unique_ptr<SignatureBase> signatureRule(treeIterator &start, const treeIterator &end);
-    [[nodiscard]] TypeSignature typeSignatureRule(treeIterator &start, const treeIterator &end);
-    [[nodiscard]] FunctionSignature functionSignatureRule(treeIterator &start, const treeIterator &end);
-    [[nodiscard]] TupleSignature tupleSignatureRule(treeIterator &start, const treeIterator &end);
+    [[nodiscard]] std::unique_ptr<SignatureBase> signatureRule(TokenTreeIterator& it);
+    [[nodiscard]] TypeSignature typeSignatureRule(TokenTreeIterator& it);
+    [[nodiscard]] FunctionSignature functionSignatureRule(TokenTreeIterator& it);
+    [[nodiscard]] TupleSignature tupleSignatureRule(TokenTreeIterator& it);
 
-    [[nodiscard]] ReturnType returnTypeRule(treeIterator &start, const treeIterator &end);
+    [[nodiscard]] ReturnType returnTypeRule(TokenTreeIterator& it);
 
     [[nodiscard]] std::vector<Identifier> identifierListRule(const TokenTree &list);
     [[nodiscard]] std::vector<Parameter> parameterListRule(const TokenTree &list);
     [[nodiscard]] std::vector<std::unique_ptr<SignatureBase>> signatureListRule(const TokenTree &list);
 
-    void recoverTopLevel(treeIterator &start, const treeIterator &end);
+    void recoverTopLevel(TokenTreeIterator& it);
 
-    void recoverUntil(treeIterator &start, const treeIterator &end, TokenType type);
+    void recoverUntil(TokenTreeIterator& it, TokenType type);
 
-    void recoverUntil(treeIterator &start, const treeIterator &end, std::vector<TokenType> oneOf);
+    void recoverUntil(TokenTreeIterator& it, std::vector<TokenType> oneOf);
 
-    void recoverUntil(treeIterator &start, const treeIterator &end, const RecoverPredicate &predicate);
+    void recoverUntil(TokenTreeIterator& it, const RecoverPredicate &predicate);
 
-    static void recoverUntil(treeIterator &start, const treeIterator &end, const RecoverPredicate &predicate, ErrorContext& errCtx);
+    static void recoverUntil(TokenTreeIterator& it, const RecoverPredicate &predicate, ErrorContext& errCtx);
 
-    static Token consumeToken(treeIterator &start, const treeIterator &end, TokenType type);
-    static std::optional<Token> tryConsumeToken(treeIterator &start, const treeIterator &end, TokenType type);
+    static Token consumeToken(TokenTreeIterator& it, TokenType type);
+    static std::optional<Token> tryConsumeToken(TokenTreeIterator& it, TokenType type);
 
-    const TokenTree& consumeTokenTree(treeIterator &start, const treeIterator &end, TokenType type);
-    std::optional<const TokenTree*> tryConsumeTokenTree(treeIterator &start, const treeIterator &end, TokenType type);
+    const TokenTree& consumeTokenTree(TokenTreeIterator& it, TokenType type);
+    std::optional<const TokenTree*> tryConsumeTokenTree(TokenTreeIterator& it, TokenType type);
 };
