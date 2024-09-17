@@ -36,6 +36,7 @@ enum class ErrorCode {
     ParameterNameMissing,
     ParameterTypeMissing,
     MissingInterfaceBody,
+    MissingInterfaceMember,
     RefAlreadyImpliesMut,
     MissingMethodName,
     MissingMethodReturnType,

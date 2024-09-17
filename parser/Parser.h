@@ -65,9 +65,9 @@ private:
     std::optional<EnumMemberDeclaration> enumMemberRule(TokenTreeIterator& it);
 
     void interfaceRule(TokenTreeIterator& it, std::vector<Token> modifiers);
-    std::optional<InterfaceMethodDeclaration> interfaceMethodRule(TokenTreeIterator& it, std::vector<Token> modifiers);
-    std::optional<InterfaceGetter> interfaceGetterRule(TokenTreeIterator& it, std::vector<Token> modifiers);
-    std::optional<InterfaceSetter> interfaceSetterRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    InterfaceMethodDeclaration interfaceMethodRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    InterfaceGetter interfaceGetterRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    InterfaceSetter interfaceSetterRule(TokenTreeIterator& it, std::vector<Token> modifiers);
 
 
     void structRule(TokenTreeIterator& it, std::vector<Token> modifiers);
