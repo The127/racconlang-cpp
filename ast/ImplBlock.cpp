@@ -5,6 +5,13 @@
 #include "ImplBlock.h"
 
 #include "utils/NodeUtils.h"
+#include "ConstructorDeclaration.h"
+#include "ImplSetter.h"
+#include "ImplGetter.h"
+#include "ImplMethod.h"
+#include "DestructureDeclaration.h"
+#include "ConstraintDeclaration.h"
+
 
 ImplBlock::ImplBlock() = default;
 ImplBlock::ImplBlock(ImplBlock &&) noexcept = default;

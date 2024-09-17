@@ -4,14 +4,9 @@
 
 #include "ImplMethod.h"
 
-#include "Identifier.h"
 #include "utils/NodeUtils.h"
-#include "ReturnType.h"
-#include "ConstructorDeclaration.h"
-#include "ImplSetter.h"
-#include "ImplGetter.h"
-#include "ImplMethod.h"
-#include "DestructureDeclaration.h"
+#include "Parameter.h"
+#include "ConstraintDeclaration.h"
 
 ImplMethod::ImplMethod() = default;
 ImplMethod::ImplMethod(ImplMethod &&) noexcept = default;

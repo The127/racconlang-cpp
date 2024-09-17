@@ -6,10 +6,10 @@
 #pragma once
 #include "Node.h"
 #include "TypeSignature.h"
+#include "Identifier.h"
 
 
 class ConstructorDeclaration;
-class Identifier;
 class ImplSetter;
 class ImplGetter;
 class ImplMethod;

@@ -28,6 +28,7 @@
 #include "ast/StructDeclaration.h"
 #include "ast/TupleSignature.h"
 #include "ast/UseNode.h"
+#include "ast/ImplBlock.h"
 #include "errors/ErrorContext.h"
 
 Parser::Parser(const std::shared_ptr<Source> &source)
@@ -1560,7 +1561,7 @@ void Parser::declarationRule(TokenTreeIterator &it) {
 
 void Parser::implRule(TokenTreeIterator &it) {
     consumeToken(it, TokenType::Impl);
-    const auto impl = modules.back().implBlocks.emplace_back();
+    const auto& impl = modules.back().implBlocks.emplace_back();
 }
 
 Path Parser::pathRule(TokenTreeIterator &it, const bool allowTrailing) {
