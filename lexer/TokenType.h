@@ -33,6 +33,7 @@ enum class TokenType {
     Impl,           // impl
     On,             // on
     Static,         // static
+    For,            // for
 
     Colon,          // :
     PathSeparator,  // ::

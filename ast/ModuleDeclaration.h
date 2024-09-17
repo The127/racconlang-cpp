@@ -13,6 +13,7 @@
 #include "Path.h"
 
 
+class ImplBlock;
 class ModuleVariableDeclaration;
 class AliasDeclaration;
 class FunctionDeclaration;
@@ -33,6 +34,7 @@ public:
     std::vector<FunctionDeclaration> functionDeclarations;
     std::vector<AliasDeclaration> aliasDeclarations;
     std::vector<ModuleVariableDeclaration> moduleVariableDeclarations;
+    std::vector<ImplBlock> implBlocks;
 
     ModuleDeclaration();
     ModuleDeclaration(ModuleDeclaration&&) noexcept;

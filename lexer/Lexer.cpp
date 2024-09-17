@@ -359,6 +359,8 @@ TokenResult Lexer::identifierRule() const {
             tokenType = TokenType::On;
         } else if (text == "static") {
             tokenType = TokenType::Static;
+        } else if (text == "for") {
+            tokenType = TokenType::For;
         }
 
         return Token(tokenType, source->offset + position, source->offset + position + offset);

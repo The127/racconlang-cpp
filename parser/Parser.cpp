@@ -75,6 +75,8 @@ void Parser::parseFile() {
             modRule(it);
         } else if (it->isModifier() || it->isDeclaratorKeyword()) {
             declarationRule(it);
+        } else if (it->isToken(TokenType::Impl)) {
+            implRule(it);
         } else {
             COMPILER_ASSERT(false, std::format("unhandled top level declaration, got {}", it->debugString()));
         }
@@ -1554,6 +1556,11 @@ void Parser::declarationRule(TokenTreeIterator &it) {
         addError(std::move(error));
         recoverTopLevel(it);
     }
+}
+
+void Parser::implRule(TokenTreeIterator &it) {
+    consumeToken(it, TokenType::Impl);
+    const auto impl = modules.back().implBlocks.emplace_back();
 }
 
 Path Parser::pathRule(TokenTreeIterator &it, const bool allowTrailing) {

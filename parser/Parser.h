@@ -83,6 +83,8 @@ private:
 
     void declarationRule(TokenTreeIterator& it);
 
+    void implRule(TokenTreeIterator& it);
+
     Path pathRule(TokenTreeIterator& it, bool allowTrailing);
 
     std::optional<ConstraintDeclaration> genericConstraintRule(TokenTreeIterator& it);

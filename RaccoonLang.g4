@@ -93,7 +93,7 @@ moduleVariableDeclaration
     ;
 
 implBlock
-    : 'impl' (genericParams? typeName 'on') typeName genericArguments? '{' (implConstructor | implDestructor | implMethod | implSetter | implGetter)* '}'
+    : 'impl' genericParams? (typeName 'on')? typeName genericArguments? ('for' typeName)? constraintDeclaration* '{' (implConstructor | implDestructor | implMethod | implSetter | implGetter)* '}'
     ;
 
 implConstructor

@@ -6,6 +6,8 @@
 #pragma once
 #include "Node.h"
 
+#include "Identifier.h"
+#include "ReturnType.h"
 
 class ImplGetter final : public Node {
 public:
@@ -13,6 +15,8 @@ public:
     uint64_t endPos{};
     bool isPublic{};
     bool isMut{};
+    std::optional<Identifier> name;
+    std::optional<ReturnType> returnType;
 
     ImplGetter();
     ImplGetter(ImplGetter&&) noexcept;
@@ -21,4 +25,6 @@ public:
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;
+
+    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
 };

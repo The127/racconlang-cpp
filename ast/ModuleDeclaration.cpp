@@ -14,6 +14,7 @@
 #include "EnumDeclaration.h"
 #include "ConstraintDeclaration.h"
 #include "EnumMemberDeclaration.h"
+#include "ImplBlock.h"
 
 #include "utils/NodeUtils.h"
 
@@ -67,6 +68,10 @@ std::string ModuleDeclaration::toString(const SourceMap &sources, const int inde
     if (!functionDeclarations.empty())
         result += std::string(indent, ' ') + "functionDeclarations: " + NodeUtils::nodeListString(
             sources, functionDeclarations, indent + 1, verbose) + "\n";
+
+    if(!implBlocks.empty())
+        result += std::string(indent, ' ') + "implBlocks: " + NodeUtils::nodeListString(
+            sources, implBlocks, indent + 1, verbose) + "\n";
 
     result += std::string(indent - 1, ' ') + "}";
     return std::move(result);

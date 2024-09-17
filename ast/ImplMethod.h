@@ -5,7 +5,12 @@
 
 #pragma once
 #include "Node.h"
+#include "Identifier.h"
+#include "ReturnType.h"
 
+
+class Parameter;
+class ConstraintDeclaration;
 
 class ImplMethod final : public Node {
 public:
@@ -14,6 +19,11 @@ public:
     bool isPublic{};
     bool isStatic{};
     bool isMut{};
+    std::optional<Identifier> name;
+    std::vector<Identifier> genericParams;
+    std::vector<ConstraintDeclaration> genericConstraints;
+    std::vector<Parameter> parameters;
+    std::optional<ReturnType> returnType;
 
     ImplMethod();
     ImplMethod(ImplMethod&&) noexcept;
@@ -22,4 +32,6 @@ public:
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;
+
+    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
 };
