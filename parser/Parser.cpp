@@ -301,7 +301,6 @@ void Parser::enumRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
     }
 
 
-    // wrong
     if (it->isToken(TokenType::Where)) {
         decl.genericConstraints = genericConstraintListRule(it, [](const TokenTreeNode &node) {
             return node.isTopLevelStarter() || node.isTokenTree(TokenType::OpenCurly);
@@ -1163,49 +1162,143 @@ std::optional<PropertyDeclaration> Parser::propertyDeclarationRule(TokenTreeIter
 }
 
 void Parser::functionRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
-    COMPILER_ASSERT(it->isToken(TokenType::Fn),
-                    "functionRule called with non-fn starting token");
-
-    auto decl = FunctionDeclaration();
+    const auto fnToken = consumeToken(it, TokenType::Fn);
+    auto &decl = modules.back().functionDeclarations.emplace_back();
     if (!modifiers.empty()) {
-        decl.startPos = modifiers.begin()->start;
+        decl.startPos = modifiers.front().start;
     } else {
-        decl.startPos = it->getStart();
+        decl.startPos = fnToken.start;
     }
-    decl.endPos = it->getEnd();
-    it += 1;
+    decl.endPos = fnToken.end;
 
     validateModifiers(modifiers, {TokenType::Pub});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
 
-    if (it.isEnd()) {
-        auto error = CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start());
-        modules.back().functionDeclarations.emplace_back(std::move(decl));
+    recoverUntil(it, [](const auto &n) {
+        return n.isTopLevelStarter()
+               || n.isToken(TokenType::Identifier)
+               || n.isTokenTree(TokenType::OpenAngle)
+               || n.isTokenTree(TokenType::OpenParen)
+               || n.isToken(TokenType::DashArrow)
+               || n.isToken(TokenType::Where)
+               || n.isToken(TokenType::EqualArrow)
+               || n.isTokenTree(TokenType::OpenCurly);
+    });
+
+    if (it.isEnd() || it->isTopLevelStarter()) {
+        addError(CompilerError(ErrorCode::MissingDeclarationName, decl.start()));
         return;
     }
 
-    decl.name = identifierRule(it);
-    if (!decl.name) {
-        auto error = CompilerError(ErrorCode::MissingDeclarationName, decl.startPos);
-        error.addLabel("expected function name", *it);
-        addError(std::move(error));
-    }
-    decl.endPos = decl.name->end();
+    if (it->isToken(TokenType::Identifier)) {
+        decl.name = identifierRule(it);
+        decl.endPos = decl.name->end();
 
-    if (it.isEnd()) {
-        auto error = CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start());
-        modules.back().functionDeclarations.emplace_back(std::move(decl));
+        recoverUntil(it, [](const auto &n) {
+            return n.isTopLevelStarter()
+                   || n.isTokenTree(TokenType::OpenAngle)
+                   || n.isTokenTree(TokenType::OpenParen)
+                   || n.isToken(TokenType::DashArrow)
+                   || n.isToken(TokenType::Where)
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return;
+        }
+    } else {
+        addError(CompilerError(ErrorCode::MissingDeclarationName, decl.start()));
+    }
+
+    if (it->isTokenTree(TokenType::OpenAngle)) {
+        decl.genericParams = identifierListRule(consumeTokenTree(it, TokenType::OpenAngle));
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isTopLevelStarter()
+                   || n.isTokenTree(TokenType::OpenParen)
+                   || n.isToken(TokenType::DashArrow)
+                   || n.isToken(TokenType::Where)
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return;
+        }
+    }
+
+    if (it->isTokenTree(TokenType::OpenParen)) {
+        decl.parameters = parameterListRule(consumeTokenTree(it, TokenType::OpenParen));
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isTopLevelStarter()
+                   || n.isToken(TokenType::DashArrow)
+                   || n.isToken(TokenType::Where)
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return;
+        }
+    } else {
+        addError(CompilerError(ErrorCode::MissingMethodParams, decl.start()));
+    }
+
+    if (it->isToken(TokenType::DashArrow)) {
+        consumeToken(it, TokenType::DashArrow);
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isTopLevelStarter()
+                   || n.isSignatureStarter()
+                   || n.isToken(TokenType::Where)
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return;
+        }
+
+        if(it->isSignatureStarter()) {
+            decl.returnType = signatureRule(it);
+        }else {
+            addError(CompilerError(ErrorCode::MissingMethodReturnType, decl.start()));
+        }
+    }
+
+    if (it->isToken(TokenType::Where)) {
+        decl.genericConstraints = genericConstraintListRule(it, [](const auto &n) {
+            return n.isTopLevelStarter()
+                   || n.isToken(TokenType::Where)
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return;
+        }
+    }
+
+    if (it->isToken(TokenType::EqualArrow)) {
+        consumeToken(it, TokenType::EqualArrow);
+        if(it->isToken(TokenType::Semicolon)) {
+            consumeToken(it, TokenType::Semicolon);
+        }else {
+            addError(CompilerError(ErrorCode::MissingSemicolon, decl.start()));
+        }
+    }else if(it->isTokenTree(TokenType::OpenCurly)){
+        consumeTokenTree(it,TokenType::OpenCurly);
+    }else {
+        addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
         return;
     }
-
-    //TODO:
-    // ('<' genericParamList '>')?
-
-    // '(' parameterList ')'
-
-    // ('->' signature)?
-
-    // genericConstraint*
 }
 
 void Parser::aliasRule(TokenTreeIterator &it, std::vector<Token> modifiers) {

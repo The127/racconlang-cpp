@@ -19,6 +19,7 @@ enum class ErrorCode {
     WrongCloser,
     UnexpectedToken,
     UnexpectedEndOfInput,
+    MissingMethodParams, //TODO
     DuplicateModifier,
     InvalidModifier,
     MissingDeclarationName,

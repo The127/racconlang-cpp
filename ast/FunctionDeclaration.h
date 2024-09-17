@@ -23,7 +23,7 @@ public:
     std::vector<Identifier> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
     std::vector<Parameter> parameters;
-    std::unique_ptr<SignatureBase> returnType;
+    std::optional<std::unique_ptr<SignatureBase>> returnType;
     //TODO: body as expression
 
     FunctionDeclaration();

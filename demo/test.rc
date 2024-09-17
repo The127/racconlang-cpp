@@ -45,3 +45,5 @@ pub struct Foo<T> where T : Foobar {
 struct Bar {} destructures into (x, y);
 
 alias bar<T> = (foo, std::map<asdf, T>) where T : numeric;
+
+fn foo(){}
