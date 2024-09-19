@@ -30,5 +30,5 @@ std::string ReturnType::toString(const SourceMap &sources, const int indent, con
     result += std::string(indent, ' ') + "type: " + type->toString(sources, indent+1, verbose) + "\n";
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }

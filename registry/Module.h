@@ -16,5 +16,9 @@ public:
 
     explicit Module(std::string_view name);
 
-    void addPart(ModuleDeclaration &declaration);
+    ~Module();
+    Module(Module&&) noexcept;
+    Module& operator=(Module&&) noexcept;
+
+    void addPart(ModuleDeclaration declaration);
 };

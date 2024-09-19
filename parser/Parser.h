@@ -33,6 +33,7 @@ class InterfaceGetter;
 class InterfaceMethodDeclaration;
 class EnumMemberDeclaration;
 class ConstraintDeclaration;
+class ModuleRegistry;
 
 
 class Parser {
@@ -48,7 +49,7 @@ public:
     Parser& operator=(Parser&&) noexcept;
     ~Parser();
 
-    void parse();
+    void parse(ModuleRegistry& registry);
 
 private:
     std::shared_ptr<FileUses> uses;

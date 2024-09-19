@@ -15,7 +15,12 @@ class Path;
 
 class ModuleRegistry {
 public:
-    std::map<std::string, Module> modules{};
+    std::map<std::string, Module> modules;
 
-    void addModulePart(const ModuleDeclaration &declaration);
+    ModuleRegistry();
+    ~ModuleRegistry();
+    ModuleRegistry(ModuleRegistry&&) noexcept;
+    ModuleRegistry& operator=(ModuleRegistry&&) noexcept;
+
+    void addModulePart(ModuleDeclaration&& declaration);
 };

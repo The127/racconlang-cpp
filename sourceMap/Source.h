@@ -25,7 +25,6 @@ public:
     std::map<uint32_t, Token> lineComments;
 
     std::optional<TokenTree> tokenTree;
-    std::vector<ModuleDeclaration> modules;
     std::vector<CompilerError> errors;
 
     Source(std::string fileName, std::string text, uint64_t offset);

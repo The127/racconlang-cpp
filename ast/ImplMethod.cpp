@@ -45,7 +45,7 @@ std::string ImplMethod::toString(const SourceMap &sources, int indent, bool verb
     }
 
     if(returnType) {
-        result += returnType->toString(sources, indent + 1, verbose) + "\n";
+        result += std::string(indent, ' ') + returnType->toString(sources, indent + 1, verbose) + "\n";
     }
 
     result += std::string(indent - 1, ' ') + "}";

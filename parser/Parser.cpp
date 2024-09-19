@@ -35,6 +35,7 @@
 #include "ast/ImplMethod.h"
 #include "ast/ImplSetter.h"
 #include "errors/ErrorContext.h"
+#include "registry/ModuleRegistry.h"
 
 Parser::Parser(const std::shared_ptr<Source> &source)
     : source(source) {
@@ -47,14 +48,13 @@ Parser &Parser::operator=(Parser &&) noexcept = default;
 
 Parser::~Parser() = default;
 
-void Parser::parse() {
+void Parser::parse(ModuleRegistry& registry) {
     parseFile();
 
     for (auto &module: modules) {
         module.uses = uses;
+        registry.addModulePart(std::move(module));
     }
-
-    source->modules = std::move(modules);
 }
 
 void Parser::addError(CompilerError error) {
