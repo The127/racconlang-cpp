@@ -98,6 +98,10 @@ bool TokenTreeNode::isSignatureStarter() const {
     return isTokenTree(TokenType::OpenParen) || isToken() && getToken().isSignatureStarter();
 }
 
+bool TokenTreeNode::isTypeSignatureStarter() const {
+    return isToken() && getToken().isTypeSignatureStarter();
+}
+
 bool TokenTreeNode::isPathStarter() const {
     return isToken() && getToken().isPathStarter();
 }

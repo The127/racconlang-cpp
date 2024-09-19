@@ -30,6 +30,7 @@ public:
     [[nodiscard]] bool isError() const;
 
     [[nodiscard]] bool isConstraintBreakout() const;
+    [[nodiscard]] bool isTypeSignatureStarter() const;
     [[nodiscard]] bool isSignatureStarter() const;
     [[nodiscard]] bool isPathStarter() const;
     [[nodiscard]] bool isTopLevelStarter() const;

@@ -76,9 +76,13 @@ bool Token::isConstraintBreakout() const {
 }
 
 bool Token::isSignatureStarter() const {
-    return type == TokenType::Identifier
-           || type == TokenType::PathSeparator
+    return isTypeSignatureStarter()
            || type == TokenType::Fn;
+}
+
+bool Token::isTypeSignatureStarter() const {
+    return type == TokenType::Identifier
+           || type == TokenType::PathSeparator;
 }
 
 bool Token::isPathStarter() const {
