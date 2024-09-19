@@ -109,7 +109,12 @@ add_executable(RaccoonLang main.cpp
         ast/ImplMethod.cpp
         ast/ImplMethod.h
         errors/ErrorContext.cpp
-        errors/ErrorContext.h)
+        errors/ErrorContext.h
+        registry/ModuleRegistry.cpp
+        registry/ModuleRegistry.h
+        registry/Module.cpp
+        registry/Module.h
+        registry/ModuleRegistry.h)
 
 target_include_directories(RaccoonLang PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 

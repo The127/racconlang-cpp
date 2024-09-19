@@ -17,6 +17,7 @@
 #include "ImplBlock.h"
 
 #include "utils/NodeUtils.h"
+#include "utils/StringUtils.h"
 
 ModuleDeclaration::ModuleDeclaration() = default;
 ModuleDeclaration::ModuleDeclaration(ModuleDeclaration &&) noexcept = default;
@@ -75,4 +76,8 @@ std::string ModuleDeclaration::toString(const SourceMap &sources, const int inde
 
     result += std::string(indent - 1, ' ') + "}";
     return std::move(result);
+}
+
+std::string ModuleDeclaration::buildPathString() const {
+    return StringUtils::join(path.parts, "::");
 }
