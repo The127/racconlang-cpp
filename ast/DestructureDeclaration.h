@@ -4,6 +4,7 @@
 
 
 #pragma once
+#include "Identifier.h"
 #include "Node.h"
 
 
@@ -11,6 +12,7 @@ class DestructureDeclaration final : public Node {
 public:
     uint64_t startPos{};
     uint64_t endPos{};
+    std::optional<Identifier> name;
 
     DestructureDeclaration();
     DestructureDeclaration(DestructureDeclaration&&) noexcept;

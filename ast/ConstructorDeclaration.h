@@ -17,6 +17,7 @@ public:
     bool isPublic{};
     std::optional<Identifier> name;
     std::vector<Parameter> parameters;
+    std::optional<Identifier> otherName;
 
     ConstructorDeclaration();
     ConstructorDeclaration(ConstructorDeclaration &&) noexcept;

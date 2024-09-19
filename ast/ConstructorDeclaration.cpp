@@ -23,9 +23,21 @@ uint64_t ConstructorDeclaration::end() const {
 std::string ConstructorDeclaration::toString(const SourceMap &sources, const int indent, const bool verbose) const {
     std::string result = NodeUtils::nameString(*this, "ConstructorDeclaration", verbose) + "{\n";
 
+    result += std::string(indent, ' ') + "isPublic: " + std::to_string(isPublic) + ",\n";
+
+    if(name) {
+        result += std::string(indent, ' ') + "name: " + std::string(name->name) + ",\n";
+    }
+
     if(!parameters.empty()) {
         result += std::string(indent, ' ') + "parameters: " + NodeUtils::nodeListString(sources, parameters, indent + 1, verbose) + "\n";
     }
+
+    if(otherName) {
+        result += std::string(indent, ' ') + "otherName: " + std::string(otherName->name) + ",\n";
+    }
+
+    //TODO: expressions for other name
 
     result += std::string(indent - 1, ' ') + "}";
     return std::move(result);

@@ -12,6 +12,8 @@
 #include "errors/InternalError.h"
 #include "ast/AliasDeclaration.h"
 #include "ast/ConstraintDeclaration.h"
+#include "ast/ConstructorDeclaration.h"
+#include "ast/DestructureDeclaration.h"
 #include "ast/EnumDeclaration.h"
 #include "ast/EnumMemberDeclaration.h"
 #include "ast/FileUses.h"
@@ -29,6 +31,9 @@
 #include "ast/TupleSignature.h"
 #include "ast/UseNode.h"
 #include "ast/ImplBlock.h"
+#include "ast/ImplGetter.h"
+#include "ast/ImplMethod.h"
+#include "ast/ImplSetter.h"
 #include "errors/ErrorContext.h"
 
 Parser::Parser(const std::shared_ptr<Source> &source)
@@ -1683,10 +1688,492 @@ void Parser::implRule(TokenTreeIterator &it) {
     if (it->isTokenTree(TokenType::OpenCurly)) {
         const auto &body = consumeTokenTree(it, TokenType::OpenCurly);
 
-        //TODO
+        auto bodyIt = TokenTreeIterator(body.tokens);
+        while (!bodyIt.isEnd()) {
+            recoverUntil(bodyIt, [](auto const &n) {
+                return n.isModifier()
+                       || n.isToken(TokenType::Identifier)
+                       || n.isToken(TokenType::Tilde)
+                       || n.isToken(TokenType::Fn)
+                       || n.isToken(TokenType::Get)
+                       || n.isToken(TokenType::Set);
+            });
+
+            if (bodyIt.isEnd()) {
+                addError(CompilerError(ErrorCode::UnexpectedEndOfInput, impl.start()));
+                break;
+            }
+
+            std::vector<Token> modifiers;
+            if (bodyIt->isModifier()) {
+                modifiers = modifierRule(bodyIt, [](auto const &n) {
+                    return n.isToken(TokenType::Identifier)
+                           || n.isToken(TokenType::Tilde)
+                           || n.isToken(TokenType::Fn)
+                           || n.isToken(TokenType::Get)
+                           || n.isToken(TokenType::Set);
+                });
+            }
+
+            if (bodyIt.isEnd()) {
+                addError(CompilerError(ErrorCode::UnexpectedEndOfInput, impl.start()));
+                break;
+            }
+
+            if (bodyIt->isToken(TokenType::Identifier)) {
+                impl.constructors.emplace_back(constructorRule(bodyIt, modifiers));
+            } else if (bodyIt->isToken(TokenType::Tilde)) {
+                impl.destructors.emplace_back(destructorRule(bodyIt, modifiers));
+            } else if (bodyIt->isToken(TokenType::Fn)) {
+                impl.methods.emplace_back(methodRule(bodyIt, modifiers));
+            } else if (bodyIt->isToken(TokenType::Set)) {
+                impl.getters.emplace_back(implGetterRule(bodyIt, modifiers));
+            } else if (bodyIt->isToken(TokenType::Get)) {
+                impl.setters.emplace_back(implSetterRule(bodyIt, modifiers));
+            }
+        }
     } else {
         addError(CompilerError(ErrorCode::UnexpectedToken, impl.start()));
     }
+}
+
+ConstructorDeclaration Parser::constructorRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
+    validateModifiers(modifiers, {TokenType::Pub});
+    ConstructorDeclaration decl;
+    decl.isPublic = containsModifier(modifiers, TokenType::Pub);
+
+    decl.name = identifierRule(it);
+
+    recoverUntil(it, [](const auto &n) {
+        return n.isTokenTree(TokenType::OpenParen)
+               || n.isToken(TokenType::Colon)
+               || n.isTokenTree(TokenType::OpenCurly);
+    });
+    if (it.isEnd()) {
+        addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+        return std::move(decl);
+    }
+
+    if (it->isTokenTree(TokenType::OpenParen)) {
+        decl.parameters = parameterListRule(consumeTokenTree(it, TokenType::OpenParen));
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isToken(TokenType::Colon)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd() || it->isTopLevelStarter()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+    }
+
+    if (tryConsumeToken(it, TokenType::Colon)) {
+        recoverUntil(it, [](const auto &n) {
+            return n.isToken(TokenType::Identifier)
+                   || n.isTokenTree(TokenType::OpenParen)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+
+        if (it->isToken(TokenType::Identifier)) {
+            decl.otherName = identifierRule(it);
+
+            recoverUntil(it, [](const auto &n) {
+                return n.isTokenTree(TokenType::OpenParen)
+                       || n.isTokenTree(TokenType::OpenCurly);
+            });
+            if (it.isEnd()) {
+                addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+                return std::move(decl);
+            }
+        } else {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+        }
+
+        if (it->isTokenTree(TokenType::OpenParen)) {
+            consumeTokenTree(it, TokenType::OpenParen);
+            //TODO: expressions
+
+            recoverUntil(it, [](const auto &n) {
+                return n.isTokenTree(TokenType::OpenCurly);
+            });
+            if (it.isEnd()) {
+                addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+                return std::move(decl);
+            }
+        } else {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+        }
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    }
+
+    if (it->isTokenTree(TokenType::OpenCurly)) {
+        consumeTokenTree(it, TokenType::OpenCurly);
+        //TODO: expressions
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+    }
+
+    return std::move(decl);
+}
+
+DestructureDeclaration Parser::destructorRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
+    validateModifiers(modifiers, {});
+    DestructureDeclaration decl;
+
+    consumeToken(it, TokenType::Tilde);
+
+    recoverUntil(it, [](const auto &n) {
+        return n.isToken(TokenType::Identifier)
+               || n.isTokenTree(TokenType::OpenParen)
+               || n.isTokenTree(TokenType::OpenCurly);
+    });
+    if (it.isEnd()) {
+        addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+        return std::move(decl);
+    }
+
+    if (it->isToken(TokenType::Identifier)) {
+        decl.name = identifierRule(it);
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isTokenTree(TokenType::OpenParen)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+    }
+
+    if (tryConsumeTokenTree(it, TokenType::OpenParen)) {
+        recoverUntil(it, [](const auto &n) {
+            return n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+    }
+
+    if (it->isTokenTree(TokenType::OpenCurly)) {
+        consumeTokenTree(it, TokenType::OpenCurly);
+        //TODO: statements!
+    }
+
+    return std::move(decl);
+}
+
+ImplMethod Parser::methodRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
+    validateModifiers(modifiers, {TokenType::Pub, TokenType::Mut, TokenType::Static});
+    ImplMethod decl;
+    decl.isPublic = containsModifier(modifiers, TokenType::Pub);
+    decl.isMut = containsModifier(modifiers, TokenType::Mut);
+    decl.isStatic = containsModifier(modifiers, TokenType::Static);
+
+    consumeToken(it, TokenType::Fn);
+
+    recoverUntil(it, [](const auto &n) {
+        return n.isToken(TokenType::Identifier)
+               || n.isTokenTree(TokenType::OpenAngle)
+               || n.isTokenTree(TokenType::OpenParen)
+               || n.isToken(TokenType::DashArrow)
+               || n.isToken(TokenType::Where)
+               || n.isToken(TokenType::EqualArrow)
+               || n.isTokenTree(TokenType::OpenCurly);
+    });
+    if (it.isEnd()) {
+        addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+        return std::move(decl);
+    }
+
+    if (it->isToken(TokenType::Identifier)) {
+        decl.name = identifierRule(it);
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isTokenTree(TokenType::OpenAngle)
+                   || n.isTokenTree(TokenType::OpenParen)
+                   || n.isToken(TokenType::DashArrow)
+                   || n.isToken(TokenType::Where)
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+    }
+
+    if (it->isTokenTree(TokenType::OpenAngle)) {
+        decl.genericParams = identifierListRule(consumeTokenTree(it, TokenType::OpenAngle));
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isTokenTree(TokenType::OpenParen)
+                   || n.isToken(TokenType::DashArrow)
+                   || n.isToken(TokenType::Where)
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    }
+
+    if (it->isTokenTree(TokenType::OpenParen)) {
+        decl.parameters = parameterListRule(consumeTokenTree(it, TokenType::OpenParen));
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isToken(TokenType::DashArrow)
+                   || n.isToken(TokenType::Where)
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+    }
+
+    if (tryConsumeToken(it, TokenType::DashArrow)) {
+        recoverUntil(it, [](const auto &n) {
+            return n.isSignatureStarter()
+                   || n.isToken(TokenType::Mut)
+                   || n.isToken(TokenType::Where)
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+
+        if (it->isSignatureStarter() || it->isToken(TokenType::Mut)) {
+            decl.returnType = returnTypeRule(it);
+        } else {
+            addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+        }
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isToken(TokenType::Where)
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    }
+
+    if (it->isToken(TokenType::Where)) {
+        decl.genericConstraints = genericConstraintListRule(it, [](const auto &n) {
+            return n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    }
+
+    if (it->isToken(TokenType::EqualArrow)) {
+        consumeToken(it, TokenType::EqualArrow);
+        //TODO: expressions
+        consumeToken(it, TokenType::Semicolon);
+    } else if (it->isTokenTree(TokenType::OpenCurly)) {
+        consumeTokenTree(it, TokenType::OpenCurly);
+        //TODO: statements
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+    }
+
+    return std::move(decl);
+}
+
+ImplGetter Parser::implGetterRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
+    validateModifiers(modifiers, {TokenType::Pub, TokenType::Mut});
+    ImplGetter decl;
+    decl.isPublic = containsModifier(modifiers, TokenType::Pub);
+    decl.isMut = containsModifier(modifiers, TokenType::Mut);
+
+    consumeToken(it, TokenType::Get);
+
+    recoverUntil(it, [](const auto &n) {
+        return n.isToken(TokenType::Identifier)
+               || n.isTokenTree(TokenType::OpenParen)
+               || n.isToken(TokenType::DashArrow)
+               || n.isToken(TokenType::EqualArrow)
+               || n.isTokenTree(TokenType::OpenCurly);
+    });
+    if (it.isEnd()) {
+        addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+        return std::move(decl);
+    }
+
+    if (it->isToken(TokenType::Identifier)) {
+        decl.name = identifierRule(it);
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isTokenTree(TokenType::OpenParen)
+                   || n.isToken(TokenType::DashArrow)
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+    }
+
+    if (it->isTokenTree(TokenType::OpenParen)) {
+        consumeTokenTree(it, TokenType::OpenParen);
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isToken(TokenType::DashArrow)
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+    }
+
+    if (it->isToken(TokenType::DashArrow)) {
+        consumeToken(it, TokenType::DashArrow);
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isToken(TokenType::Mut) || n.isSignatureStarter()
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+
+        if (it->isToken(TokenType::Mut) || it->isSignatureStarter()) {
+            decl.returnType = returnTypeRule(it);
+        } else {
+            addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+        }
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+    }
+
+    if (it->isToken(TokenType::EqualArrow)) {
+        consumeToken(it, TokenType::EqualArrow);
+        consumeToken(it, TokenType::Semicolon);
+        //TODO: expressions
+    } else if (it->isTokenTree(TokenType::OpenCurly)) {
+        consumeTokenTree(it, TokenType::OpenCurly);
+        //TODO: statements
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+    }
+
+    return std::move(decl);
+}
+
+ImplSetter Parser::implSetterRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
+    validateModifiers(modifiers, {TokenType::Pub});
+    ImplSetter decl;
+    decl.isPublic = containsModifier(modifiers, TokenType::Pub);
+
+    consumeToken(it, TokenType::Set);
+
+    recoverUntil(it, [](const auto &n) {
+        return n.isToken(TokenType::Identifier)
+               || n.isTokenTree(TokenType::OpenParen)
+               || n.isToken(TokenType::EqualArrow)
+               || n.isTokenTree(TokenType::OpenCurly);
+    });
+    if (it.isEnd()) {
+        addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+        return std::move(decl);
+    }
+
+    if (it->isToken(TokenType::Identifier)) {
+        decl.name = identifierRule(it);
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isTokenTree(TokenType::OpenParen)
+                   || n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+    }
+
+    if (it->isTokenTree(TokenType::OpenParen)) {
+        auto params = parameterListRule(consumeTokenTree(it, TokenType::OpenParen));
+        if(params.size() != 1) {
+            addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+        }
+        decl.parameter = std::move(params[0]);
+
+        recoverUntil(it, [](const auto &n) {
+            return n.isToken(TokenType::EqualArrow)
+                   || n.isTokenTree(TokenType::OpenCurly);
+        });
+        if (it.isEnd()) {
+            addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
+            return std::move(decl);
+        }
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+    }
+
+    if (it->isToken(TokenType::EqualArrow)) {
+        consumeToken(it, TokenType::EqualArrow);
+        consumeToken(it, TokenType::Semicolon);
+        //TODO: expressions
+    } else if (it->isTokenTree(TokenType::OpenCurly)) {
+        consumeTokenTree(it, TokenType::OpenCurly);
+        //TODO: statements
+    } else {
+        addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
+    }
+
+    return std::move(decl);
 }
 
 Path Parser::pathRule(TokenTreeIterator &it, const bool allowTrailing) {

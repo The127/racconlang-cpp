@@ -12,6 +12,11 @@
 #include "ast/FileUses.h"
 #include "TokenTreeIterator.h"
 
+class ImplSetter;
+class ImplGetter;
+class ImplMethod;
+class DestructureDeclaration;
+class ConstructorDeclaration;
 class ErrorContext;
 class Parameter;
 class TupleSignature;
@@ -84,6 +89,11 @@ private:
     void declarationRule(TokenTreeIterator& it);
 
     void implRule(TokenTreeIterator& it);
+    ConstructorDeclaration constructorRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    DestructureDeclaration destructorRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    ImplMethod methodRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    ImplGetter implGetterRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    ImplSetter implSetterRule(TokenTreeIterator& it, std::vector<Token> modifiers);
 
     Path pathRule(TokenTreeIterator& it, bool allowTrailing);
 

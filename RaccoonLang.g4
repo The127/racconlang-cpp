@@ -97,7 +97,7 @@ implBlock
     ;
 
 implConstructor
-    : 'pub'? Identifier '(' parameterList? ')' blockStatement
+    : 'pub'? Identifier '(' parameterList? ')' (':' Identifier '(' ')')? blockStatement
     ;
 
 implDestructor
@@ -105,7 +105,7 @@ implDestructor
     ;
 
 implMethod
-    : 'pub'? 'mut'? 'static'? 'fn' Identifier genericParams '(' ')' ('->' type)  constraintDeclaration* (blockExpression | lambdaBody)
+    : 'pub'? 'mut'? 'static'? 'fn' Identifier genericParams '(' parameterList ')' ('->' returnType)?  constraintDeclaration* (blockExpression | lambdaBody)
     ;
 
 implSetter
@@ -113,7 +113,7 @@ implSetter
     ;
 
 implGetter
-    : 'pub'? 'mut'? Identifier '(' ')' ('->' type) (blockExpression | lambdaBody)
+    : 'pub'? 'mut'? 'get' Identifier '(' ')' '->' returnType (blockExpression | lambdaBody)
     ;
 
 constraintDeclaration
