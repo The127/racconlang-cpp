@@ -60,7 +60,8 @@ bool Token::isTopLevelStarter() const {
     return isDeclaratorKeyword()
            || isModifier()
            || type == TokenType::Mod
-           || type == TokenType::Use;
+           || type == TokenType::Use
+           || type == TokenType::Impl;
 }
 
 bool Token::isModifier() const {

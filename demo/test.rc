@@ -47,3 +47,13 @@ struct Bar {} destructures into (x, y);
 alias bar<T> = (foo, std::map<asdf, T>) where T : numeric;
 
 fn foo(){}
+
+impl<T> Foo<T> on Bar<T> for Qux<T> {
+    Bar(ref i: int){}
+    ~Bar(){}
+    lol(){}
+    fn foo(a: int) -> Bar => ;
+    fn foo2(b: string, t: T) {}
+    mut get a() -> int {}
+    set b(val: int) => ;
+}

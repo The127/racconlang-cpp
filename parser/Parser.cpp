@@ -1726,9 +1726,9 @@ void Parser::implRule(TokenTreeIterator &it) {
                 impl.destructors.emplace_back(destructorRule(bodyIt, modifiers));
             } else if (bodyIt->isToken(TokenType::Fn)) {
                 impl.methods.emplace_back(methodRule(bodyIt, modifiers));
-            } else if (bodyIt->isToken(TokenType::Set)) {
-                impl.getters.emplace_back(implGetterRule(bodyIt, modifiers));
             } else if (bodyIt->isToken(TokenType::Get)) {
+                impl.getters.emplace_back(implGetterRule(bodyIt, modifiers));
+            } else if (bodyIt->isToken(TokenType::Set)) {
                 impl.setters.emplace_back(implSetterRule(bodyIt, modifiers));
             }
         }
