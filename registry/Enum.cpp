@@ -4,10 +4,15 @@
 
 #include "Enum.h"
 
-Enum::Enum(std::string name, uint8_t arity, EnumDeclaration *declaration)
+#include <utility>
+
+Enum::Enum(std::string name, uint8_t arity, EnumDeclaration *declaration, std::shared_ptr<Source> source,
+           std::shared_ptr<FileUses> fileUses)
     : name(std::move(name)),
       arity(arity),
-      declaration(declaration) {
+      declaration(declaration),
+      source(std::move(source)),
+      fileUses(std::move(fileUses)) {
 }
 
 Enum::~Enum() = default;

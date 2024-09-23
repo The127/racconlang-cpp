@@ -6,10 +6,13 @@
 
 #include <utility>
 
-Alias::Alias(std::string name, uint8_t arity, AliasDeclaration *declaration)
+Alias::Alias(std::string name, uint8_t arity, AliasDeclaration *declaration, std::shared_ptr<Source> source,
+             std::shared_ptr<FileUses> fileUses)
     : name(std::move(name)),
       arity(arity),
-      declaration(declaration) {
+      declaration(declaration),
+      source(std::move(source)),
+      fileUses(std::move(fileUses)) {
 }
 
 Alias::~Alias() = default;

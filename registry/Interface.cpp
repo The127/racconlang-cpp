@@ -4,10 +4,13 @@
 
 #include "Interface.h"
 
-Interface::Interface(std::string name, uint8_t arity, InterfaceDeclaration *declaration)
+Interface::Interface(std::string name, uint8_t arity, InterfaceDeclaration *declaration, std::shared_ptr<Source> source,
+                     std::shared_ptr<FileUses> fileUses)
     : name(std::move(name)),
       arity(arity),
-      declaration(declaration) {
+      declaration(declaration),
+      source(std::move(source)),
+      fileUses(std::move(fileUses)) {
 }
 
 Interface::~Interface() = default;
