@@ -2384,25 +2384,17 @@ std::vector<Identifier> Parser::identifierListRule(const TokenTree &list) {
     auto it = TokenTreeIterator(list.tokens);
 
     while (it) {
-        recoverUntil(it, {TokenType::Identifier, TokenType::Comma});
+        recoverUntil(it, TokenType::Identifier);
         if (it.isEnd()) {
             break;
         }
+        result.emplace_back(identifierRule(it));
 
-        if (it->isToken(TokenType::Identifier)) {
-            result.emplace_back(identifierRule(it));
-            recoverUntil(it, {TokenType::Identifier, TokenType::Comma});
-            if (it.isEnd()) {
-                break;
-            }
-        } else {
-            addError(CompilerError(ErrorCode::UnexpectedToken, it->getStart()));
-            it += 1;
-            continue;
+        if (it.isEnd()) {
+            break;
         }
-
         if (!tryConsumeToken(it, TokenType::Comma)) {
-            addError(CompilerError(ErrorCode::MissingComma, it->getStart()));
+            addError(CompilerError(ErrorCode::MissingComma, (it - 1)->getEnd()));
         }
     }
 
