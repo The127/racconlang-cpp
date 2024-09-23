@@ -34,6 +34,7 @@ enum class TokenType {
     On,             // on
     Static,         // static
     For,            // for
+    Value,          // value
 
     Colon,          // :
     PathSeparator,  // ::

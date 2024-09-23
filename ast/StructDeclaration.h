@@ -16,6 +16,7 @@ public:
     uint64_t startPos{};
     uint64_t endPos{};
     bool isPublic{};
+    bool isValue{};
     std::optional<Identifier> name;
     std::vector<Identifier> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;

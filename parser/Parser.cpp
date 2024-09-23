@@ -846,8 +846,9 @@ void Parser::structRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
     decl.endPos = it->getEnd();
     it += 1;
 
-    validateModifiers(modifiers, {TokenType::Pub});
+    validateModifiers(modifiers, {TokenType::Pub, TokenType::Value});
     decl.isPublic = containsModifier(modifiers, TokenType::Pub);
+    decl.isValue = containsModifier(modifiers, TokenType::Value);
 
     if (it.isEnd()) {
         auto error = CompilerError(ErrorCode::MissingDeclarationName, decl.startPos);
