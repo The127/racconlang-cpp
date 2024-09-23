@@ -120,7 +120,9 @@ add_executable(RaccoonLang main.cpp
         registry/Enum.cpp
         registry/Enum.h
         registry/Alias.cpp
-        registry/Alias.h)
+        registry/Alias.h
+        registry/Interface.cpp
+        registry/Interface.h)
 
 target_include_directories(RaccoonLang PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 

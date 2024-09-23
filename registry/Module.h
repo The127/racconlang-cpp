@@ -9,6 +9,7 @@
 #include "Struct.h"
 #include "Enum.h"
 #include "Alias.h"
+#include "Interface.h"
 #include "ast/ModuleDeclaration.h"
 #include "ast/StructDeclaration.h"
 #include "parser/Parser.h"
@@ -20,6 +21,7 @@ public:
     std::vector<Struct> structs{};
     std::vector<Enum> enums{};
     std::vector<Alias> aliases{};
+    std::vector<Interface> interfaces{};
 
     explicit Module(std::string name);
 
@@ -30,4 +32,5 @@ public:
     void addStruct(const std::shared_ptr<Source> &source, std::string name, uint8_t arity, StructDeclaration &structDeclaration);
     void addEnum(const std::shared_ptr<Source> &source, std::string name, uint8_t arity, EnumDeclaration &enumDeclaration);
     void addAlias(const std::shared_ptr<Source> &source, std::string name, uint8_t arity, AliasDeclaration &aliasDeclaration);
+    void addInterface(const std::shared_ptr<Source> &source, std::string name, uint8_t arity, InterfaceDeclaration &interfaceDeclaration);
 };

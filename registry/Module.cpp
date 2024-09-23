@@ -7,6 +7,7 @@
 #include "Struct.h"
 #include "ast/EnumDeclaration.h"
 #include "ast/AliasDeclaration.h"
+#include "ast/InterfaceDeclaration.h"
 #include "sourceMap/Source.h"
 
 Module::~Module() = default;
@@ -63,4 +64,20 @@ void Module::addAlias(const std::shared_ptr<Source> &source, std::string name, u
         std::move(name),
         arity,
         &aliasDeclaration);
+}
+
+void Module::addInterface(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
+                          InterfaceDeclaration &interfaceDeclaration) {
+    auto it = std::ranges::find_if(interfaces, [&](Interface &i) {
+        return i.name == name && i.arity == arity;
+    });
+    if (it != interfaces.end()) {
+        source->errors.emplace_back(ErrorCode::DuplicateInterfaceDeclaration, interfaceDeclaration.start());
+        return;
+    }
+
+    interfaces.emplace_back(
+        std::move(name),
+        arity,
+        &interfaceDeclaration);
 }
