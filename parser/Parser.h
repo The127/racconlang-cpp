@@ -68,7 +68,7 @@ private:
     void validateModifiers(std::vector<Token> &modifiers, const std::vector<TokenType> &validTokenTypes);
 
     void enumRule(TokenTreeIterator& it, std::vector<Token> modifiers);
-    std::optional<EnumMemberDeclaration> enumMemberRule(TokenTreeIterator& it);
+    EnumMemberDeclaration enumMemberRule(TokenTreeIterator& it);
 
     void interfaceRule(TokenTreeIterator& it, std::vector<Token> modifiers);
     InterfaceMethodDeclaration interfaceMethodRule(TokenTreeIterator& it, std::vector<Token> modifiers);

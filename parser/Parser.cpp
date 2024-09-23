@@ -329,10 +329,8 @@ void Parser::enumRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
     }
 
 
-    COMPILER_ASSERT(it->isTokenTree(TokenType::OpenCurly), "unexpected token");
-
-    decl.endPos = it->getEnd();
-    const auto &body = it->getTokenTree();
+    const auto &body = consumeTokenTree(it, TokenType::OpenCurly);
+    decl.endPos = body.right.getEnd();
 
     if (body.right.isError()) {
         addError(CompilerError(ErrorCode::UnclosedEnumBody, body.right.getStart()));
@@ -341,42 +339,36 @@ void Parser::enumRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
     auto bodyIt = TokenTreeIterator(body.tokens);
 
     while (bodyIt) {
-        auto member = enumMemberRule(bodyIt);
-        if (member) {
-            decl.memberDeclarations.emplace_back(std::move(*member));
-            recoverUntil(bodyIt, {TokenType::Identifier, TokenType::Comma});
-            if (it && it->isToken(TokenType::Identifier)) {
-                addError(CompilerError(ErrorCode::MissingComma, it->getStart()));
-            } else {
-                tryConsumeToken(it, TokenType::Comma);
-            }
+        recoverUntil(bodyIt, TokenType::Identifier);
+        if (bodyIt.isEnd()) {
+            break;
+        }
+        decl.memberDeclarations.emplace_back(enumMemberRule(bodyIt));
+
+        if (bodyIt.isEnd()) {
+            break;
+        }
+        if (!tryConsumeToken(bodyIt, TokenType::Comma)) {
+            addError(CompilerError(ErrorCode::MissingComma, (bodyIt - 1)->getEnd()));
         }
     }
-
-    it += 1;
 }
 
-std::optional<EnumMemberDeclaration> Parser::enumMemberRule(TokenTreeIterator &it) {
-    recoverUntil(it, {TokenType::Identifier, TokenType::Comma});
-
-    if (it.isEnd() || tryConsumeToken(it, TokenType::Comma)) {
-        return std::nullopt;
-    }
-
+EnumMemberDeclaration Parser::enumMemberRule(TokenTreeIterator &it) {
     auto decl = EnumMemberDeclaration(identifierRule(it));
 
     decl.startPos = decl.name.start();
     decl.endPos = decl.name.end();
 
     if (it.isEnd()) {
-        return std::move(decl);
+        return decl;
     }
 
     if (const auto &tree = tryConsumeTokenTree(it, TokenType::OpenParen)) {
         decl.endPos = (*tree)->right.getEnd();
         decl.values = signatureListRule(**tree);
     }
-    return std::move(decl);
+    return decl;
 }
 
 
