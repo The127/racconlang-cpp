@@ -3,16 +3,64 @@
 //
 
 #include "Module.h"
-#include "ast/ModuleDeclaration.h"
+
+#include "Struct.h"
+#include "ast/EnumDeclaration.h"
+#include "ast/AliasDeclaration.h"
+#include "sourceMap/Source.h"
 
 Module::~Module() = default;
-Module::Module(Module&&) noexcept = default;
-Module &Module::operator=(Module &&) noexcept  = default;
+Module::Module(Module &&) noexcept = default;
+Module &Module::operator=(Module &&) noexcept = default;
 
-Module::Module(const std::string_view name)
-    : name(name) {
+Module::Module(const std::string path)
+    : path(path) {
 }
 
-void Module::addPart(ModuleDeclaration declaration) {
-    parts.emplace_back(std::move(declaration));
+void Module::addStruct(const std::shared_ptr<Source> &source, std::string name, const uint8_t arity,
+                       StructDeclaration &structDeclaration) {
+    auto it = std::ranges::find_if(structs, [&](Struct &s) {
+        return s.name == name && s.arity == arity;
+    });
+    if (it != structs.end()) {
+        source->errors.emplace_back(ErrorCode::DuplicateStructDeclaration, structDeclaration.start());
+        return;
+    }
+
+    structs.emplace_back(
+        std::move(name),
+        arity,
+        &structDeclaration);
+}
+
+void Module::addEnum(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
+                     EnumDeclaration &enumDeclaration) {
+    auto it = std::ranges::find_if(enums, [&](Enum &e) {
+        return e.name == name && e.arity == arity;
+    });
+    if (it != enums.end()) {
+        source->errors.emplace_back(ErrorCode::DuplicateEnumDeclaration, enumDeclaration.start());
+        return;
+    }
+
+    enums.emplace_back(
+        std::move(name),
+        arity,
+        &enumDeclaration);
+}
+
+void Module::addAlias(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
+                      AliasDeclaration &aliasDeclaration) {
+    auto it = std::ranges::find_if(aliases, [&](Alias &a) {
+        return a.name == name && a.arity == arity;
+    });
+    if (it != aliases.end()) {
+        source->errors.emplace_back(ErrorCode::DuplicateEnumDeclaration, aliasDeclaration.start());
+        return;
+    }
+
+    aliases.emplace_back(
+        std::move(name),
+        arity,
+        &aliasDeclaration);
 }

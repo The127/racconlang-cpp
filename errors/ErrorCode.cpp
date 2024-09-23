@@ -47,16 +47,20 @@ static std::map<ErrorCode, std::pair<std::string, std::string> > ErrorInfos = {
     {ErrorCode::MissingStructBody, {"EST0001", "missing struct body"}},
     {ErrorCode::MissingPropertyName, {"EST0002", "missing property name"}},
     {ErrorCode::MissingPropertyType, {"EST0003", "missing property type"}},
+    {ErrorCode::DuplicateStructDeclaration, {"EST0004", "duplicate struct declaration"}},
 
     {ErrorCode::MissingEnumBody, {"EEN0001", "missing enum body"}},
     {ErrorCode::UnclosedEnumBody, {"EEN0002", "unclosed enum body"}},
     {ErrorCode::EnumMemberExpected, {"EEN0003", "expected enum member"}},
+    {ErrorCode::DuplicateEnumDeclaration, {"EEN0004", "duplicate enum declaration"}},
 
     {ErrorCode::MissingInterfaceBody, {"EIN0001", "missing interface body"}},
+    {ErrorCode::DuplicateInterfaceDeclaration, {"EIN0002", "duplicate interface declaration"}},
 
     {ErrorCode::MissingVariableType, {"EVA0001", "missing variable type"}},
 
     {ErrorCode::MissingAliasType, {"EAL0001", "missing alias type"}},
+    {ErrorCode::DuplicateAliasDeclaration, {"EAL0002", "duplicate alias declaration"}},
 };
 
 const std::pair<std::string, std::string> & ErrorInfo(ErrorCode code) {

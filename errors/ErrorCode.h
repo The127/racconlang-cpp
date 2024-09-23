@@ -51,6 +51,11 @@ enum class ErrorCode {
     MissingVariableType,
     MissingAliasType,
     MissingColon,
+
+    DuplicateStructDeclaration,
+    DuplicateEnumDeclaration,
+    DuplicateAliasDeclaration,
+    DuplicateInterfaceDeclaration,
 };
 
 const std::pair<std::string, std::string>& ErrorInfo(ErrorCode code);

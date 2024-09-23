@@ -7,11 +7,12 @@
 
 #include <map>
 
+#include "parser/Parser.h"
 #include "sourceMap/Source.h"
 
 
+class ModulePart;
 class Module;
-class Path;
 
 class ModuleRegistry {
 public:
@@ -22,5 +23,6 @@ public:
     ModuleRegistry(ModuleRegistry&&) noexcept;
     ModuleRegistry& operator=(ModuleRegistry&&) noexcept;
 
-    void addModulePart(ModuleDeclaration&& declaration);
+    void addModule(std::string path);
+    Module& getModule(std::string path);
 };

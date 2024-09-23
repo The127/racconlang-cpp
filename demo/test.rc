@@ -32,7 +32,7 @@ let x: Foo<T>;
 
 pub struct Foo(x: int, y: int);
 
-pub struct Foo<T>  where T : Foobar {
+pub struct Foo2<T>  where T : Foobar {
     foo: int;
     pub mut bar: int;
 }

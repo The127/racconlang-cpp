@@ -49,7 +49,7 @@ public:
     Parser& operator=(Parser&&) noexcept;
     ~Parser();
 
-    void parse(ModuleRegistry& registry);
+    std::vector<ModuleDeclaration> parse();
 
 private:
     std::shared_ptr<FileUses> uses;

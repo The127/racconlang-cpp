@@ -114,7 +114,13 @@ add_executable(RaccoonLang main.cpp
         registry/ModuleRegistry.h
         registry/Module.cpp
         registry/Module.h
-        registry/ModuleRegistry.h)
+        registry/ModuleRegistry.h
+        registry/Struct.cpp
+        registry/Struct.h
+        registry/Enum.cpp
+        registry/Enum.h
+        registry/Alias.cpp
+        registry/Alias.h)
 
 target_include_directories(RaccoonLang PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 

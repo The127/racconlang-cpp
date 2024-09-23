@@ -48,13 +48,14 @@ Parser &Parser::operator=(Parser &&) noexcept = default;
 
 Parser::~Parser() = default;
 
-void Parser::parse(ModuleRegistry& registry) {
+std::vector<ModuleDeclaration> Parser::parse() {
     parseFile();
 
     for (auto &module: modules) {
         module.uses = uses;
-        registry.addModulePart(std::move(module));
     }
+
+    return std::move(modules);
 }
 
 void Parser::addError(CompilerError error) {
@@ -132,7 +133,7 @@ void Parser::useRule(TokenTreeIterator &it) {
         if (!use.path.isTrailing()) {
             addError(CompilerError(ErrorCode::MissingPathSeparator, (*tree)->left.start));
         }
-        use.names = std::move(identifierListRule(**tree));
+        use.names = identifierListRule(**tree);
         use.endPos = (*tree)->right.getEnd();
     }
 

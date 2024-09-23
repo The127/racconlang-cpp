@@ -15,14 +15,12 @@ ModuleRegistry::ModuleRegistry(ModuleRegistry &&) noexcept = default;
 
 ModuleRegistry &ModuleRegistry::operator=(ModuleRegistry &&) noexcept = default;
 
-
-void ModuleRegistry::addModulePart(ModuleDeclaration&& declaration) {
-    const auto key = declaration.buildPathString();
-
-    if (!modules.contains(key)) {
-        modules.emplace(key, std::string_view(key));
+void ModuleRegistry::addModule(std::string path) {
+    if (!modules.contains(path)) {
+        modules.emplace(path, Module(path));
     }
-
-    modules.at(key).addPart(std::move(declaration));
 }
 
+Module &ModuleRegistry::getModule(std::string path) {
+    return modules.at(path);
+}
