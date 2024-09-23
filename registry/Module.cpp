@@ -10,16 +10,17 @@
 #include "ast/InterfaceDeclaration.h"
 #include "sourceMap/Source.h"
 
-Module::~Module() = default;
-Module::Module(Module &&) noexcept = default;
-Module &Module::operator=(Module &&) noexcept = default;
 
 Module::Module(const std::string path)
     : path(path) {
 }
 
-void Module::addStruct(const std::shared_ptr<Source> &source, std::string name, const uint8_t arity,
-                       StructDeclaration &structDeclaration) {
+Module::~Module() = default;
+Module::Module(Module &&) noexcept = default;
+Module &Module::operator=(Module &&) noexcept = default;
+
+void Module::addStruct(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
+                       StructDeclaration &structDeclaration, std::shared_ptr<FileUses> &fileUses) {
     auto it = std::ranges::find_if(structs, [&](Struct &s) {
         return s.name == name && s.arity == arity;
     });
@@ -31,11 +32,14 @@ void Module::addStruct(const std::shared_ptr<Source> &source, std::string name, 
     structs.emplace_back(
         std::move(name),
         arity,
-        &structDeclaration);
+        &structDeclaration,
+        source,
+        fileUses);
 }
 
 void Module::addEnum(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
-                     EnumDeclaration &enumDeclaration) {
+                     EnumDeclaration &enumDeclaration,
+                     const std::shared_ptr<FileUses> &fileUses) {
     auto it = std::ranges::find_if(enums, [&](Enum &e) {
         return e.name == name && e.arity == arity;
     });
@@ -47,11 +51,14 @@ void Module::addEnum(const std::shared_ptr<Source> &source, std::string name, ui
     enums.emplace_back(
         std::move(name),
         arity,
-        &enumDeclaration);
+        &enumDeclaration,
+        source,
+        fileUses);
 }
 
 void Module::addAlias(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
-                      AliasDeclaration &aliasDeclaration) {
+                      AliasDeclaration &aliasDeclaration,
+                      const std::shared_ptr<FileUses> &fileUses) {
     auto it = std::ranges::find_if(aliases, [&](Alias &a) {
         return a.name == name && a.arity == arity;
     });
@@ -63,11 +70,14 @@ void Module::addAlias(const std::shared_ptr<Source> &source, std::string name, u
     aliases.emplace_back(
         std::move(name),
         arity,
-        &aliasDeclaration);
+        &aliasDeclaration,
+        source,
+        fileUses);
 }
 
 void Module::addInterface(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
-                          InterfaceDeclaration &interfaceDeclaration) {
+                          InterfaceDeclaration &interfaceDeclaration,
+                          const std::shared_ptr<FileUses> &fileUses) {
     auto it = std::ranges::find_if(interfaces, [&](Interface &i) {
         return i.name == name && i.arity == arity;
     });
@@ -79,5 +89,7 @@ void Module::addInterface(const std::shared_ptr<Source> &source, std::string nam
     interfaces.emplace_back(
         std::move(name),
         arity,
-        &interfaceDeclaration);
+        &interfaceDeclaration,
+        source,
+        fileUses);
 }

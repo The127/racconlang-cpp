@@ -2,6 +2,7 @@
 
 #include "ast/AliasDeclaration.h"
 #include "ast/EnumDeclaration.h"
+#include "ast/InterfaceDeclaration.h"
 #include "ast/ModuleDeclaration.h"
 #include "errors/ConsoleErrorHandler.h"
 #include "errors/ErrorHandler.h"
@@ -55,29 +56,44 @@ int main() {
                 source,
                 std::string(structDeclaration.name->name),
                 structDeclaration.genericParams.size(),
-                structDeclaration);
+                structDeclaration,
+                moduleDecl.uses);
         }
 
-        for(auto &enumDeclaration: moduleDecl.enumDeclarations) {
-            if(!enumDeclaration.name)
+        for (auto &enumDeclaration: moduleDecl.enumDeclarations) {
+            if (!enumDeclaration.name)
                 continue;
 
             module.addEnum(
                 source,
                 std::string(enumDeclaration.name->name),
                 enumDeclaration.genericParams.size(),
-                enumDeclaration);
+                enumDeclaration,
+                moduleDecl.uses);
         }
 
-        for(auto &aliasDeclaration: moduleDecl.aliasDeclarations) {
-            if(!aliasDeclaration.name)
+        for (auto &interfaceDeclaration: moduleDecl.interfaceDeclarations) {
+            if (!interfaceDeclaration.name)
+                continue;
+
+            module.addInterface(
+                source,
+                std::string(interfaceDeclaration.name->name),
+                interfaceDeclaration.genericParams.size(),
+                interfaceDeclaration,
+                moduleDecl.uses);
+        }
+
+        for (auto &aliasDeclaration: moduleDecl.aliasDeclarations) {
+            if (!aliasDeclaration.name)
                 continue;
 
             module.addAlias(
                 source,
                 std::string(aliasDeclaration.name->name),
                 aliasDeclaration.genericParams.size(),
-                aliasDeclaration);
+                aliasDeclaration,
+                moduleDecl.uses);
         }
     }
 

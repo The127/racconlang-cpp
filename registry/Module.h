@@ -26,11 +26,19 @@ public:
     explicit Module(std::string name);
 
     ~Module();
-    Module(Module&&) noexcept;
-    Module& operator=(Module&&) noexcept;
+    Module(Module &&) noexcept;
+    Module &operator=(Module &&) noexcept;
 
-    void addStruct(const std::shared_ptr<Source> &source, std::string name, uint8_t arity, StructDeclaration &structDeclaration);
-    void addEnum(const std::shared_ptr<Source> &source, std::string name, uint8_t arity, EnumDeclaration &enumDeclaration);
-    void addAlias(const std::shared_ptr<Source> &source, std::string name, uint8_t arity, AliasDeclaration &aliasDeclaration);
-    void addInterface(const std::shared_ptr<Source> &source, std::string name, uint8_t arity, InterfaceDeclaration &interfaceDeclaration);
+    void addStruct(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
+                   StructDeclaration &structDeclaration,
+                   std::shared_ptr<FileUses> &fileUses);
+    void addEnum(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
+                 EnumDeclaration &enumDeclaration,
+                 const std::shared_ptr<FileUses> &fileUses);
+    void addAlias(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
+                  AliasDeclaration &aliasDeclaration,
+                  const std::shared_ptr<FileUses> &fileUses);
+    void addInterface(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
+                      InterfaceDeclaration &interfaceDeclaration,
+                      const std::shared_ptr<FileUses> &fileUses);
 };
