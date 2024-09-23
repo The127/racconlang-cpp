@@ -4,17 +4,18 @@
 class TokenTreeIterator {
     using InnerIterator = std::vector<TokenTreeNode>::const_iterator;
 private:
+    InnerIterator begin;
     InnerIterator current;
     InnerIterator end;
 
 public:
     explicit TokenTreeIterator(const std::vector<TokenTreeNode>& vec) {
-        current = vec.begin();
+        begin = current = vec.begin();
         end = vec.end();
     }
 
     TokenTreeIterator(InnerIterator start, InnerIterator end) {
-        this->current = start;
+        begin = current = start;
         this->end = end;
     }
 
@@ -27,12 +28,12 @@ public:
     }
 
     const TokenTreeNode& operator*() const {
-        COMPILER_ASSERT(current < end, "attempt to access invalid iterator");
+        COMPILER_ASSERT(current < end && current >= begin, "attempt to access invalid iterator");
         return current.operator*();
     }
 
     const TokenTreeNode* operator->() const {
-        COMPILER_ASSERT(current < end, "attempt to access invalid iterator");
+        COMPILER_ASSERT(current < end && current >= begin, "attempt to access invalid iterator");
         return current.operator->();
     }
 
