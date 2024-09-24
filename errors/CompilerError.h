@@ -29,7 +29,8 @@ public:
 
     CompilerError(ErrorCode code, uint64_t position);
     CompilerError(ErrorCode code, const Token &token);
-
+    CompilerError(const CompilerError&) = delete;
+    CompilerError& operator=(const CompilerError&) = delete;
     CompilerError(CompilerError&&) noexcept;
     CompilerError& operator=(CompilerError&&) noexcept;
     ~CompilerError();

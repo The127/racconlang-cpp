@@ -20,7 +20,9 @@ public:
     std::shared_ptr<FileUses> fileUses;
 
     Enum(std::string name, uint8_t arity, EnumDeclaration* declaration, std::shared_ptr<Source> source, std::shared_ptr<FileUses> fileUses);
-    ~Enum();
+    Enum(const Enum&) = delete;
+    Enum& operator=(const Enum&) = delete;
     Enum(Enum&&) noexcept;
     Enum& operator=(Enum&&) noexcept;
+    ~Enum();
 };

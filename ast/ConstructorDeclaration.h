@@ -20,6 +20,8 @@ public:
     std::optional<Identifier> otherName;
 
     ConstructorDeclaration();
+    ConstructorDeclaration(const ConstructorDeclaration&) = delete;
+    ConstructorDeclaration& operator=(const ConstructorDeclaration&) = delete;
     ConstructorDeclaration(ConstructorDeclaration &&) noexcept;
     ConstructorDeclaration &operator=(ConstructorDeclaration &&) noexcept;
     ~ConstructorDeclaration() override;

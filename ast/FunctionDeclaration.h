@@ -27,6 +27,8 @@ public:
     //TODO: body as expression
 
     FunctionDeclaration();
+    FunctionDeclaration(const FunctionDeclaration&) = delete;
+    FunctionDeclaration& operator=(const FunctionDeclaration&) = delete;
     FunctionDeclaration(FunctionDeclaration&&) noexcept;
     FunctionDeclaration& operator=(FunctionDeclaration&&) noexcept;
     ~FunctionDeclaration() override;

@@ -26,6 +26,8 @@ public:
     std::optional<std::unique_ptr<SignatureBase>> signature;
 
     AliasDeclaration();
+    AliasDeclaration(const AliasDeclaration&) = delete;
+    AliasDeclaration& operator=(const AliasDeclaration&) = delete;
     AliasDeclaration(AliasDeclaration&&) noexcept;
     AliasDeclaration& operator=(AliasDeclaration&&) noexcept;
     ~AliasDeclaration() override;

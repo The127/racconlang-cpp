@@ -18,6 +18,8 @@ public:
     TokenResult right;
 
     explicit TokenTree(const Token &left);
+    TokenTree(const TokenTree&) = delete;
+    TokenTree& operator=(const TokenTree&) = delete;
     TokenTree(TokenTree&&) noexcept;
     TokenTree& operator=(TokenTree&&) noexcept;
     ~TokenTree();

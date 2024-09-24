@@ -20,6 +20,8 @@ public:
     std::vector<std::unique_ptr<SignatureBase>> genericArguments;
 
     TypeSignature();
+    TypeSignature(const TypeSignature&) = delete;
+    TypeSignature& operator=(const TypeSignature&) = delete;
     TypeSignature(TypeSignature&&) noexcept;
     TypeSignature& operator=(TypeSignature&&) noexcept;
     ~TypeSignature() override;

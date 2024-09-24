@@ -20,6 +20,8 @@ public:
     std::vector<std::unique_ptr<SignatureBase>> values;
 
     explicit EnumMemberDeclaration(Identifier name);
+    EnumMemberDeclaration(const EnumMemberDeclaration&) = delete;
+    EnumMemberDeclaration& operator=(const EnumMemberDeclaration&) = delete;
     EnumMemberDeclaration(EnumMemberDeclaration&&) noexcept;
     EnumMemberDeclaration& operator=(EnumMemberDeclaration&&) noexcept;
     ~EnumMemberDeclaration() override;

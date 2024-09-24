@@ -18,6 +18,8 @@ public:
     std::optional<Token> trailer;
 
     Path();
+    Path(const Path&) = delete;
+    Path& operator=(const Path&) = delete;
     Path(Path&&) noexcept;
     Path& operator=(Path&&) noexcept;
     ~Path() override;

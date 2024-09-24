@@ -13,6 +13,8 @@ InterfaceMethodDeclaration::InterfaceMethodDeclaration() = default;
 
 InterfaceMethodDeclaration::InterfaceMethodDeclaration(InterfaceMethodDeclaration &&) noexcept = default;
 
+InterfaceMethodDeclaration &InterfaceMethodDeclaration::operator=(InterfaceMethodDeclaration &&other) noexcept = default;
+
 InterfaceMethodDeclaration::~InterfaceMethodDeclaration() = default;
 
 uint64_t InterfaceMethodDeclaration::start() const {

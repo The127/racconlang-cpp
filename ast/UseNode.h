@@ -18,6 +18,8 @@ public:
     std::vector<Identifier> names;
 
     UseNode();
+    UseNode(const UseNode&) = delete;
+    UseNode& operator=(const UseNode&) = delete;
     UseNode(UseNode&&) noexcept;
     UseNode& operator=(UseNode&&) noexcept;
     ~UseNode() override;

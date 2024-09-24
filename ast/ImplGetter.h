@@ -19,6 +19,8 @@ public:
     std::optional<ReturnType> returnType;
 
     ImplGetter();
+    ImplGetter(const ImplGetter&) = delete;
+    ImplGetter& operator=(const ImplGetter&) = delete;
     ImplGetter(ImplGetter&&) noexcept;
     ImplGetter& operator=(ImplGetter&&) noexcept;
     ~ImplGetter() override;

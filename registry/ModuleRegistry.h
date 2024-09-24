@@ -19,9 +19,11 @@ public:
     std::map<std::string, Module> modules;
 
     ModuleRegistry();
-    ~ModuleRegistry();
+    ModuleRegistry(const ModuleRegistry&) = delete;
+    ModuleRegistry& operator=(const ModuleRegistry&) = delete;
     ModuleRegistry(ModuleRegistry&&) noexcept;
     ModuleRegistry& operator=(ModuleRegistry&&) noexcept;
+    ~ModuleRegistry();
 
     void addModule(std::string path);
     Module& getModule(std::string path);

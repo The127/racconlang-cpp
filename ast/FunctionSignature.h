@@ -20,6 +20,8 @@ public:
     std::optional<ReturnType> returnType;
 
     FunctionSignature();
+    FunctionSignature(const FunctionSignature&) = delete;
+    FunctionSignature& operator=(const FunctionSignature&) = delete;
     FunctionSignature(FunctionSignature&&) noexcept;
     FunctionSignature& operator=(FunctionSignature&&) noexcept;
     ~FunctionSignature() override;

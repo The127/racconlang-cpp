@@ -16,6 +16,8 @@ public:
     std::unique_ptr<SignatureBase> type;
 
     ReturnType();
+    ReturnType(const ReturnType&) = delete;
+    ReturnType& operator=(const ReturnType&) = delete;
     ReturnType(ReturnType&&) noexcept;
     ReturnType& operator=(ReturnType&&) noexcept;
     ~ReturnType() override;

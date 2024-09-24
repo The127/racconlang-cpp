@@ -20,6 +20,8 @@ public:
     std::optional<std::unique_ptr<SignatureBase>> type;
 
     ModuleVariableDeclaration();
+    ModuleVariableDeclaration(const ModuleVariableDeclaration&) = delete;
+    ModuleVariableDeclaration& operator=(const ModuleVariableDeclaration&) = delete;
     ModuleVariableDeclaration(ModuleVariableDeclaration&&) noexcept;
     ModuleVariableDeclaration& operator=(ModuleVariableDeclaration&&) noexcept;
     ~ModuleVariableDeclaration() override;

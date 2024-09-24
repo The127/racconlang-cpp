@@ -33,6 +33,8 @@ public:
 
 
     ImplBlock();
+    ImplBlock(const ImplBlock&) = delete;
+    ImplBlock& operator=(const ImplBlock&) = delete;
     ImplBlock(ImplBlock&&) noexcept;
     ImplBlock& operator=(ImplBlock&&) noexcept;
     ~ImplBlock() override;

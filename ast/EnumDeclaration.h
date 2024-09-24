@@ -26,6 +26,8 @@ public:
     std::vector<EnumMemberDeclaration> memberDeclarations;
 
     EnumDeclaration();
+    EnumDeclaration(const EnumDeclaration&) = delete;
+    EnumDeclaration& operator=(const EnumDeclaration&) = delete;
     EnumDeclaration(EnumDeclaration&&) noexcept;
     EnumDeclaration& operator=(EnumDeclaration&&) noexcept;
     ~EnumDeclaration() override;

@@ -17,6 +17,8 @@ public:
     std::optional<Parameter> parameter;
 
     InterfaceSetter();
+    InterfaceSetter(const InterfaceSetter&) = delete;
+    InterfaceSetter& operator=(const InterfaceSetter&) = delete;
     InterfaceSetter(InterfaceSetter&&) noexcept;
     InterfaceSetter& operator=(InterfaceSetter&&) noexcept;
     ~InterfaceSetter() override;

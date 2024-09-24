@@ -21,6 +21,8 @@ public:
     std::vector<std::unique_ptr<GenericConstraintBase>> constraints;
 
     ConstraintDeclaration();
+    ConstraintDeclaration(const ConstraintDeclaration&) = delete;
+    ConstraintDeclaration& operator=(const ConstraintDeclaration&) = delete;
     ConstraintDeclaration(ConstraintDeclaration&&) noexcept;
     ConstraintDeclaration& operator=(ConstraintDeclaration&&) noexcept;
     ~ConstraintDeclaration() override;

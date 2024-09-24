@@ -37,6 +37,8 @@ public:
     std::vector<ImplBlock> implBlocks;
 
     ModuleDeclaration();
+    ModuleDeclaration(const ModuleDeclaration&) = delete;
+    ModuleDeclaration& operator=(const ModuleDeclaration&) = delete;
     ModuleDeclaration(ModuleDeclaration&&) noexcept;
     ModuleDeclaration& operator=(ModuleDeclaration&&) noexcept;
     ~ModuleDeclaration() override;

@@ -20,8 +20,8 @@ public:
     Token(TokenType type, u_int64_t start, u_int64_t end);
 
     Token(const Token&);
-    Token(Token&&) noexcept;
     Token& operator=(const Token&);
+    Token(Token&&) noexcept;
     Token& operator=(Token&&) noexcept;
 
     [[nodiscard]] bool isComment() const;

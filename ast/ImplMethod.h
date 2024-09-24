@@ -26,6 +26,8 @@ public:
     std::optional<ReturnType> returnType;
 
     ImplMethod();
+    ImplMethod(const ImplMethod&) = delete;
+    ImplMethod& operator=(const ImplMethod&) = delete;
     ImplMethod(ImplMethod&&) noexcept;
     ImplMethod& operator=(ImplMethod&&) noexcept;
     ~ImplMethod() override;

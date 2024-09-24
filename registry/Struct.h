@@ -22,7 +22,9 @@ public:
     std::shared_ptr<FileUses> fileUses;
 
     Struct(std::string name, uint8_t arity, StructDeclaration* declaration, std::shared_ptr<Source> source, std::shared_ptr<FileUses> fileUses);
-    ~Struct();
+    Struct(const Struct&) = delete;
+    Struct& operator=(const Struct&) = delete;
     Struct(Struct&&) noexcept;
     Struct& operator=(Struct&&) noexcept;
+    ~Struct();
 };

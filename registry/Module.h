@@ -24,10 +24,11 @@ public:
     std::vector<Interface> interfaces{};
 
     explicit Module(std::string name);
-
+    Module(const Module&) = delete;
+    Module& operator=(const Module&) = delete;
+    Module(Module&&) noexcept;
+    Module& operator=(Module&&) noexcept;
     ~Module();
-    Module(Module &&) noexcept;
-    Module &operator=(Module &&) noexcept;
 
     void addStruct(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
                    StructDeclaration &structDeclaration,

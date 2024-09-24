@@ -25,7 +25,8 @@ public:
     std::vector<std::string> expected;
 
     LexerErr(LexerErrReason reason, const Token &got, std::vector<std::string> expected);
-
+    LexerErr(const LexerErr&) = delete;
+    LexerErr& operator=(const LexerErr&) = delete;
     LexerErr(LexerErr&&) noexcept;
     LexerErr& operator=(LexerErr&&) noexcept;
     ~LexerErr();

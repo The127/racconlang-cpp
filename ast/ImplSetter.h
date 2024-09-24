@@ -18,6 +18,8 @@ public:
     std::optional<Parameter> parameter;
 
     ImplSetter();
+    ImplSetter(const ImplSetter&) = delete;
+    ImplSetter& operator=(const ImplSetter&) = delete;
     ImplSetter(ImplSetter&&) noexcept;
     ImplSetter& operator=(ImplSetter&&) noexcept;
     ~ImplSetter() override;

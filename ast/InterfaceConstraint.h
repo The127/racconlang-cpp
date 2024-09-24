@@ -16,6 +16,8 @@ public:
     [[nodiscard]] uint64_t end() const override;
 
     InterfaceConstraint();
+    InterfaceConstraint(const InterfaceConstraint&) = delete;
+    InterfaceConstraint& operator=(const InterfaceConstraint&) = delete;
     InterfaceConstraint(InterfaceConstraint&& other) noexcept;
     InterfaceConstraint& operator=(InterfaceConstraint&& other) noexcept;
     ~InterfaceConstraint() override;

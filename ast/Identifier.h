@@ -17,11 +17,11 @@ public:
     Token identifier;
     std::string_view name;
 
-    ~Identifier() override;
     Identifier(const Identifier&);
     Identifier& operator=(const Identifier&);
     Identifier(Identifier&&) noexcept;
     Identifier& operator=(Identifier&&) noexcept;
+    ~Identifier() override;
 
     static Identifier make(const Token &identifier, const std::shared_ptr<Source> &source);
 

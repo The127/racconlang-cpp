@@ -15,6 +15,8 @@ public:
     std::vector<std::unique_ptr<SignatureBase>> types;
 
     TupleSignature();
+    TupleSignature(const TupleSignature&) = delete;
+    TupleSignature& operator=(const TupleSignature&) = delete;
     TupleSignature(TupleSignature&&) noexcept;
     TupleSignature& operator=(TupleSignature&&) noexcept;
     ~TupleSignature() override;

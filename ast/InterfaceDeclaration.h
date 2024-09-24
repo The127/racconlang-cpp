@@ -28,6 +28,8 @@ public:
     std::vector<InterfaceSetter> setters;
 
     InterfaceDeclaration();
+    InterfaceDeclaration(const InterfaceDeclaration&) = delete;
+    InterfaceDeclaration& operator=(const InterfaceDeclaration&) = delete;
     InterfaceDeclaration(InterfaceDeclaration&&) noexcept;
     InterfaceDeclaration& operator=(InterfaceDeclaration&&) noexcept;
     ~InterfaceDeclaration() override;

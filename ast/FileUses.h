@@ -13,6 +13,8 @@ public:
     std::vector<UseNode> uses;
 
     FileUses();
+    FileUses(const FileUses&) = delete;
+    FileUses& operator=(const FileUses&) = delete;
     FileUses(FileUses&& other) noexcept;
     FileUses& operator=(FileUses&& other) noexcept;
     ~FileUses();

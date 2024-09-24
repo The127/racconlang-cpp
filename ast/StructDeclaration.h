@@ -24,6 +24,8 @@ public:
     std::vector<Identifier> destructureProperties;
 
     StructDeclaration();
+    StructDeclaration(const StructDeclaration&) = delete;
+    StructDeclaration& operator=(const StructDeclaration&) = delete;
     StructDeclaration(StructDeclaration&&) noexcept;
     StructDeclaration& operator=(StructDeclaration&&) noexcept;
     ~StructDeclaration() override;

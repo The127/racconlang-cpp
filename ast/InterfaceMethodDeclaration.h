@@ -28,6 +28,8 @@ public:
     std::optional<ReturnType> returnType;
 
     InterfaceMethodDeclaration();
+    InterfaceMethodDeclaration(const InterfaceMethodDeclaration&) = delete;
+    InterfaceMethodDeclaration& operator=(const InterfaceMethodDeclaration&) = delete;
     InterfaceMethodDeclaration(InterfaceMethodDeclaration&&) noexcept;
     InterfaceMethodDeclaration& operator=(InterfaceMethodDeclaration&& other) noexcept;
     ~InterfaceMethodDeclaration() override;

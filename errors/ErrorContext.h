@@ -15,6 +15,8 @@ class ErrorContext {
 public:
     std::vector<CompilerError> errors;
     ErrorContext();
+    ErrorContext(const ErrorContext&) = delete;
+    ErrorContext& operator=(const ErrorContext&) = delete;
     ErrorContext(ErrorContext&&) noexcept;
     ErrorContext& operator=(ErrorContext&&) noexcept;
     void addError(CompilerError error);

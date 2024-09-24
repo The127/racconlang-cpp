@@ -23,6 +23,8 @@ public:
     std::optional<std::unique_ptr<SignatureBase>> type;
 
     explicit PropertyDeclaration(const Identifier& name);
+    PropertyDeclaration(const PropertyDeclaration&) = delete;
+    PropertyDeclaration& operator=(const PropertyDeclaration&) = delete;
     PropertyDeclaration(PropertyDeclaration&&) noexcept;
     PropertyDeclaration& operator=(PropertyDeclaration&&) noexcept;
     ~PropertyDeclaration() override;

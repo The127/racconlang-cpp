@@ -22,6 +22,8 @@ public:
     std::optional<std::unique_ptr<SignatureBase>> type;
 
     explicit Parameter(Identifier name);
+    Parameter(const Parameter&) = delete;
+    Parameter& operator=(const Parameter&) = delete;
     Parameter(Parameter&&) noexcept;
     Parameter& operator=(Parameter&&) noexcept;
     ~Parameter() override;

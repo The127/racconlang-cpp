@@ -17,6 +17,8 @@ public:
     std::optional<ReturnType> returnType;
 
     InterfaceGetter();
+    InterfaceGetter(const InterfaceGetter&) = delete;
+    InterfaceGetter& operator=(const InterfaceGetter&) = delete;
     InterfaceGetter(InterfaceGetter&&) noexcept;
     InterfaceGetter& operator=(InterfaceGetter&&) noexcept;
     ~InterfaceGetter() override;

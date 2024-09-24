@@ -15,9 +15,9 @@ public:
     std::vector<Token> precedingComments;
 
     explicit(false) TokenTreeNode(TokenTree tree, std::vector<Token> comments);
-
     explicit(false) TokenTreeNode(TokenResult result, std::vector<Token> comments);
-
+    TokenTreeNode(const TokenTreeNode&) = delete;
+    TokenTreeNode& operator=(const TokenTreeNode&) = delete;
     TokenTreeNode(TokenTreeNode&&) noexcept;
     TokenTreeNode& operator=(TokenTreeNode&&) noexcept;
     ~TokenTreeNode();

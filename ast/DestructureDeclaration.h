@@ -15,6 +15,8 @@ public:
     std::optional<Identifier> name;
 
     DestructureDeclaration();
+    DestructureDeclaration(const DestructureDeclaration&) = delete;
+    DestructureDeclaration& operator=(const DestructureDeclaration&) = delete;
     DestructureDeclaration(DestructureDeclaration&&) noexcept;
     DestructureDeclaration& operator=(DestructureDeclaration&&) noexcept;
     ~DestructureDeclaration() override;

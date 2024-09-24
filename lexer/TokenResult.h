@@ -17,7 +17,8 @@ public:
     explicit(false) TokenResult(const Token &token);
 
     explicit(false) TokenResult(LexerErr err);
-
+    TokenResult(const TokenResult&) = delete;
+    TokenResult& operator=(const TokenResult&) = delete;
     TokenResult(TokenResult&&) noexcept;
     TokenResult& operator=(TokenResult&&) noexcept;
     ~TokenResult();
