@@ -46,4 +46,7 @@ public:
     void addInterface(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
                       InterfaceDeclaration &interfaceDeclaration,
                       const std::shared_ptr<FileUses> &fileUses);
+
+    void populate();
+    void populateStructs();
 };

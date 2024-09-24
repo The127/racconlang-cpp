@@ -44,8 +44,7 @@ int main() {
     ModuleRegistry moduleRegistry{};
     for (auto &moduleDecl: modules) {
         auto modulePath = moduleDecl.buildPathString();
-        moduleRegistry.addModule(modulePath);
-        auto &module = moduleRegistry.getModule(modulePath);
+        auto &module = moduleRegistry.addModule(modulePath);
 
         //TODO: what to do with declarations that have the same generic parameter multiple times?
 
@@ -97,6 +96,8 @@ int main() {
                 moduleDecl.uses);
         }
     }
+
+    moduleRegistry.populate();
 
     const std::unique_ptr<ErrorHandler> errorHandler = std::make_unique<ConsoleErrorHandler>(ConsoleErrorHandler());
     for (const auto &error: source->errors) {

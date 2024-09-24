@@ -25,6 +25,6 @@ public:
     ModuleRegistry& operator=(ModuleRegistry&&) noexcept;
     ~ModuleRegistry();
 
-    void addModule(std::string path);
-    Module& getModule(std::string path);
+    Module& addModule(std::string path);
+    void populate();
 };

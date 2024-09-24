@@ -100,3 +100,14 @@ void Module::addInterface(const std::shared_ptr<Source> &source, std::string nam
         source,
         fileUses);
 }
+
+void Module::populate() {
+    populateStructs();
+    //TODO: rest
+}
+
+void Module::populateStructs() {
+    for (auto &s : structs) {
+        s.declaration->genericParams
+    }
+}

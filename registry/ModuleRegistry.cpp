@@ -15,12 +15,15 @@ ModuleRegistry::ModuleRegistry(ModuleRegistry &&) noexcept = default;
 
 ModuleRegistry &ModuleRegistry::operator=(ModuleRegistry &&) noexcept = default;
 
-void ModuleRegistry::addModule(std::string path) {
+Module &ModuleRegistry::addModule(std::string path) {
     if (!modules.contains(path)) {
         modules.emplace(path, Module(path));
     }
+    return modules.at(path);
 }
 
-Module &ModuleRegistry::getModule(std::string path) {
-    return modules.at(path);
+void ModuleRegistry::populate() {
+    for (auto &[key, module] : modules) {
+        module.populate();
+    }
 }
