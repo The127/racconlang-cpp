@@ -8,10 +8,10 @@
 #include <memory>
 #include <string>
 
-#include "sourceMap/Source.h"
 
-
+class Source;
 class AliasDeclaration;
+class FileUses;
 
 class Alias {
 public:

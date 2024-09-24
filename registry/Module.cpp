@@ -4,15 +4,22 @@
 
 #include "Module.h"
 
+#include <utility>
+
 #include "Struct.h"
+#include "Enum.h"
+#include "Alias.h"
+#include "Interface.h"
 #include "ast/EnumDeclaration.h"
 #include "ast/AliasDeclaration.h"
 #include "ast/InterfaceDeclaration.h"
+#include "ast/StructDeclaration.h"
 #include "sourceMap/Source.h"
+#include "parser/Parser.h"
 
 
-Module::Module(const std::string path)
-    : path(path) {
+Module::Module(std::string  path)
+    : path(std::move(path)) {
 }
 
 Module::~Module() = default;

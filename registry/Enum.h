@@ -4,12 +4,15 @@
 
 
 #pragma once
+
 #include <cstdint>
 #include <string>
+#include <memory>
 
-#include "ast/FileUses.h"
 
 class EnumDeclaration;
+class FileUses;
+class Source;
 
 class Enum {
 public:

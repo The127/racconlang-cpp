@@ -4,6 +4,11 @@
 
 #include "Struct.h"
 
+#include "sourceMap/Source.h"
+#include "ast/FileUses.h"
+#include "ast/StructDeclaration.h"
+
+
 #include <utility>
 
 Struct::Struct(std::string name, const uint8_t arity, StructDeclaration *declaration, std::shared_ptr<Source> source,

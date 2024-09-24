@@ -4,6 +4,10 @@
 
 #include "Enum.h"
 
+#include "ast/FileUses.h"
+#include "ast/EnumDeclaration.h"
+#include "sourceMap/Source.h"
+
 #include <utility>
 
 Enum::Enum(std::string name, uint8_t arity, EnumDeclaration *declaration, std::shared_ptr<Source> source,

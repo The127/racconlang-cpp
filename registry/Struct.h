@@ -9,9 +9,9 @@
 #include <memory>
 #include <string>
 
-#include "sourceMap/Source.h"
-
 class StructDeclaration;
+class Source;
+class FileUses;
 
 class Struct {
 public:

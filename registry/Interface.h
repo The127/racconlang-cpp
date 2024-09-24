@@ -7,11 +7,12 @@
 
 #include <cstdint>
 #include <string>
-
-#include "ast/FileUses.h"
+#include <memory>
 
 
 class InterfaceDeclaration;
+class FileUses;
+class Source;
 
 class Interface {
 public:

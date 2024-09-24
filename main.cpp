@@ -3,6 +3,7 @@
 #include "ast/AliasDeclaration.h"
 #include "ast/EnumDeclaration.h"
 #include "ast/InterfaceDeclaration.h"
+#include "ast/StructDeclaration.h"
 #include "ast/ModuleDeclaration.h"
 #include "errors/ConsoleErrorHandler.h"
 #include "errors/ErrorHandler.h"

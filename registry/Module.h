@@ -5,25 +5,29 @@
 
 #pragma once
 #include <string>
+#include <vector>
+#include <memory>
 
-#include "Struct.h"
-#include "Enum.h"
-#include "Alias.h"
-#include "Interface.h"
-#include "ast/ModuleDeclaration.h"
-#include "ast/StructDeclaration.h"
-#include "parser/Parser.h"
-
+class Struct;
+class Enum;
+class Alias;
+class Interface;
+class Source;
+class StructDeclaration;
+class EnumDeclaration;
+class AliasDeclaration;
+class InterfaceDeclaration;
+class FileUses;
 
 class Module {
 public:
     std::string path;
-    std::vector<Struct> structs{};
-    std::vector<Enum> enums{};
-    std::vector<Alias> aliases{};
-    std::vector<Interface> interfaces{};
+    std::vector<Struct> structs;
+    std::vector<Enum> enums;
+    std::vector<Alias> aliases;
+    std::vector<Interface> interfaces;
 
-    explicit Module(std::string name);
+    explicit Module(std::string  name);
     Module(const Module&) = delete;
     Module& operator=(const Module&) = delete;
     Module(Module&&) noexcept;
