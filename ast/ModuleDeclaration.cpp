@@ -75,7 +75,7 @@ std::string ModuleDeclaration::toString(const SourceMap &sources, const int inde
             sources, implBlocks, indent + 1, verbose) + "\n";
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }
 
 std::string ModuleDeclaration::buildPathString() const {

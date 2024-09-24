@@ -64,5 +64,5 @@ std::string ImplBlock::toString(const SourceMap &sources, const int indent, cons
     }
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }

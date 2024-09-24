@@ -27,5 +27,5 @@ std::string DestructureDeclaration::toString(const SourceMap &sources, int inden
     }
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }

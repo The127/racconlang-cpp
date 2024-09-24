@@ -29,5 +29,5 @@ std::string TypeSignature::toString(const SourceMap &sources, const int indent, 
     }
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }

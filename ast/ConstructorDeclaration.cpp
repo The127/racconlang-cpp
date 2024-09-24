@@ -40,5 +40,5 @@ std::string ConstructorDeclaration::toString(const SourceMap &sources, const int
     //TODO: expressions for other name
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }

@@ -15,8 +15,8 @@ Token::Token(TokenType type, u_int64_t start, u_int64_t end): type(type),
 }
 
 Token::Token(const Token &) = default;
-Token::Token(Token &&) noexcept = default;
 Token &Token::operator=(const Token &) = default;
+Token::Token(Token &&) noexcept = default;
 Token &Token::operator=(Token &&) noexcept = default;
 
 bool Token::isComment() const {

@@ -13,7 +13,7 @@ namespace NodeUtils {
         if(verbose) {
             result += "(" + std::to_string(node.start()) + ", " + std::to_string(node.end()) + ")";
         }
-        return std::move(result);
+        return result;
     }
 
     template<class  T>
@@ -27,7 +27,7 @@ namespace NodeUtils {
         }
 
         result += std::string(indent-1, ' ') + "],";
-        return std::move(result);
+        return result;
     }
 
     template<class  T>
@@ -41,6 +41,6 @@ namespace NodeUtils {
         }
 
         result += std::string(indent-1, ' ') + "],";
-        return std::move(result);
+        return result;
     }
 }

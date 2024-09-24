@@ -33,5 +33,5 @@ std::string ModuleVariableDeclaration::toString(const SourceMap &sources, const 
     }
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }

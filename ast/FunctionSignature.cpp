@@ -32,5 +32,5 @@ std::string FunctionSignature::toString(const SourceMap &sources, int indent, bo
     }
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }

@@ -34,5 +34,5 @@ std::string ImplSetter::toString(const SourceMap &sources, int indent, bool verb
     }
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }

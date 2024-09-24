@@ -27,7 +27,7 @@ uint64_t Identifier::end() const {
 }
 
 std::string Identifier::toString(const SourceMap &sources, const int indent, const bool verbose) const {
-    return std::move(std::string(name));
+    return std::string(name);
 }
 
 Identifier::Identifier(const Token &identifier, const std::string_view &name): identifier(identifier), name(name) {}

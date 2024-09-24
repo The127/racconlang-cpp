@@ -25,5 +25,5 @@ std::string InterfaceConstraint::toString(const SourceMap &sources, int indent, 
     result += std::string(indent, ' ') + "typeSignature: " + typeSignature.toString(sources, indent+1, verbose) + ",\n";
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }

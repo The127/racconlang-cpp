@@ -19,12 +19,12 @@ std::shared_ptr<Source> SourceMap::addEntry(const std::string &fileName) {
         throw std::runtime_error("Could not open file: " + fileName);
     }
     std::string text(std::istreambuf_iterator<char>(file), {});
-
+    auto size = text.size();
     auto source = std::make_shared<Source>(fileName, std::move(text), offset);
     entries.push_back(source);
 
-    offset += text.size();
-    return std::move(source);
+    offset += size;
+    return source;
 }
 
 std::shared_ptr<Source> SourceMap::findSourceByPosition(const uint64_t position) const {

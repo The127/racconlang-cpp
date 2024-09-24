@@ -49,5 +49,5 @@ std::string InterfaceDeclaration::toString(const SourceMap &sources, const int i
         result += std::string(indent, ' ') + "setters: " + NodeUtils::nodeListString(sources, setters, indent + 1, verbose) + "\n";
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }

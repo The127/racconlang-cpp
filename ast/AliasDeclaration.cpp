@@ -42,5 +42,5 @@ std::string AliasDeclaration::toString(const SourceMap &sources, const int inden
     }
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }

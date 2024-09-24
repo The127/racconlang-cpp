@@ -30,5 +30,5 @@ std::string PropertyDeclaration::toString(const SourceMap &sources, const int in
     }
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }

@@ -570,7 +570,7 @@ InterfaceMethodDeclaration Parser::interfaceMethodRule(TokenTreeIterator &it,
 
     if (it.isEnd()) {
         addError(CompilerError(ErrorCode::MissingMethodName, (it - 1)->getEnd()));
-        return std::move(decl);
+        return decl;
     }
 
     decl.name = identifierRule(it);
@@ -578,7 +578,7 @@ InterfaceMethodDeclaration Parser::interfaceMethodRule(TokenTreeIterator &it,
         auto error = CompilerError(ErrorCode::MissingMethodName, decl.startPos);
         error.addLabel("expected method name", *it);
         addError(std::move(error));
-        return std::move(decl);
+        return decl;
     }
     decl.endPos = decl.name->end();
 
@@ -586,7 +586,7 @@ InterfaceMethodDeclaration Parser::interfaceMethodRule(TokenTreeIterator &it,
         auto error = CompilerError(ErrorCode::UnexpectedToken, (it - 1)->getEnd());
         error.setNote("unexpected end of method declaration");
         addError(std::move(error));
-        return std::move(decl);
+        return decl;
     }
 
     if (!it->isTokenTree(TokenType::OpenAngle) && !it->isTokenTree(TokenType::OpenParen)) {
@@ -600,10 +600,10 @@ InterfaceMethodDeclaration Parser::interfaceMethodRule(TokenTreeIterator &it,
         });
         if (it->isToken(TokenType::Semicolon)) {
             it += 1;
-            return std::move(decl);
+            return decl;
         }
         if (it.isEnd()) {
-            return std::move(decl);
+            return decl;
         }
     }
 
@@ -616,14 +616,14 @@ InterfaceMethodDeclaration Parser::interfaceMethodRule(TokenTreeIterator &it,
         auto error = CompilerError(ErrorCode::UnexpectedToken, (it - 1)->getEnd());
         error.setNote("unexpected end of method declaration, expected method parameters");
         addError(std::move(error));
-        return std::move(decl);
+        return decl;
     }
 
     if (!it->isTokenTree(TokenType::OpenParen)) {
         auto error = CompilerError(ErrorCode::UnexpectedToken, decl.start());
         error.addLabel("expected method parameters", *it);
         addError(std::move(error));
-        return std::move(decl);
+        return decl;
     }
     const auto &tree = consumeTokenTree(it, TokenType::OpenParen);
     decl.parameters = parameterListRule(tree);
@@ -632,7 +632,7 @@ InterfaceMethodDeclaration Parser::interfaceMethodRule(TokenTreeIterator &it,
         auto error = CompilerError(ErrorCode::UnexpectedToken, (it - 1)->getEnd());
         error.setNote("unexpected end of method declaration, expected return type, generic constraints or `;`");
         addError(std::move(error));
-        return std::move(decl);
+        return decl;
     }
 
     if (it->isToken(TokenType::DashArrow)) {
@@ -641,7 +641,7 @@ InterfaceMethodDeclaration Parser::interfaceMethodRule(TokenTreeIterator &it,
             auto error = CompilerError(ErrorCode::UnexpectedToken, (it - 1)->getEnd());
             error.setNote("unexpected end of method declaration, expected return type, generic constraints or `;`");
             addError(std::move(error));
-            return std::move(decl);
+            return decl;
         }
 
         decl.returnType = returnTypeRule(it);
@@ -649,7 +649,7 @@ InterfaceMethodDeclaration Parser::interfaceMethodRule(TokenTreeIterator &it,
             auto error = CompilerError(ErrorCode::MissingMethodReturnType, decl.start());
             error.addLabel("expected method return type", *it);
             addError(std::move(error));
-            return std::move(decl);
+            return decl;
         }
     }
 
@@ -666,13 +666,13 @@ InterfaceMethodDeclaration Parser::interfaceMethodRule(TokenTreeIterator &it,
     if (it.isEnd() || !it->isToken(TokenType::Semicolon)) {
         auto error = CompilerError(ErrorCode::MissingSemicolon, (it - 1)->getEnd());
         addError(std::move(error));
-        return std::move(decl);
+        return decl;
     }
 
     decl.endPos = it->getEnd();
     it += 1;
 
-    return std::move(decl);
+    return decl;
 }
 
 InterfaceGetter Parser::interfaceGetterRule(TokenTreeIterator &it,
@@ -691,7 +691,7 @@ InterfaceGetter Parser::interfaceGetterRule(TokenTreeIterator &it,
         auto error = CompilerError(ErrorCode::MissingGetterName, (it - 1)->getEnd());
         error.setNote("unexpected end of getter declaration");
         addError(std::move(error));
-        return std::move(decl);
+        return decl;;
     }
 
     decl.name = identifierRule(it);
@@ -706,7 +706,7 @@ InterfaceGetter Parser::interfaceGetterRule(TokenTreeIterator &it,
         auto error = CompilerError(ErrorCode::MissingGetterParam, (it - 1)->getEnd());
         error.setNote("unexpected end of setter declaration, expected `(`");
         addError(std::move(error));
-        return std::move(decl);
+        return decl;;
     }
 
     const auto &tree = consumeTokenTree(it, TokenType::OpenParen);
@@ -723,14 +723,14 @@ InterfaceGetter Parser::interfaceGetterRule(TokenTreeIterator &it,
         auto error = CompilerError(ErrorCode::MissingGetterReturnType, (it - 1)->getEnd());
         error.setNote("unexpected end of getter declaration, expected return type`->`");
         addError(std::move(error));
-        return std::move(decl);
+        return decl;;
     }
 
     if (!it->isToken(TokenType::DashArrow)) {
         auto error = CompilerError(ErrorCode::MissingGetterReturnType, decl.startPos);
         error.addLabel("unexpected end of getter declaration, expected return type: `->`", *it);
         addError(std::move(error));
-        return std::move(decl);
+        return decl;;
     }
 
     decl.endPos = it->getEnd();
@@ -741,7 +741,7 @@ InterfaceGetter Parser::interfaceGetterRule(TokenTreeIterator &it,
         auto error = CompilerError(ErrorCode::MissingGetterReturnType, decl.startPos);
         error.addLabel("unexpected end of getter declaration, expected return type", *it);
         addError(std::move(error));
-        return std::move(decl);
+        return decl;;
     }
 
     if (it.isEnd()) {
@@ -759,7 +759,7 @@ InterfaceGetter Parser::interfaceGetterRule(TokenTreeIterator &it,
         addError(std::move(error));
     }
 
-    return std::move(decl);
+    return decl;;
 }
 
 InterfaceSetter Parser::interfaceSetterRule(TokenTreeIterator &it,
@@ -777,7 +777,7 @@ InterfaceSetter Parser::interfaceSetterRule(TokenTreeIterator &it,
         auto error = CompilerError(ErrorCode::MissingSetterName, (it - 1)->getEnd());
         error.setNote("unexpected end of setter declaration");
         addError(std::move(error));
-        return std::move(decl);
+        return decl;;
     }
 
     decl.name = identifierRule(it);
@@ -785,7 +785,7 @@ InterfaceSetter Parser::interfaceSetterRule(TokenTreeIterator &it,
         auto error = CompilerError(ErrorCode::MissingSetterName, decl.startPos);
         error.addLabel("expected setter name", *it);
         addError(std::move(error));
-        return std::move(decl);
+        return decl;;
     }
     decl.endPos = decl.name->end();
 
@@ -793,7 +793,7 @@ InterfaceSetter Parser::interfaceSetterRule(TokenTreeIterator &it,
         auto error = CompilerError(ErrorCode::MissingSetterParam, (it - 1)->getEnd());
         error.setNote("unexpected end of setter declaration, expected `(`");
         addError(std::move(error));
-        return std::move(decl);
+        return decl;;
     }
 
     const auto &tree = consumeTokenTree(it, TokenType::OpenParen);
@@ -830,7 +830,7 @@ InterfaceSetter Parser::interfaceSetterRule(TokenTreeIterator &it,
         addError(std::move(error));
     }
 
-    return std::move(decl);
+    return decl;;
 }
 
 
@@ -1115,7 +1115,7 @@ std::optional<PropertyDeclaration> Parser::propertyDeclarationRule(TokenTreeIter
     if (it.isEnd()) {
         auto error = CompilerError(ErrorCode::MissingPropertyType, it->getStart());
         addError(std::move(error));
-        return std::move(prop);
+        return prop;
     }
     if (it->isToken(TokenType::Colon)) {
         prop.endPos = it->getEnd();
@@ -1137,7 +1137,7 @@ std::optional<PropertyDeclaration> Parser::propertyDeclarationRule(TokenTreeIter
     if (!it->isSignatureStarter()) {
         auto error = CompilerError(ErrorCode::MissingPropertyType, it->getStart());
         addError(std::move(error));
-        return std::move(prop);
+        return prop;
     }
 
     auto signature = signatureRule(it);
@@ -1160,7 +1160,7 @@ std::optional<PropertyDeclaration> Parser::propertyDeclarationRule(TokenTreeIter
     }
     prop.endPos = it->getEnd();
     it += 1;
-    return std::move(prop);
+    return prop;
 }
 
 void Parser::functionRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
@@ -1745,7 +1745,7 @@ ConstructorDeclaration Parser::constructorRule(TokenTreeIterator &it, std::vecto
     });
     if (it.isEnd()) {
         addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-        return std::move(decl);
+        return decl;;
     }
 
     if (it->isTokenTree(TokenType::OpenParen)) {
@@ -1757,7 +1757,7 @@ ConstructorDeclaration Parser::constructorRule(TokenTreeIterator &it, std::vecto
         });
         if (it.isEnd() || it->isTopLevelStarter()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     } else {
         addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
@@ -1771,7 +1771,7 @@ ConstructorDeclaration Parser::constructorRule(TokenTreeIterator &it, std::vecto
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
 
         if (it->isToken(TokenType::Identifier)) {
@@ -1783,7 +1783,7 @@ ConstructorDeclaration Parser::constructorRule(TokenTreeIterator &it, std::vecto
             });
             if (it.isEnd()) {
                 addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-                return std::move(decl);
+                return decl;;
             }
         } else {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
@@ -1798,7 +1798,7 @@ ConstructorDeclaration Parser::constructorRule(TokenTreeIterator &it, std::vecto
             });
             if (it.isEnd()) {
                 addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-                return std::move(decl);
+                return decl;;
             }
         } else {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
@@ -1809,7 +1809,7 @@ ConstructorDeclaration Parser::constructorRule(TokenTreeIterator &it, std::vecto
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     }
 
@@ -1820,7 +1820,7 @@ ConstructorDeclaration Parser::constructorRule(TokenTreeIterator &it, std::vecto
         addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
     }
 
-    return std::move(decl);
+    return decl;;
 }
 
 DestructureDeclaration Parser::destructorRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
@@ -1836,7 +1836,7 @@ DestructureDeclaration Parser::destructorRule(TokenTreeIterator &it, std::vector
     });
     if (it.isEnd()) {
         addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-        return std::move(decl);
+        return decl;;
     }
 
     if (it->isToken(TokenType::Identifier)) {
@@ -1848,7 +1848,7 @@ DestructureDeclaration Parser::destructorRule(TokenTreeIterator &it, std::vector
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     } else {
         addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
@@ -1860,7 +1860,7 @@ DestructureDeclaration Parser::destructorRule(TokenTreeIterator &it, std::vector
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     } else {
         addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
@@ -1871,7 +1871,7 @@ DestructureDeclaration Parser::destructorRule(TokenTreeIterator &it, std::vector
         //TODO: statements!
     }
 
-    return std::move(decl);
+    return decl;;
 }
 
 ImplMethod Parser::methodRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
@@ -1894,7 +1894,7 @@ ImplMethod Parser::methodRule(TokenTreeIterator &it, std::vector<Token> modifier
     });
     if (it.isEnd()) {
         addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-        return std::move(decl);
+        return decl;;
     }
 
     if (it->isToken(TokenType::Identifier)) {
@@ -1910,7 +1910,7 @@ ImplMethod Parser::methodRule(TokenTreeIterator &it, std::vector<Token> modifier
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     } else {
         addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
@@ -1928,7 +1928,7 @@ ImplMethod Parser::methodRule(TokenTreeIterator &it, std::vector<Token> modifier
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     }
 
@@ -1943,7 +1943,7 @@ ImplMethod Parser::methodRule(TokenTreeIterator &it, std::vector<Token> modifier
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     } else {
         addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
@@ -1971,7 +1971,7 @@ ImplMethod Parser::methodRule(TokenTreeIterator &it, std::vector<Token> modifier
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     }
 
@@ -1987,7 +1987,7 @@ ImplMethod Parser::methodRule(TokenTreeIterator &it, std::vector<Token> modifier
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     }
 
@@ -2002,7 +2002,7 @@ ImplMethod Parser::methodRule(TokenTreeIterator &it, std::vector<Token> modifier
         addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
     }
 
-    return std::move(decl);
+    return decl;;
 }
 
 ImplGetter Parser::implGetterRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
@@ -2022,7 +2022,7 @@ ImplGetter Parser::implGetterRule(TokenTreeIterator &it, std::vector<Token> modi
     });
     if (it.isEnd()) {
         addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-        return std::move(decl);
+        return decl;;
     }
 
     if (it->isToken(TokenType::Identifier)) {
@@ -2036,7 +2036,7 @@ ImplGetter Parser::implGetterRule(TokenTreeIterator &it, std::vector<Token> modi
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     } else {
         addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
@@ -2052,7 +2052,7 @@ ImplGetter Parser::implGetterRule(TokenTreeIterator &it, std::vector<Token> modi
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     } else {
         addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
@@ -2068,7 +2068,7 @@ ImplGetter Parser::implGetterRule(TokenTreeIterator &it, std::vector<Token> modi
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
 
         if (it->isToken(TokenType::Mut) || it->isSignatureStarter()) {
@@ -2083,7 +2083,7 @@ ImplGetter Parser::implGetterRule(TokenTreeIterator &it, std::vector<Token> modi
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     } else {
         addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
@@ -2100,7 +2100,7 @@ ImplGetter Parser::implGetterRule(TokenTreeIterator &it, std::vector<Token> modi
         addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
     }
 
-    return std::move(decl);
+    return decl;;
 }
 
 ImplSetter Parser::implSetterRule(TokenTreeIterator &it, std::vector<Token> modifiers) {
@@ -2118,7 +2118,7 @@ ImplSetter Parser::implSetterRule(TokenTreeIterator &it, std::vector<Token> modi
     });
     if (it.isEnd()) {
         addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-        return std::move(decl);
+        return decl;;
     }
 
     if (it->isToken(TokenType::Identifier)) {
@@ -2131,7 +2131,7 @@ ImplSetter Parser::implSetterRule(TokenTreeIterator &it, std::vector<Token> modi
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     } else {
         addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
@@ -2150,7 +2150,7 @@ ImplSetter Parser::implSetterRule(TokenTreeIterator &it, std::vector<Token> modi
         });
         if (it.isEnd()) {
             addError(CompilerError(ErrorCode::UnexpectedEndOfInput, decl.start()));
-            return std::move(decl);
+            return decl;;
         }
     } else {
         addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
@@ -2167,7 +2167,7 @@ ImplSetter Parser::implSetterRule(TokenTreeIterator &it, std::vector<Token> modi
         addError(CompilerError(ErrorCode::UnexpectedToken, decl.start()));
     }
 
-    return std::move(decl);
+    return decl;;
 }
 
 Path Parser::pathRule(TokenTreeIterator &it, const bool allowTrailing) {
@@ -2375,7 +2375,7 @@ ReturnType Parser::returnTypeRule(TokenTreeIterator &it) {
     }
     result.endPos = result.type->end();
 
-    return std::move(result);
+    return result;
 }
 
 std::vector<Identifier> Parser::identifierListRule(const TokenTree &list) {
@@ -2499,7 +2499,7 @@ std::vector<Parameter> Parser::parameterListRule(const TokenTree &list) {
         it += 1;
     }
 
-    return std::move(result);
+    return result;
 }
 
 std::vector<std::unique_ptr<SignatureBase> > Parser::signatureListRule(const TokenTree &list) {
@@ -2531,7 +2531,7 @@ std::vector<std::unique_ptr<SignatureBase> > Parser::signatureListRule(const Tok
         }
     }
 
-    return std::move(result);
+    return result;
 }
 
 void Parser::recoverTopLevel(TokenTreeIterator &it) {

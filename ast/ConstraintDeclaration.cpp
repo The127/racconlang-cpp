@@ -31,5 +31,5 @@ std::string ConstraintDeclaration::toString(const SourceMap &sources, int indent
     }
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }

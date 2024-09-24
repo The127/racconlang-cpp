@@ -13,7 +13,7 @@ ErrorContext::ErrorContext(ErrorContext &&) noexcept = default;
 ErrorContext & ErrorContext::operator=(ErrorContext &&) noexcept = default;
 
 void ErrorContext::addError(CompilerError error) {
-    errors.push_back(std::move(error));
+    errors.emplace_back(std::move(error));
 }
 
 void ErrorContext::apply(const std::shared_ptr<Source> &source) {

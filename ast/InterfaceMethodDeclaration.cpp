@@ -49,5 +49,5 @@ std::string InterfaceMethodDeclaration::toString(const SourceMap &sources, int i
     }
 
     result += std::string(indent - 1, ' ') + "}";
-    return std::move(result);
+    return result;
 }
