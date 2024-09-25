@@ -54,8 +54,6 @@ int main() {
 
             module.addStruct(
                 source,
-                std::string(structDeclaration.name->name),
-                structDeclaration.genericParams.size(),
                 structDeclaration,
                 moduleDecl.uses);
         }
@@ -66,8 +64,6 @@ int main() {
 
             module.addEnum(
                 source,
-                std::string(enumDeclaration.name->name),
-                enumDeclaration.genericParams.size(),
                 enumDeclaration,
                 moduleDecl.uses);
         }
@@ -78,8 +74,6 @@ int main() {
 
             module.addInterface(
                 source,
-                std::string(interfaceDeclaration.name->name),
-                interfaceDeclaration.genericParams.size(),
                 interfaceDeclaration,
                 moduleDecl.uses);
         }
@@ -90,8 +84,6 @@ int main() {
 
             module.addAlias(
                 source,
-                std::string(aliasDeclaration.name->name),
-                aliasDeclaration.genericParams.size(),
                 aliasDeclaration,
                 moduleDecl.uses);
         }

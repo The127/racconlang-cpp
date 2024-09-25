@@ -2,11 +2,11 @@
 // Created by zoe on 12.09.24.
 //
 
-#include "ReturnType.h"
-
 #include "utils/NodeUtils.h"
 
-ReturnType::ReturnType() = default;
+#include "ReturnType.h"
+
+ReturnType::ReturnType(Signature type) : type(std::move(type)) {};
 
 ReturnType::ReturnType(ReturnType &&) noexcept = default;
 
@@ -27,7 +27,7 @@ std::string ReturnType::toString(const SourceMap &sources, const int indent, con
 
     result += std::string(indent, ' ') + "isMut: " + std::to_string(isMut) + ",\n";
 
-    result += std::string(indent, ' ') + "type: " + type->toString(sources, indent+1, verbose) + "\n";
+    result += std::string(indent, ' ') + "type: " + type.toString(sources, indent+1, verbose) + "\n";
 
     result += std::string(indent - 1, ' ') + "}";
     return result;

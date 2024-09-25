@@ -9,7 +9,7 @@
 
 #include "Identifier.h"
 #include "Node.h"
-#include "SignatureBase.h"
+#include "Signature.h"
 
 class Parameter;
 class ConstraintDeclaration;
@@ -23,7 +23,7 @@ public:
     std::vector<Identifier> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
     std::vector<Parameter> parameters;
-    std::optional<std::unique_ptr<SignatureBase>> returnType;
+    std::optional<Signature> returnType;
     //TODO: body as expression
 
     FunctionDeclaration();

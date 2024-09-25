@@ -19,6 +19,10 @@ Enum::Enum(std::string name, uint8_t arity, EnumDeclaration *declaration, std::s
       fileUses(std::move(fileUses)) {
 }
 
+void Enum::populate() {
+
+}
+
 Enum::~Enum() = default;
 Enum::Enum(Enum &&) noexcept = default;
 Enum &Enum::operator=(Enum &&) noexcept = default;

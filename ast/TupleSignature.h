@@ -5,14 +5,14 @@
 #pragma once
 
 #include "Node.h"
-#include "SignatureBase.h"
 
+class Signature;
 
-class TupleSignature final : public SignatureBase {
+class TupleSignature final : public Node {
 public:
     uint64_t startPos{};
     uint64_t endPos{};
-    std::vector<std::unique_ptr<SignatureBase>> types;
+    std::vector<Signature> types;
 
     TupleSignature();
     TupleSignature(const TupleSignature&) = delete;

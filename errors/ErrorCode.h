@@ -40,9 +40,8 @@ enum class ErrorCode {
     MissingInterfaceMember,
     RefAlreadyImpliesMut,
     MissingMethodName,
-    MissingMethodReturnType,
+    MissingReturnType,
     MissingGetterName,
-    MissingGetterReturnType,
     MissingGetterParam,
     TooManyGetterParams,
     MissingSetterName,
@@ -52,10 +51,7 @@ enum class ErrorCode {
     MissingAliasType,
     MissingColon,
 
-    DuplicateStructDeclaration,
-    DuplicateEnumDeclaration,
-    DuplicateAliasDeclaration,
-    DuplicateInterfaceDeclaration,
+    DuplicateTypeDeclaration,
 };
 
 const std::pair<std::string, std::string>& ErrorInfo(ErrorCode code);

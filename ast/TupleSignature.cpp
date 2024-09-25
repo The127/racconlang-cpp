@@ -2,9 +2,10 @@
 // Created by zoe on 10.09.24.
 //
 
-#include "TupleSignature.h"
-
 #include "utils/NodeUtils.h"
+#include "Signature.h"
+
+#include "TupleSignature.h"
 
 TupleSignature::TupleSignature() = default;
 TupleSignature::TupleSignature(TupleSignature &&) noexcept = default;

@@ -2,10 +2,12 @@
 // Created by zoe on 10.09.24.
 //
 
-#include "FunctionSignature.h"
 #include "ConstraintDeclaration.h"
-
+#include "ReturnType.h"
+#include "Parameter.h"
 #include "utils/NodeUtils.h"
+
+#include "FunctionSignature.h"
 
 FunctionSignature::FunctionSignature() = default;
 FunctionSignature::FunctionSignature(FunctionSignature &&) noexcept = default;

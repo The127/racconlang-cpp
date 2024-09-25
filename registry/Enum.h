@@ -28,4 +28,6 @@ public:
     Enum(Enum&&) noexcept;
     Enum& operator=(Enum&&) noexcept;
     ~Enum();
+
+    void populate();
 };

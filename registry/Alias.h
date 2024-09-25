@@ -28,4 +28,5 @@ public:
     Alias& operator=(Alias&&) noexcept;
     ~Alias();
 
+    void populate();
 };

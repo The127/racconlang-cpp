@@ -3,7 +3,7 @@
 //
 
 #include "Parameter.h"
-#include "SignatureBase.h"
+#include "Signature.h"
 
 #include "utils/NodeUtils.h"
 
@@ -32,7 +32,7 @@ std::string Parameter::toString(const SourceMap &sources, const int indent, cons
     result += std::string(indent, ' ') + "name: " + name.toString(sources, indent + 1, verbose) + ",\n";
     result += std::string(indent, ' ') + "type: ";
     if (type) {
-        result += std::string(indent, ' ') + "type: " + (*type)->toString(sources, indent + 1, verbose) + ",\n";
+        result += std::string(indent, ' ') + "type: " + (*type).toString(sources, indent + 1, verbose) + ",\n";
     }
 
     result += std::string(indent - 1, ' ') + "}";

@@ -4,20 +4,20 @@
 
 
 #pragma once
-#include "Parameter.h"
-#include "ReturnType.h"
-#include "SignatureBase.h"
 
 
 class ConstraintDeclaration;
+class Signature;
+class Parameter;
+class ReturnType;
 
-class FunctionSignature final : public SignatureBase {
+class FunctionSignature final : public Node {
 public:
     uint64_t startPos{};
     uint64_t endPos{};
 
-    std::vector<std::unique_ptr<SignatureBase>> parameterTypes;
-    std::optional<ReturnType> returnType;
+    std::vector<Signature> parameterTypes;
+    std::unique_ptr<ReturnType> returnType; // this is a pointer to avoid circular nesting, nullptr means the function has no return type
 
     FunctionSignature();
     FunctionSignature(const FunctionSignature&) = delete;

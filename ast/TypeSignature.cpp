@@ -2,9 +2,11 @@
 // Created by zoe on 07.09.24.
 //
 
+#include "utils/NodeUtils.h"
+#include "Signature.h"
+
 #include "TypeSignature.h"
 
-#include "utils/NodeUtils.h"
 
 TypeSignature::TypeSignature() = default;
 TypeSignature::TypeSignature(TypeSignature &&) noexcept = default;

@@ -5,7 +5,7 @@
 
 #pragma once
 #include "Node.h"
-#include "SignatureBase.h"
+#include "Signature.h"
 
 
 class ReturnType final : public Node {
@@ -13,9 +13,10 @@ public:
     uint64_t startPos{};
     uint64_t endPos{};
     bool isMut{};
-    std::unique_ptr<SignatureBase> type;
+    Signature type;
 
-    ReturnType();
+    explicit ReturnType(Signature type);
+
     ReturnType(const ReturnType&) = delete;
     ReturnType& operator=(const ReturnType&) = delete;
     ReturnType(ReturnType&&) noexcept;

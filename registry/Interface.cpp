@@ -17,6 +17,10 @@ Interface::Interface(std::string name, uint8_t arity, InterfaceDeclaration *decl
       fileUses(std::move(fileUses)) {
 }
 
+void Interface::populate() {
+
+}
+
 Interface::~Interface() = default;
 Interface::Interface(Interface &&) noexcept = default;
 Interface &Interface::operator=(Interface &&) noexcept = default;

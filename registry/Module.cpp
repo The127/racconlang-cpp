@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include "Type.h"
 #include "Struct.h"
 #include "Enum.h"
 #include "Alias.h"
@@ -18,96 +19,80 @@
 #include "parser/Parser.h"
 
 
-Module::Module(std::string  path)
-    : path(std::move(path)) {
+Module::Module(std::string path)
+        : path(std::move(path)) {
 }
 
 Module::~Module() = default;
+
 Module::Module(Module &&) noexcept = default;
+
 Module &Module::operator=(Module &&) noexcept = default;
 
-void Module::addStruct(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
-                       StructDeclaration &structDeclaration, std::shared_ptr<FileUses> &fileUses) {
-    auto it = std::ranges::find_if(structs, [&](Struct &s) {
-        return s.name == name && s.arity == arity;
-    });
-    if (it != structs.end()) {
-        source->errors.emplace_back(ErrorCode::DuplicateStructDeclaration, structDeclaration.start());
+void Module::addStruct(const std::shared_ptr<Source> &source, StructDeclaration &decl, std::shared_ptr<FileUses> &fileUses) {
+    COMPILER_ASSERT(decl.name.has_value(), "tried to add unnamed struct to registry");
+    auto name = std::string(decl.name->name);
+    auto arity = decl.genericParams.size();
+    if (types.contains({name, arity})) {
+        source->errors.emplace_back(ErrorCode::DuplicateTypeDeclaration, decl.start());
         return;
     }
 
-    structs.emplace_back(
-        std::move(name),
-        arity,
-        &structDeclaration,
-        source,
-        fileUses);
+    types.emplace(std::make_pair(name, arity), std::make_shared<Type>(Struct(name, arity, &decl, source, fileUses)));
 }
 
-void Module::addEnum(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
-                     EnumDeclaration &enumDeclaration,
-                     const std::shared_ptr<FileUses> &fileUses) {
-    auto it = std::ranges::find_if(enums, [&](Enum &e) {
-        return e.name == name && e.arity == arity;
-    });
-    if (it != enums.end()) {
-        source->errors.emplace_back(ErrorCode::DuplicateEnumDeclaration, enumDeclaration.start());
+void Module::addEnum(const std::shared_ptr<Source> &source, EnumDeclaration &decl, const std::shared_ptr<FileUses> &fileUses) {
+    COMPILER_ASSERT(decl.name.has_value(), "tried to add unnamed struct to registry");
+    auto name = std::string(decl.name->name);
+    auto arity = decl.genericParams.size();
+    if (types.contains({name, arity})) {
+        source->errors.emplace_back(ErrorCode::DuplicateTypeDeclaration, decl.start());
         return;
     }
 
-    enums.emplace_back(
-        std::move(name),
-        arity,
-        &enumDeclaration,
-        source,
-        fileUses);
+    types.emplace(std::make_pair(name, arity), std::make_shared<Type>(Enum(name, arity, &decl, source, fileUses)));
 }
 
-void Module::addAlias(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
-                      AliasDeclaration &aliasDeclaration,
-                      const std::shared_ptr<FileUses> &fileUses) {
-    auto it = std::ranges::find_if(aliases, [&](Alias &a) {
-        return a.name == name && a.arity == arity;
-    });
-    if (it != aliases.end()) {
-        source->errors.emplace_back(ErrorCode::DuplicateEnumDeclaration, aliasDeclaration.start());
+void Module::addAlias(const std::shared_ptr<Source> &source, AliasDeclaration &decl, const std::shared_ptr<FileUses> &fileUses) {
+    COMPILER_ASSERT(decl.name.has_value(), "tried to add unnamed struct to registry");
+    auto name = std::string(decl.name->name);
+    auto arity = decl.genericParams.size();
+    if (types.contains({name, arity})) {
+        source->errors.emplace_back(ErrorCode::DuplicateTypeDeclaration, decl.start());
         return;
     }
 
-    aliases.emplace_back(
-        std::move(name),
-        arity,
-        &aliasDeclaration,
-        source,
-        fileUses);
+    types.emplace(std::make_pair(name, arity), std::make_shared<Type>(Alias(name, arity, &decl, source, fileUses)));
 }
 
-void Module::addInterface(const std::shared_ptr<Source> &source, std::string name, uint8_t arity,
-                          InterfaceDeclaration &interfaceDeclaration,
-                          const std::shared_ptr<FileUses> &fileUses) {
-    auto it = std::ranges::find_if(interfaces, [&](Interface &i) {
-        return i.name == name && i.arity == arity;
-    });
-    if (it != interfaces.end()) {
-        source->errors.emplace_back(ErrorCode::DuplicateInterfaceDeclaration, interfaceDeclaration.start());
+void Module::addInterface(const std::shared_ptr<Source> &source, InterfaceDeclaration &decl, const std::shared_ptr<FileUses> &fileUses) {
+    COMPILER_ASSERT(decl.name.has_value(), "tried to add unnamed struct to registry");
+    auto name = std::string(decl.name->name);
+    auto arity = decl.genericParams.size();
+    if (types.contains({name, arity})) {
+        source->errors.emplace_back(ErrorCode::DuplicateTypeDeclaration, decl.start());
         return;
     }
 
-    interfaces.emplace_back(
-        std::move(name),
-        arity,
-        &interfaceDeclaration,
-        source,
-        fileUses);
+    types.emplace(std::make_pair(name, arity), std::make_shared<Type>(Interface(name, arity, &decl, source, fileUses)));
 }
 
 void Module::populate() {
-    populateStructs();
+    for (auto &[key, type]: types) {
+        auto &[name, arity] = key;
+        type->populate();
+    }
     //TODO: rest
 }
 
 void Module::populateStructs() {
-    for (auto &s : structs) {
-        s.declaration->genericParams
-    }
+//    for (auto &s : structs) {
+//        s.declaration->genericParams
+//    }
+}
+
+Type Module::getType(const std::string &name, uint8_t arity) {
+//    auto it = std::ranges::find_if(structs, [&](Struct &s) {
+//        return s.name == name && s.arity == arity;
+//    });
 }

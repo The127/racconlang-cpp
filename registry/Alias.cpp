@@ -19,6 +19,10 @@ Alias::Alias(std::string name, uint8_t arity, AliasDeclaration *declaration, std
       fileUses(std::move(fileUses)) {
 }
 
+void Alias::populate() {
+
+}
+
 Alias::~Alias() = default;
 Alias::Alias(Alias &&) noexcept = default;
 Alias &Alias::operator=(Alias &&) noexcept = default;

@@ -8,7 +8,7 @@
 
 #include "Identifier.h"
 #include "Node.h"
-#include "SignatureBase.h"
+#include "Signature.h"
 
 class ModuleVariableDeclaration final : public Node {
 public:
@@ -17,7 +17,7 @@ public:
     bool isPublic{};
     bool isMut{};
     std::optional<Identifier> name;
-    std::optional<std::unique_ptr<SignatureBase>> type;
+    std::optional<Signature> type;
 
     ModuleVariableDeclaration();
     ModuleVariableDeclaration(const ModuleVariableDeclaration&) = delete;

@@ -27,4 +27,6 @@ public:
     ~Interface();
     Interface(Interface &&) noexcept;
     Interface &operator=(Interface &&) noexcept;
+
+    void populate();
 };

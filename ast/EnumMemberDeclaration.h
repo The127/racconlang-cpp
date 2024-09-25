@@ -8,8 +8,7 @@
 #include <memory>
 
 #include "Identifier.h"
-#include "Parameter.h"
-#include "SignatureBase.h"
+#include "Signature.h"
 
 
 class EnumMemberDeclaration final : public Node {
@@ -17,7 +16,7 @@ public:
     uint64_t startPos{};
     uint64_t endPos{};
     Identifier name;
-    std::vector<std::unique_ptr<SignatureBase>> values;
+    std::vector<Signature> values;
 
     explicit EnumMemberDeclaration(Identifier name);
     EnumMemberDeclaration(const EnumMemberDeclaration&) = delete;

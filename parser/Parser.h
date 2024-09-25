@@ -9,9 +9,10 @@
 #include <memory>
 
 #include "errors/CompilerError.h"
-#include "ast/FileUses.h"
 #include "TokenTreeIterator.h"
 
+class Identifier;
+class FileUses;
 class ImplSetter;
 class ImplGetter;
 class ImplMethod;
@@ -19,10 +20,10 @@ class DestructureDeclaration;
 class ConstructorDeclaration;
 class ErrorContext;
 class Parameter;
+class Path;
 class TupleSignature;
 class FunctionSignature;
 class TypeSignature;
-class SignatureBase;
 class InterfaceConstraint;
 class ModuleDeclaration;
 class Source;
@@ -34,6 +35,7 @@ class InterfaceMethodDeclaration;
 class EnumMemberDeclaration;
 class ConstraintDeclaration;
 class ModuleRegistry;
+class Signature;
 
 
 class Parser {
@@ -105,16 +107,16 @@ private:
 
     [[nodiscard]] Identifier identifierRule(TokenTreeIterator& it) const;
 
-    [[nodiscard]] std::unique_ptr<SignatureBase> signatureRule(TokenTreeIterator& it);
+    [[nodiscard]] Signature signatureRule(TokenTreeIterator& it);
     [[nodiscard]] TypeSignature typeSignatureRule(TokenTreeIterator& it);
     [[nodiscard]] FunctionSignature functionSignatureRule(TokenTreeIterator& it);
     [[nodiscard]] TupleSignature tupleSignatureRule(TokenTreeIterator& it);
 
-    [[nodiscard]] ReturnType returnTypeRule(TokenTreeIterator& it);
+    [[nodiscard]] std::optional<ReturnType> returnTypeRule(TokenTreeIterator& it);
 
     [[nodiscard]] std::vector<Identifier> identifierListRule(const TokenTree &list);
     [[nodiscard]] std::vector<Parameter> parameterListRule(const TokenTree &list);
-    [[nodiscard]] std::vector<std::unique_ptr<SignatureBase>> signatureListRule(const TokenTree &list);
+    [[nodiscard]] std::vector<Signature> signatureListRule(const TokenTree &list);
 
     void recoverTopLevel(TokenTreeIterator& it);
 

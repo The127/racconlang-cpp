@@ -3,129 +3,74 @@ project(RaccoonLang)
 
 set(CMAKE_CXX_STANDARD 26)
 
-add_executable(RaccoonLang main.cpp
+add_library(racc STATIC
         lexer/Lexer.cpp
-        lexer/Lexer.h
         lexer/TokenTree.cpp
-        lexer/TokenTree.h
         lexer/Token.cpp
-        lexer/Token.h
         sourceMap/Location.cpp
-        sourceMap/Location.h
         sourceMap/SourceMap.cpp
-        sourceMap/SourceMap.h
         sourceMap/Source.cpp
-        sourceMap/Source.h
         lexer/TokenType.cpp
-        lexer/TokenType.h
         lexer/LexerErr.cpp
-        lexer/LexerErr.h
         ast/Node.cpp
-        ast/Node.h
         ast/UseNode.cpp
-        ast/UseNode.h
         ast/ModuleDeclaration.cpp
-        ast/ModuleDeclaration.h
         ast/StructDeclaration.cpp
-        ast/StructDeclaration.h
         ast/EnumDeclaration.cpp
-        ast/EnumDeclaration.h
         ast/InterfaceDeclaration.cpp
-        ast/InterfaceDeclaration.h
         ast/FunctionDeclaration.cpp
-        ast/FunctionDeclaration.h
         ast/AliasDeclaration.cpp
-        ast/AliasDeclaration.h
         ast/ModuleVariableDeclaration.cpp
-        ast/ModuleVariableDeclaration.h
         ast/ConstraintDeclaration.cpp
-        ast/ConstraintDeclaration.h
         ast/GenericConstraint.cpp
-        ast/GenericConstraintBase.h
         ast/InterfaceConstraint.cpp
-        ast/InterfaceConstraint.h
-        ast/SignatureBase.cpp
-        ast/SignatureBase.h
+        ast/Signature.cpp
         ast/TypeSignature.cpp
-        ast/TypeSignature.h
         ast/EnumMemberDeclaration.cpp
-        ast/EnumMemberDeclaration.h
         ast/InterfaceMethodDeclaration.cpp
-        ast/InterfaceMethodDeclaration.h
         ast/PropertyDeclaration.cpp
-        ast/PropertyDeclaration.h
         ast/Path.cpp
-        ast/Path.h
         ast/Identifier.cpp
-        ast/Identifier.h
         parser/Parser.cpp
-        parser/Parser.h
         errors/CompilerError.cpp
-        errors/CompilerError.h
         errors/InternalError.cpp
-        errors/InternalError.h
         lexer/TokenTreeNode.cpp
-        lexer/TokenTreeNode.h
         lexer/TokenResult.cpp
-        lexer/TokenResult.h
-        utils/StringUtils.h
-        utils/NodeUtils.h
         ast/FileUses.cpp
-        ast/FileUses.h
         ast/Parameter.cpp
-        ast/Parameter.h
         ast/FunctionSignature.cpp
-        ast/FunctionSignature.h
         ast/TupleSignature.cpp
-        ast/TupleSignature.h
         ast/InterfaceGetter.cpp
-        ast/InterfaceGetter.h
         ast/InterfaceSetter.cpp
-        ast/InterfaceSetter.h
         ast/ReturnType.cpp
-        ast/ReturnType.h
         errors/ErrorHandler.cpp
-        errors/ErrorHandler.h
         errors/ErrorCode.cpp
-        errors/ErrorCode.h
         errors/ConsoleErrorHandler.cpp
-        errors/ConsoleErrorHandler.h
         errors/ErrorLabelGroup.cpp
-        errors/ErrorLabelGroup.h
         errors/SimpleErrorLabel.cpp
-        errors/SimpleErrorLabel.h
         errors/ErrorLabel.cpp
-        errors/ErrorLabel.h
         ast/ImplBlock.cpp
-        ast/ImplBlock.h
         ast/DestructureDeclaration.cpp
-        ast/DestructureDeclaration.h
         ast/ConstructorDeclaration.cpp
-        ast/ConstructorDeclaration.h
         ast/ImplGetter.cpp
-        ast/ImplGetter.h
         ast/ImplSetter.cpp
-        ast/ImplSetter.h
         ast/ImplMethod.cpp
-        ast/ImplMethod.h
         errors/ErrorContext.cpp
-        errors/ErrorContext.h
         registry/ModuleRegistry.cpp
-        registry/ModuleRegistry.h
         registry/Module.cpp
-        registry/Module.h
-        registry/ModuleRegistry.h
         registry/Struct.cpp
-        registry/Struct.h
         registry/Enum.cpp
-        registry/Enum.h
         registry/Alias.cpp
-        registry/Alias.h
         registry/Interface.cpp
-        registry/Interface.h
         registry/Type.cpp
-        registry/Type.h)
+)
 
-target_include_directories(RaccoonLang PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(RaccoonLang PRIVATE stdc++exp)
+target_include_directories(racc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_options(racc PRIVATE -Wpessimizing-move)
+target_link_libraries(racc PRIVATE stdc++exp)
+
+add_executable(racc_exe main.cpp)
+target_link_libraries(racc_exe PRIVATE racc)
+set_target_properties(racc_exe PROPERTIES OUTPUT_NAME racc)
+

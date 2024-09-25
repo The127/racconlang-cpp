@@ -11,8 +11,8 @@
 #include "sourceMap/Source.h"
 
 
-class ModulePart;
 class Module;
+class Type;
 
 class ModuleRegistry {
 public:
@@ -26,5 +26,8 @@ public:
     ~ModuleRegistry();
 
     Module& addModule(std::string path);
+
+    Type& lookupType(const FileUses& uses, const Path& path);
+
     void populate();
 };

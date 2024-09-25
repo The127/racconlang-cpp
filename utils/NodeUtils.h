@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "ast/Node.h"
+
 #include <string>
 
 namespace NodeUtils {

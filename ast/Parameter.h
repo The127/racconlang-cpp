@@ -6,7 +6,7 @@
 #pragma once
 #include "Identifier.h"
 #include "Node.h"
-#include "SignatureBase.h"
+#include "Signature.h"
 
 #include <optional>
 #include <memory>
@@ -19,7 +19,7 @@ public:
     bool isMut{};
     bool isRef{};
     Identifier name;
-    std::optional<std::unique_ptr<SignatureBase>> type;
+    std::optional<Signature> type;
 
     explicit Parameter(Identifier name);
     Parameter(const Parameter&) = delete;

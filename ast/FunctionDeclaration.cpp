@@ -3,7 +3,7 @@
 //
 
 #include "FunctionDeclaration.h"
-#include "SignatureBase.h"
+#include "Signature.h"
 #include "ConstraintDeclaration.h"
 #include "GenericConstraintBase.h"
 #include "Parameter.h"
@@ -42,7 +42,7 @@ std::string FunctionDeclaration::toString(const SourceMap &sources, const int in
         result += std::string(indent, ' ') + "parameters: " + NodeUtils::nodeListString(sources, parameters, indent + 1, verbose) + "\n";
 
     if(returnType)
-        result += std::string(indent, ' ') + "returnType: " + (*returnType)->toString(sources, indent + 1, verbose) + "\n";
+        result += std::string(indent, ' ') + "returnType: " + (*returnType).toString(sources, indent + 1, verbose) + "\n";
 
     result += std::string(indent - 1, ' ') + "}";
     return result;

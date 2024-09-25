@@ -11,8 +11,8 @@
 
 #include "Identifier.h"
 #include "Node.h"
+#include "Signature.h"
 
-class SignatureBase;
 class ConstraintDeclaration;
 
 class AliasDeclaration final : public Node {
@@ -23,7 +23,7 @@ public:
     std::optional<Identifier> name;
     std::vector<Identifier> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
-    std::optional<std::unique_ptr<SignatureBase>> signature;
+    std::optional<Signature> signature;
 
     AliasDeclaration();
     AliasDeclaration(const AliasDeclaration&) = delete;

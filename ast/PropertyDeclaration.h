@@ -9,7 +9,7 @@
 #include <string>
 
 #include "Identifier.h"
-#include "SignatureBase.h"
+#include "Signature.h"
 #include "Node.h"
 
 
@@ -20,7 +20,7 @@ public:
     bool isPublic = false;
     bool isMutable = false;
     Identifier name;
-    std::optional<std::unique_ptr<SignatureBase>> type;
+    std::optional<Signature> type;
 
     explicit PropertyDeclaration(const Identifier& name);
     PropertyDeclaration(const PropertyDeclaration&) = delete;

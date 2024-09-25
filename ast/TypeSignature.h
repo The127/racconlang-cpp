@@ -8,16 +8,16 @@
 #include <vector>
 
 #include "Path.h"
-#include "SignatureBase.h"
 
+class Signature;
 
-class TypeSignature final : public SignatureBase {
+class TypeSignature final : public Node {
 public:
     uint64_t startPos{};
     uint64_t endPos{};
 
     Path path;
-    std::vector<std::unique_ptr<SignatureBase>> genericArguments;
+    std::vector<Signature> genericArguments;
 
     TypeSignature();
     TypeSignature(const TypeSignature&) = delete;
