@@ -20,14 +20,14 @@ class FunctionDeclaration;
 class StructDeclaration;
 class InterfaceDeclaration;
 class EnumDeclaration;
-class FileUses;
+class UseMap;
 
 class ModuleDeclaration final : public Node {
 public:
     uint64_t startPos{};
     uint64_t endPos{};
     Path path;
-    std::shared_ptr<FileUses> uses;
+    std::shared_ptr<UseMap> uses;
     std::vector<EnumDeclaration> enumDeclarations;
     std::vector<InterfaceDeclaration> interfaceDeclarations;
     std::vector<StructDeclaration> structDeclarations;

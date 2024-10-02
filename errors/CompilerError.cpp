@@ -31,6 +31,10 @@ void CompilerError::addLabel(const std::string &text, const uint64_t start, cons
     addLabel(SimpleErrorLabel(text, start, end));
 }
 
+void CompilerError::addLabel(const std::string &text, const uint64_t pos) {
+    addLabel(SimpleErrorLabel(text, pos, pos));
+}
+
 void CompilerError::addLabel(const std::string &text, const Token &startToken, const Token &endToken) {
     addLabel(SimpleErrorLabel(text, startToken.start, endToken.end));
 }

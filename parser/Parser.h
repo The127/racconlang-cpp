@@ -12,7 +12,6 @@
 #include "TokenTreeIterator.h"
 
 class Identifier;
-class FileUses;
 class ImplSetter;
 class ImplGetter;
 class ImplMethod;
@@ -20,6 +19,7 @@ class DestructureDeclaration;
 class ConstructorDeclaration;
 class ErrorContext;
 class Parameter;
+class NamelessParameter;
 class Path;
 class TupleSignature;
 class FunctionSignature;
@@ -36,6 +36,7 @@ class EnumMemberDeclaration;
 class ConstraintDeclaration;
 class ModuleRegistry;
 class Signature;
+class UseNode;
 
 
 class Parser {
@@ -54,7 +55,8 @@ public:
     std::vector<ModuleDeclaration> parse();
 
 private:
-    std::shared_ptr<FileUses> uses;
+    std::vector<UseNode> uses;
+
     std::vector<ModuleDeclaration> modules;
 
     void addError(CompilerError error);
@@ -116,17 +118,18 @@ private:
 
     [[nodiscard]] std::vector<Identifier> identifierListRule(const TokenTree &list);
     [[nodiscard]] std::vector<Parameter> parameterListRule(const TokenTree &list);
+    [[nodiscard]] std::vector<NamelessParameter> namelessParameterListRule(const TokenTree &list);
     [[nodiscard]] std::vector<Signature> signatureListRule(const TokenTree &list);
 
-    void recoverTopLevel(TokenTreeIterator& it);
+    bool recoverTopLevel(TokenTreeIterator& it);
 
-    void recoverUntil(TokenTreeIterator& it, TokenType type);
+    bool recoverUntil(TokenTreeIterator& it, TokenType type);
 
-    void recoverUntil(TokenTreeIterator& it, std::vector<TokenType> oneOf);
+    bool recoverUntil(TokenTreeIterator& it, std::vector<TokenType> oneOf);
 
-    void recoverUntil(TokenTreeIterator& it, const RecoverPredicate &predicate);
+    bool recoverUntil(TokenTreeIterator& it, const RecoverPredicate &predicate);
 
-    static void recoverUntil(TokenTreeIterator& it, const RecoverPredicate &predicate, ErrorContext& errCtx);
+    static bool recoverUntil(TokenTreeIterator& it, const RecoverPredicate &predicate, ErrorContext& errCtx);
 
     static Token consumeToken(TokenTreeIterator& it, TokenType type);
     static std::optional<Token> tryConsumeToken(TokenTreeIterator& it, TokenType type);

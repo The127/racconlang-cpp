@@ -6,17 +6,14 @@
 
 #include <utility>
 
-#include "Type.h"
-#include "Struct.h"
-#include "Enum.h"
-#include "Alias.h"
-#include "Interface.h"
+#include "TypeRefImpl.h"
 #include "ast/EnumDeclaration.h"
 #include "ast/AliasDeclaration.h"
 #include "ast/InterfaceDeclaration.h"
 #include "ast/StructDeclaration.h"
 #include "sourceMap/Source.h"
 #include "parser/Parser.h"
+#include "registry/ModuleRegistry.h"
 
 
 Module::Module(std::string path)
@@ -29,7 +26,7 @@ Module::Module(Module &&) noexcept = default;
 
 Module &Module::operator=(Module &&) noexcept = default;
 
-void Module::addStruct(const std::shared_ptr<Source> &source, StructDeclaration &decl, std::shared_ptr<FileUses> &fileUses) {
+void Module::addStruct(const std::shared_ptr<Source> &source, StructDeclaration &decl, const std::shared_ptr<UseMap> &useMap) {
     COMPILER_ASSERT(decl.name.has_value(), "tried to add unnamed struct to registry");
     auto name = std::string(decl.name->name);
     auto arity = decl.genericParams.size();
@@ -38,10 +35,10 @@ void Module::addStruct(const std::shared_ptr<Source> &source, StructDeclaration 
         return;
     }
 
-    types.emplace(std::make_pair(name, arity), std::make_shared<Type>(Struct(name, arity, &decl, source, fileUses)));
+    types.emplace(std::make_pair(name, arity), TypeRef::make<Struct>(name, path, arity, &decl, source, useMap));
 }
 
-void Module::addEnum(const std::shared_ptr<Source> &source, EnumDeclaration &decl, const std::shared_ptr<FileUses> &fileUses) {
+void Module::addEnum(const std::shared_ptr<Source> &source, EnumDeclaration &decl, const std::shared_ptr<UseMap> &useMap) {
     COMPILER_ASSERT(decl.name.has_value(), "tried to add unnamed struct to registry");
     auto name = std::string(decl.name->name);
     auto arity = decl.genericParams.size();
@@ -50,10 +47,10 @@ void Module::addEnum(const std::shared_ptr<Source> &source, EnumDeclaration &dec
         return;
     }
 
-    types.emplace(std::make_pair(name, arity), std::make_shared<Type>(Enum(name, arity, &decl, source, fileUses)));
+    types.emplace(std::make_pair(name, arity), TypeRef::make<Enum>(name, path, arity, &decl, source, useMap));
 }
 
-void Module::addAlias(const std::shared_ptr<Source> &source, AliasDeclaration &decl, const std::shared_ptr<FileUses> &fileUses) {
+void Module::addAlias(const std::shared_ptr<Source> &source, AliasDeclaration &decl, const std::shared_ptr<UseMap> &useMap) {
     COMPILER_ASSERT(decl.name.has_value(), "tried to add unnamed struct to registry");
     auto name = std::string(decl.name->name);
     auto arity = decl.genericParams.size();
@@ -62,10 +59,10 @@ void Module::addAlias(const std::shared_ptr<Source> &source, AliasDeclaration &d
         return;
     }
 
-    types.emplace(std::make_pair(name, arity), std::make_shared<Type>(Alias(name, arity, &decl, source, fileUses)));
+    types.emplace(std::make_pair(name, arity), TypeRef::make<Alias>(name, path, arity, &decl, source, useMap));
 }
 
-void Module::addInterface(const std::shared_ptr<Source> &source, InterfaceDeclaration &decl, const std::shared_ptr<FileUses> &fileUses) {
+void Module::addInterface(const std::shared_ptr<Source> &source, InterfaceDeclaration &decl, const std::shared_ptr<UseMap> &useMap) {
     COMPILER_ASSERT(decl.name.has_value(), "tried to add unnamed struct to registry");
     auto name = std::string(decl.name->name);
     auto arity = decl.genericParams.size();
@@ -74,15 +71,15 @@ void Module::addInterface(const std::shared_ptr<Source> &source, InterfaceDeclar
         return;
     }
 
-    types.emplace(std::make_pair(name, arity), std::make_shared<Type>(Interface(name, arity, &decl, source, fileUses)));
+    types.emplace(std::make_pair(name, arity), TypeRef::make<Interface>(name, path, arity, &decl, source, useMap));
 }
 
-void Module::populate() {
+void Module::populate(ModuleRegistry& registry) {
     for (auto &[key, type]: types) {
         auto &[name, arity] = key;
-        type->populate();
+        type.populate(registry);
     }
-    //TODO: rest
+    //TODO: anything else?
 }
 
 void Module::populateStructs() {
@@ -91,8 +88,11 @@ void Module::populateStructs() {
 //    }
 }
 
-Type Module::getType(const std::string &name, uint8_t arity) {
-//    auto it = std::ranges::find_if(structs, [&](Struct &s) {
-//        return s.name == name && s.arity == arity;
-//    });
+std::optional<TypeRef> Module::getType(const std::string &name, uint8_t arity) {
+    auto it = types.find({name, arity});
+    if (it == types.end()) {
+        return std::nullopt;
+    }
+
+    return it->second;
 }

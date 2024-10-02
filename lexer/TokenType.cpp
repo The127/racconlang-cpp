@@ -34,6 +34,7 @@ static std::map<TokenType, std::pair<std::string, std::string>> TokenTypes = {
     {TokenType::Static, {"Static", "static"}},
     {TokenType::For, {"For", "for"}},
     {TokenType::Value, {"Value", "value"}},
+    {TokenType::As, {"As", "as"}},
     {TokenType::PathSeparator, {"PathSeparator", "::"}},
     {TokenType::DashArrow, {"DashArrow", "->"}},
     {TokenType::EqualArrow, {"EqualArrow", "=>"}},

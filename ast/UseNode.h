@@ -15,7 +15,8 @@ public:
     uint64_t startPos{};
     uint64_t endPos{};
     Path path;
-    std::vector<Identifier> names;
+    std::vector<std::pair<Identifier, std::optional<Identifier>>> names;
+    std::optional<Identifier> as;
 
     UseNode();
     UseNode(const UseNode&) = delete;

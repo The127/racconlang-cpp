@@ -77,7 +77,7 @@ uint64_t Signature::start() const {
     if (isFunction()) {
         return asFunction().start();
     }
-    COMPILER_ASSERT(false, "unreachable");
+    COMPILER_UNREACHABLE();
 }
 
 uint64_t Signature::end() const {
@@ -90,7 +90,7 @@ uint64_t Signature::end() const {
     if (isFunction()) {
         return asFunction().end();
     }
-    COMPILER_ASSERT(false, "unreachable");
+    COMPILER_UNREACHABLE();
 }
 
 std::string Signature::toString(const SourceMap &sources, int indent, bool verbose) const {
@@ -104,5 +104,5 @@ std::string Signature::toString(const SourceMap &sources, int indent, bool verbo
     if (isFunction()) {
         return asFunction().toString(sources, indent, verbose);
     }
-    COMPILER_ASSERT(false, "unreachable");
+    COMPILER_UNREACHABLE();
 }

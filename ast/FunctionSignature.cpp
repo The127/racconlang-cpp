@@ -4,7 +4,7 @@
 
 #include "ConstraintDeclaration.h"
 #include "ReturnType.h"
-#include "Parameter.h"
+#include "NamelessParameter.h"
 #include "utils/NodeUtils.h"
 
 #include "FunctionSignature.h"

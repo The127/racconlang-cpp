@@ -49,3 +49,11 @@ std::string Path::toString(const SourceMap &sources, const int indent, const boo
     }
     return result;
 }
+
+Path Path::clone() const {
+    auto other = Path();
+    other.rooted = this->rooted;
+    other.parts = this->parts;
+    other.trailer = this->trailer;
+    return other;
+}

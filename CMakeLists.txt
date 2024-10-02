@@ -38,6 +38,7 @@ add_library(racc STATIC
         lexer/TokenResult.cpp
         ast/FileUses.cpp
         ast/Parameter.cpp
+        ast/NamelessParameter.cpp
         ast/FunctionSignature.cpp
         ast/TupleSignature.cpp
         ast/InterfaceGetter.cpp
@@ -62,12 +63,20 @@ add_library(racc STATIC
         registry/Enum.cpp
         registry/Alias.cpp
         registry/Interface.cpp
-        registry/Type.cpp
+        registry/FunctionType.cpp
+        registry/TupleType.cpp
+        ast/UseMap.cpp
+        registry/TypeVar.cpp
+        registry/StructMember.cpp
+        registry/EnumMember.cpp
+        registry/TypeRef.cpp
+        registry/BuiltinType.cpp
+        registry/BuiltinType.h
 )
 
 
 target_include_directories(racc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_options(racc PRIVATE -Wpessimizing-move)
+target_compile_options(racc PRIVATE -Wpessimizing-move -Werror=return-type)
 target_link_libraries(racc PRIVATE stdc++exp)
 
 add_executable(racc_exe main.cpp)

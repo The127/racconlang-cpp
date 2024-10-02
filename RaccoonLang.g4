@@ -167,7 +167,15 @@ tupleType
     ;
 
 fnType
-    : 'fn' genericArguments? '(' typeList ')' ('->' type)? constraintDeclaration*
+    : 'fn' genericArguments? '(' namelessParameterList ')' ('->' returnType)? constraintDeclaration*
+    ;
+
+namelessParameterList
+    : namelessParameter (',' namelessParameter)* ','?
+    ;
+
+namelessParameter
+    : ('mut' | 'ref')?  type
     ;
 
 parameterList

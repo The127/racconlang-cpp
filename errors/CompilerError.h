@@ -39,6 +39,8 @@ public:
 
     void addLabel(const std::string &text, uint64_t start, uint64_t end);
 
+    void addLabel(const std::string &text, uint64_t pos);
+
     void addLabel(const std::string &text, const Token &startToken, const Token &endToken);
 
     void addLabel(const std::string &text, const Token &token);

@@ -4,18 +4,31 @@
 
 
 #pragma once
+
 #include "UseNode.h"
 
+#include "Identifier.h"
+#include "Path.h"
+
+#include <map>
+
+class UseMap;
 
 class FileUses {
 public:
-    bool isVerified{};
     std::vector<UseNode> uses;
 
     FileUses();
-    FileUses(const FileUses&) = delete;
-    FileUses& operator=(const FileUses&) = delete;
-    FileUses(FileUses&& other) noexcept;
-    FileUses& operator=(FileUses&& other) noexcept;
+
+    FileUses(const FileUses &) = delete;
+
+    FileUses &operator=(const FileUses &) = delete;
+
+    FileUses(FileUses &&other) noexcept;
+
+    FileUses &operator=(FileUses &&other) noexcept;
+
     ~FileUses();
+
+    std::shared_ptr<UseMap> toMap();
 };

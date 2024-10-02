@@ -10,6 +10,7 @@
 #include "Identifier.h"
 #include "Node.h"
 #include "Signature.h"
+#include "ReturnType.h"
 
 class Parameter;
 class ConstraintDeclaration;
@@ -23,7 +24,7 @@ public:
     std::vector<Identifier> genericParams;
     std::vector<ConstraintDeclaration> genericConstraints;
     std::vector<Parameter> parameters;
-    std::optional<Signature> returnType;
+    std::optional<ReturnType> returnType;
     //TODO: body as expression
 
     FunctionDeclaration();

@@ -7,7 +7,7 @@
 #include "EnumDeclaration.h"
 #include "FunctionDeclaration.h"
 #include "AliasDeclaration.h"
-#include "FileUses.h"
+#include "UseMap.h"
 #include "InterfaceDeclaration.h"
 #include "ModuleVariableDeclaration.h"
 #include "StructDeclaration.h"
@@ -42,9 +42,10 @@ std::string ModuleDeclaration::toString(const SourceMap &sources, const int inde
 
     result += std::string(indent, ' ') + "path: " + path.toString(sources, indent, verbose) + ",\n";
 
-    if (!uses->uses.empty())
-        result += std::string(indent, ' ') + "uses: " + NodeUtils::nodeListString(
-            sources, uses->uses, indent + 1, verbose) + "\n";
+    // todo: print use  map
+//    if (!uses->uses.empty())
+//        result += std::string(indent, ' ') + "uses: " + NodeUtils::nodeListString(
+//            sources, uses->uses, indent + 1, verbose) + "\n";
 
     if (!moduleVariableDeclarations.empty())
         result += std::string(indent, ' ') + "moduleVariableDeclarations: " + NodeUtils::nodeListString(

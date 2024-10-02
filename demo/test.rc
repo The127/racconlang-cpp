@@ -1,5 +1,37 @@
 use std::foo;
 
+use std::ds::{map as stdMap};
+
+use std::{foo as bar};
+
+mod std;
+
+pub struct map<TKey, TValue> {}
+
+
+mod foo::bar;
+
+fn asdf() {}
+
+
+
+
+mod mycoollib::foobar;
+
+struct Y<T> {
+    y: T;
+}
+
+pub struct X<T> {
+    a: Y<T>;
+    b: fn(T)->T;
+}
+
+pub struct Z {
+    pub x: X<int>;
+}
+
+
 mod main;
 
 
@@ -8,14 +40,24 @@ pub enum Option<T>{
     None
 }
 
+let x: bar::asdf;
 
-pub interface Foo<T> : Bar::foo, Bar2<T> where T : Asdf {
+struct ASDF<T> {
+    x: Option<T>;
+    y: mycoollib::foobar::Z;
+}
+
+struct BLABLABLA {
+    x: ASDF<int>;
+}
+
+pub interface Foo1<T> : Bar::foo, Bar2<T> where T : Asdf {
     pub fn foo(a: foo::bar, foo: int);
     pub fn foo3() -> mut u8;
     mut pub fn foo2(a: u8, b: (u8, u8));
     pub fn bar<T>(t: T);
-    pub fn qux<T1, T2>(value: T1) where T1 : SomeInterface<T2>;
-    pub fn qux2<T1, T2>(value: T1) -> T2 where T1 : SomeInterface<T2>;
+    pub fn qux<T1, T2>(@value: T1) where T1 : SomeInterface<T2>;
+    pub fn qux2<T1, T2>(@value: T1) -> T2 where T1 : SomeInterface<T2>;
 
     pub get x() -> u8;
     pub mut get y() -> mut Bar<T>;
@@ -23,28 +65,28 @@ pub interface Foo<T> : Bar::foo, Bar2<T> where T : Asdf {
     pub set x(a: int);
     pub set xy(y: u8);
 
-    set x(value: u8);
+    set x(@value: u8);
 }
 
 let bar: T;
 mut let foo: u8;
 let x: Foo<T>;
 
-pub struct Foo(x: int, y: int);
+pub struct Foo2(x: int, y: int);
 
-pub struct Foo2<T>  where T : Foobar {
+pub struct Foo3<T>  where T : Foobar {
     foo: int;
     pub mut bar: int;
 }
 
-pub struct Foo<T> where T : Foobar {
+pub struct Foo4<T> where T : Foobar {
     pub mut x: T;
     pub y: T;
 } destructures into (x, y);
 
 struct Bar {} destructures into (x, y);
 
-alias bar<T> = (foo, std::map<asdf, T>) where T : numeric;
+alias bar<T> = (Foo2, std::map<Foo1<T>, T>) where T : numeric;
 
 fn foo(){}
 
@@ -57,3 +99,92 @@ impl<T> Foo<T> on Bar<T> for Qux<T> {
     mut get a() -> int {}
     set b(val: int) => ;
 }
+
+fn foo<T>(mut t: T, ref x: int) {
+    whatever
+}
+
+fn foo(t: fn(int)->int) {
+
+}
+
+
+
+fn asdf(x: int) {
+    let f: fn(fn(int)->int) = foo(?);
+    foo(x);
+    foo<int>(x);
+}
+
+fn foo(mapper: fn(int)->int) {
+
+}
+
+interface Foo5 {}
+struct Foo6 {}
+
+
+struct Foo7<T1,T2> {
+    a: T1;
+    b: T2;
+}
+
+alias Foo8<T2> = Foo7<T2, int>;
+
+
+mod foo;
+
+pub struct X {}
+pub struct Y {
+    pub x: X;
+}
+
+pub enum Z {
+    Foo(X),
+}
+
+
+
+mod bar;
+
+struct asdf {
+    x: ::foo::Y;
+}
+
+mod some::geometry::library;
+
+pub struct Point2d<T> {
+    x: T;
+    y: T;
+}
+
+
+mod publicity;
+
+pub struct B {}
+
+pub struct A<T> {
+    x: T;
+}
+
+pub struct Foo {
+    pub a: A<B>;
+}
+
+struct somePrivateType{}
+
+pub alias C<T> = A<T>;
+pub alias D = C<somePrivateType>;
+
+
+struct Vector<T> {
+    ///
+}
+
+impl Vector<T> {
+   pub fn first() -> T {}
+    // ...
+}
+
+
+alias Point = some::geometry::library::Point2d<int>;

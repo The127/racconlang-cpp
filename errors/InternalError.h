@@ -6,12 +6,20 @@
 #pragma once
 #include <iostream>
 #include <stacktrace>
+#ifdef __cpp_lib_debugging
+#include <debugging>
+#endif
 
 
 #define COMPILER_ASSERT(cond, msg) do { if (!(cond)) { raccoonlang_compiler_assert(msg, __FILE__, __LINE__); }} while(0)
 
+#define COMPILER_UNREACHABLE() COMPILER_ASSERT(false, "unreachable")
+
 [[noreturn]] static void raccoonlang_compiler_assert(std::string msg, const std::string& filename, int line) {
-    std::cerr << "compiler error in " << filename << ":" << line << ": " << msg << std::endl << std::flush;
+#ifdef __cpp_lib_debugging
+    std::breakpoint_if_debugging();
+#endif
+    std::cerr << "internal compiler error in " << filename << ":" << line << ": " << msg << std::endl << std::flush;
 #ifndef NDEBUG
     std::cerr << std::stacktrace::current() << std::endl << std::flush;
 #endif

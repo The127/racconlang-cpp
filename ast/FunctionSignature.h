@@ -8,7 +8,7 @@
 
 class ConstraintDeclaration;
 class Signature;
-class Parameter;
+class NamelessParameter;
 class ReturnType;
 
 class FunctionSignature final : public Node {
@@ -16,7 +16,7 @@ public:
     uint64_t startPos{};
     uint64_t endPos{};
 
-    std::vector<Signature> parameterTypes;
+    std::vector<NamelessParameter> parameterTypes;
     std::unique_ptr<ReturnType> returnType; // this is a pointer to avoid circular nesting, nullptr means the function has no return type
 
     FunctionSignature();

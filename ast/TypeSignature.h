@@ -16,6 +16,9 @@ public:
     uint64_t startPos{};
     uint64_t endPos{};
 
+    uint64_t genericStartPos{};
+    uint64_t genericEndPos{};
+
     Path path;
     std::vector<Signature> genericArguments;
 
