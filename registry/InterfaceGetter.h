@@ -1,6 +1,9 @@
 #pragma once
 
+namespace racc::registry {
 
-class InterfaceGetterDeclaration {
+    class InterfaceGetterDeclaration {
 
-};
+    };
+
+}

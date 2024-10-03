@@ -4,4 +4,8 @@
 
 #include "Node.h"
 
-Node::~Node() = default;
+namespace racc::ast {
+
+    Node::~Node() = default;
+
+}

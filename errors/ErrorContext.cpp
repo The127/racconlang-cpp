@@ -6,19 +6,23 @@
 #include "CompilerError.h"
 #include "sourceMap/Source.h"
 
-ErrorContext::ErrorContext() = default;
+namespace racc::errors {
 
-ErrorContext::ErrorContext(ErrorContext &&) noexcept = default;
+    ErrorContext::ErrorContext() = default;
 
-ErrorContext & ErrorContext::operator=(ErrorContext &&) noexcept = default;
+    ErrorContext::ErrorContext(ErrorContext &&) noexcept = default;
 
-void ErrorContext::addError(CompilerError error) {
-    errors.emplace_back(std::move(error));
-}
+    ErrorContext &ErrorContext::operator=(ErrorContext &&) noexcept = default;
 
-void ErrorContext::apply(const std::shared_ptr<Source> &source) {
-    for (auto & error : errors) {
-        source->addError(std::move(error));
+    void ErrorContext::addError(CompilerError error) {
+        errors.emplace_back(std::move(error));
     }
-    errors.clear();
+
+    void ErrorContext::apply(const std::shared_ptr<sourcemap::Source> &source) {
+        for (auto &error: errors) {
+            source->addError(std::move(error));
+        }
+        errors.clear();
+    }
+
 }

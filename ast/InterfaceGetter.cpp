@@ -6,32 +6,39 @@
 
 #include "utils/NodeUtils.h"
 
-InterfaceGetterDeclaration::InterfaceGetterDeclaration() = default;
-InterfaceGetterDeclaration::InterfaceGetterDeclaration(InterfaceGetterDeclaration &&) noexcept = default;
-InterfaceGetterDeclaration & InterfaceGetterDeclaration::operator=(InterfaceGetterDeclaration &&) noexcept = default;
-InterfaceGetterDeclaration::~InterfaceGetterDeclaration() = default;
+namespace racc::ast {
 
-uint64_t InterfaceGetterDeclaration::start() const {
-    return startPos;
-}
+    InterfaceGetterDeclaration::InterfaceGetterDeclaration() = default;
 
-uint64_t InterfaceGetterDeclaration::end() const {
-    return endPos;
-}
+    InterfaceGetterDeclaration::InterfaceGetterDeclaration(InterfaceGetterDeclaration &&) noexcept = default;
 
-std::string InterfaceGetterDeclaration::toString(const SourceMap &sources, const int indent, const bool verbose) const {
-    std::string result = NodeUtils::nameString(*this, "InterfaceGetter", verbose) + "{\n";
+    InterfaceGetterDeclaration &InterfaceGetterDeclaration::operator=(InterfaceGetterDeclaration &&) noexcept = default;
 
-    result += std::string(indent, ' ') + "isMut: " + std::to_string(isMut) + ",\n";
+    InterfaceGetterDeclaration::~InterfaceGetterDeclaration() = default;
 
-    if (name) {
-        result += std::string(indent, ' ') + "name: " + name->toString(sources, indent+1, verbose) + ",\n";
+    uint64_t InterfaceGetterDeclaration::start() const {
+        return startPos;
     }
 
-    if (returnType) {
-        result += std::string(indent, ' ') + "returnType: " + returnType->toString(sources, indent+1, verbose) + ",\n";
+    uint64_t InterfaceGetterDeclaration::end() const {
+        return endPos;
     }
 
-    result += std::string(indent - 1, ' ') + "}";
-    return result;
+    std::string InterfaceGetterDeclaration::toString(const sourcemap::SourceMap &sources, const int indent, const bool verbose) const {
+        std::string result = utils::node::nameString(*this, "InterfaceGetter", verbose) + "{\n";
+
+        result += std::string(indent, ' ') + "isMut: " + std::to_string(isMut) + ",\n";
+
+        if (name) {
+            result += std::string(indent, ' ') + "name: " + name->toString(sources, indent + 1, verbose) + ",\n";
+        }
+
+        if (returnType) {
+            result += std::string(indent, ' ') + "returnType: " + returnType->toString(sources, indent + 1, verbose) + ",\n";
+        }
+
+        result += std::string(indent - 1, ' ') + "}";
+        return result;
+    }
+
 }

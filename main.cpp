@@ -18,17 +18,17 @@ int main() {
     auto directory = "demo";
 
 
-    SourceMap sources{};
+    racc::sourcemap::SourceMap sources{};
 
     const auto source = sources.addEntry("demo/test.rc");
 
-    Lexer lexer(source);
+    racc::lexer::Lexer lexer(source);
     lexer.tokenize();
 
 
     std::cout << source->tokenTree->toString(sources, 0);
 
-    Parser parser(source);
+    racc::parser::Parser parser(source);
     auto modules = parser.parse();
 
     /*for (auto &module: modules) {
@@ -41,7 +41,7 @@ int main() {
         std::cout << std::endl << std::endl;
     }*/
 
-    ModuleRegistry moduleRegistry{};
+    racc::registry::ModuleRegistry moduleRegistry{};
     for (auto &moduleDecl: modules) {
         auto modulePath = moduleDecl.buildPathString();
         auto &module = moduleRegistry.addModule(modulePath);
@@ -91,7 +91,7 @@ int main() {
 
     moduleRegistry.populate();
 
-    const std::unique_ptr<ErrorHandler> errorHandler = std::make_unique<ConsoleErrorHandler>(ConsoleErrorHandler());
+    const std::unique_ptr<racc::errors::ErrorHandler> errorHandler = std::make_unique<racc::errors::ConsoleErrorHandler>();
     for (const auto &error: source->errors) {
         errorHandler->handleError(error, sources);
     }

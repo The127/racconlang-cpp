@@ -4,17 +4,22 @@
 
 #pragma once
 
+#include "predeclare.h"
+
 #include <cstdint>
 #include <string>
 
-#include "sourceMap/SourceMap.h"
+namespace racc::ast {
 
+    class Node {
+    public:
+        virtual ~Node();
 
-class Node {
-public:
-    virtual ~Node();
+        [[nodiscard]] virtual uint64_t start() const = 0;
 
-    [[nodiscard]] virtual uint64_t start() const = 0;
-    [[nodiscard]] virtual uint64_t end() const = 0;
-    [[nodiscard]] virtual std::string toString(const SourceMap &sources, int indent, bool verbose) const = 0;
-};
+        [[nodiscard]] virtual uint64_t end() const = 0;
+
+        [[nodiscard]] virtual std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const = 0;
+    };
+
+}

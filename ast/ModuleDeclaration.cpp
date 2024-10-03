@@ -19,66 +19,72 @@
 #include "utils/NodeUtils.h"
 #include "utils/StringUtils.h"
 
-ModuleDeclaration::ModuleDeclaration() = default;
-ModuleDeclaration::ModuleDeclaration(ModuleDeclaration &&) noexcept = default;
-ModuleDeclaration & ModuleDeclaration::operator=(ModuleDeclaration &&) noexcept = default;
+namespace racc::ast {
 
-ModuleDeclaration::~ModuleDeclaration() = default;
+    ModuleDeclaration::ModuleDeclaration() = default;
 
-ModuleDeclaration::ModuleDeclaration(Path path)
-    : path(std::move(path)) {
-}
+    ModuleDeclaration::ModuleDeclaration(ModuleDeclaration &&) noexcept = default;
 
-uint64_t ModuleDeclaration::start() const {
-    return startPos;
-}
+    ModuleDeclaration &ModuleDeclaration::operator=(ModuleDeclaration &&) noexcept = default;
 
-uint64_t ModuleDeclaration::end() const {
-    return endPos;
-}
+    ModuleDeclaration::~ModuleDeclaration() = default;
 
-std::string ModuleDeclaration::toString(const SourceMap &sources, const int indent, const bool verbose) const {
-    std::string result = NodeUtils::nameString(*this, "ModuleDeclaration", verbose) + "{\n";
+    ModuleDeclaration::ModuleDeclaration(Path path)
+            : path(std::move(path)) {
+    }
 
-    result += std::string(indent, ' ') + "path: " + path.toString(sources, indent, verbose) + ",\n";
+    uint64_t ModuleDeclaration::start() const {
+        return startPos;
+    }
 
-    // todo: print use  map
+    uint64_t ModuleDeclaration::end() const {
+        return endPos;
+    }
+
+    std::string ModuleDeclaration::toString(const sourcemap::SourceMap &sources, const int indent, const bool verbose) const {
+        std::string result = utils::node::nameString(*this, "ModuleDeclaration", verbose) + "{\n";
+
+        result += std::string(indent, ' ') + "path: " + path.toString(sources, indent, verbose) + ",\n";
+
+        // todo: print use  map
 //    if (!uses->uses.empty())
-//        result += std::string(indent, ' ') + "uses: " + NodeUtils::nodeListString(
+//        result += std::string(indent, ' ') + "uses: " + utils::node::nodeListString(
 //            sources, uses->uses, indent + 1, verbose) + "\n";
 
-    if (!moduleVariableDeclarations.empty())
-        result += std::string(indent, ' ') + "moduleVariableDeclarations: " + NodeUtils::nodeListString(
-            sources, moduleVariableDeclarations, indent + 1, verbose) + "\n";
+        if (!moduleVariableDeclarations.empty())
+            result += std::string(indent, ' ') + "moduleVariableDeclarations: " + utils::node::nodeListString(
+                    sources, moduleVariableDeclarations, indent + 1, verbose) + "\n";
 
-    if (!aliasDeclarations.empty())
-        result += std::string(indent, ' ') + "aliasDeclarations: " + NodeUtils::nodeListString(
-            sources, aliasDeclarations, indent + 1, verbose) + "\n";
+        if (!aliasDeclarations.empty())
+            result += std::string(indent, ' ') + "aliasDeclarations: " + utils::node::nodeListString(
+                    sources, aliasDeclarations, indent + 1, verbose) + "\n";
 
-    if (!enumDeclarations.empty())
-        result += std::string(indent, ' ') + "enumDeclarations: " + NodeUtils::nodeListString(
-            sources, enumDeclarations, indent + 1, verbose) + "\n";
+        if (!enumDeclarations.empty())
+            result += std::string(indent, ' ') + "enumDeclarations: " + utils::node::nodeListString(
+                    sources, enumDeclarations, indent + 1, verbose) + "\n";
 
-    if (!interfaceDeclarations.empty())
-        result += std::string(indent, ' ') + "interfaceDeclarations: " + NodeUtils::nodeListString(
-            sources, interfaceDeclarations, indent + 1, verbose) + "\n";
+        if (!interfaceDeclarations.empty())
+            result += std::string(indent, ' ') + "interfaceDeclarations: " + utils::node::nodeListString(
+                    sources, interfaceDeclarations, indent + 1, verbose) + "\n";
 
-    if (!structDeclarations.empty())
-        result += std::string(indent, ' ') + "structDeclarations: " + NodeUtils::nodeListString(
-            sources, structDeclarations, indent + 1, verbose) + "\n";
+        if (!structDeclarations.empty())
+            result += std::string(indent, ' ') + "structDeclarations: " + utils::node::nodeListString(
+                    sources, structDeclarations, indent + 1, verbose) + "\n";
 
-    if (!functionDeclarations.empty())
-        result += std::string(indent, ' ') + "functionDeclarations: " + NodeUtils::nodeListString(
-            sources, functionDeclarations, indent + 1, verbose) + "\n";
+        if (!functionDeclarations.empty())
+            result += std::string(indent, ' ') + "functionDeclarations: " + utils::node::nodeListString(
+                    sources, functionDeclarations, indent + 1, verbose) + "\n";
 
-    if(!implBlocks.empty())
-        result += std::string(indent, ' ') + "implBlocks: " + NodeUtils::nodeListString(
-            sources, implBlocks, indent + 1, verbose) + "\n";
+        if (!implBlocks.empty())
+            result += std::string(indent, ' ') + "implBlocks: " + utils::node::nodeListString(
+                    sources, implBlocks, indent + 1, verbose) + "\n";
 
-    result += std::string(indent - 1, ' ') + "}";
-    return result;
-}
+        result += std::string(indent - 1, ' ') + "}";
+        return result;
+    }
 
-std::string ModuleDeclaration::buildPathString() const {
-    return StringUtils::join(path.parts, "::");
+    std::string ModuleDeclaration::buildPathString() const {
+        return utils::string::join(path.parts, "::");
+    }
+
 }

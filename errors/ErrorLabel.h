@@ -9,18 +9,24 @@
 #include "ErrorLabelGroup.h"
 #include "SimpleErrorLabel.h"
 
+namespace racc::errors {
 
-class ErrorLabel {
-public:
-    explicit(false) ErrorLabel(SimpleErrorLabel label);
-    explicit(false) ErrorLabel(ErrorLabelGroup group);
+    class ErrorLabel {
+    public:
+        explicit(false) ErrorLabel(SimpleErrorLabel label);
 
-    [[nodiscard]] bool isSimpleLabel() const;
-    [[nodiscard]] bool isLabelGroup() const;
+        explicit(false) ErrorLabel(ErrorLabelGroup group);
 
-    [[nodiscard]] const SimpleErrorLabel &simpleLabel() const;
-    [[nodiscard]] const ErrorLabelGroup &labelGroup() const;
-private:
-    std::variant<SimpleErrorLabel, ErrorLabelGroup> item;
-};
+        [[nodiscard]] bool isSimpleLabel() const;
 
+        [[nodiscard]] bool isLabelGroup() const;
+
+        [[nodiscard]] const SimpleErrorLabel &simpleLabel() const;
+
+        [[nodiscard]] const ErrorLabelGroup &labelGroup() const;
+
+    private:
+        std::variant<SimpleErrorLabel, ErrorLabelGroup> item;
+    };
+
+}

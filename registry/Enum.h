@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "predeclare.h"
+
 #include "ModuleRegistry.h"
 #include "TypeRef.h"
 
@@ -13,47 +15,40 @@
 #include <memory>
 #include <optional>
 
+namespace racc::registry {
+    class Enum {
+    public:
+        std::string name;
+        std::string_view modulePath;
+        uint8_t arity;
+        bool isPublic;
+        ast::EnumDeclaration *declaration;
+        std::shared_ptr<sourcemap::Source> source;
+        std::shared_ptr<ast::UseMap> useMap;
+        std::vector<TypeRef> genericParams;
+        std::map<std::string, TypeRef, std::less<>> genericParamsMap;
+        std::vector<EnumMember> members;
+        std::map<std::string, EnumMember *, std::less<>> memberMap;
+        std::optional<std::shared_ptr<Enum>> genericBase;
+        WeakTypeRef type;
 
-class EnumDeclaration;
+        Enum(std::string name, std::string_view module, uint8_t arity, ast::EnumDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
+             std::shared_ptr<ast::UseMap> useMap);
 
-class UseMap;
+        Enum(const Enum &) = delete;
 
-class Source;
+        Enum &operator=(const Enum &) = delete;
 
-class EnumMember;
+        Enum(Enum &&) noexcept;
 
-class Enum {
-public:
-    std::string name;
-    std::string_view modulePath;
-    uint8_t arity;
-    bool isPublic;
-    EnumDeclaration *declaration;
-    std::shared_ptr<Source> source;
-    std::shared_ptr<UseMap> useMap;
-    std::vector<TypeRef> genericParams;
-    std::map<std::string, TypeRef, std::less<>> genericParamsMap;
-    std::vector<EnumMember> members;
-    std::map<std::string, EnumMember *, std::less<>> memberMap;
-    std::optional<std::shared_ptr<Enum>> genericBase;
-    WeakTypeRef type;
+        Enum &operator=(Enum &&) noexcept;
 
-    Enum(std::string name, std::string_view module, uint8_t arity, EnumDeclaration *declaration, std::shared_ptr<Source> source,
-         std::shared_ptr<UseMap> useMap);
+        ~Enum();
 
-    Enum(const Enum &) = delete;
+        void populate(ModuleRegistry &registry);
 
-    Enum &operator=(const Enum &) = delete;
+        [[nodiscard]] TypeRef concretize(ModuleRegistry &registry, std::vector<TypeRef> args) const;
 
-    Enum(Enum &&) noexcept;
-
-    Enum &operator=(Enum &&) noexcept;
-
-    ~Enum();
-
-    void populate(ModuleRegistry &registry);
-
-    [[nodiscard]] TypeRef concretize(ModuleRegistry &registry, std::vector<TypeRef> args) const;
-
-    [[nodiscard]] TypeRef substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const;
-};
+        [[nodiscard]] TypeRef substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const;
+    };
+}

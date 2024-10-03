@@ -8,31 +8,38 @@
 
 #include "utils/NodeUtils.h"
 
-ImplSetter::ImplSetter() = default;
-ImplSetter::ImplSetter(ImplSetter &&) noexcept = default;
-ImplSetter & ImplSetter::operator=(ImplSetter &&) noexcept = default;
-ImplSetter::~ImplSetter() = default;
+namespace racc::ast {
 
-uint64_t ImplSetter::start() const {
-    return startPos;
-}
+    ImplSetter::ImplSetter() = default;
 
-uint64_t ImplSetter::end() const {
-    return endPos;
-}
+    ImplSetter::ImplSetter(ImplSetter &&) noexcept = default;
 
-std::string ImplSetter::toString(const SourceMap &sources, int indent, bool verbose) const {
-    std::string result = NodeUtils::nameString(*this, "ImplSetter", verbose) + "{\n";
+    ImplSetter &ImplSetter::operator=(ImplSetter &&) noexcept = default;
 
-    result += std::string(indent, ' ') + "isPublic: " + std::to_string(isPublic) + ",\n";
+    ImplSetter::~ImplSetter() = default;
 
-    if(name) {
-        result += std::string(indent, ' ') + "name: " + name->toString(sources, indent+1, verbose) + ",\n";
-    }
-    if(parameter) {
-        result += std::string(indent, ' ') + "parameter: " + parameter->toString(sources, indent+1, verbose) + ",\n";
+    uint64_t ImplSetter::start() const {
+        return startPos;
     }
 
-    result += std::string(indent - 1, ' ') + "}";
-    return result;
+    uint64_t ImplSetter::end() const {
+        return endPos;
+    }
+
+    std::string ImplSetter::toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const {
+        std::string result = utils::node::nameString(*this, "ImplSetter", verbose) + "{\n";
+
+        result += std::string(indent, ' ') + "isPublic: " + std::to_string(isPublic) + ",\n";
+
+        if (name) {
+            result += std::string(indent, ' ') + "name: " + name->toString(sources, indent + 1, verbose) + ",\n";
+        }
+        if (parameter) {
+            result += std::string(indent, ' ') + "parameter: " + parameter->toString(sources, indent + 1, verbose) + ",\n";
+        }
+
+        result += std::string(indent - 1, ' ') + "}";
+        return result;
+
+    }
 }

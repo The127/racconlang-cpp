@@ -4,53 +4,52 @@
 
 #pragma once
 
+#include "predeclare.h"
+
+#include "Node.h"
+#include "Path.h"
+
 #include <functional>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "Node.h"
-#include "Path.h"
+namespace racc::ast {
+    class ModuleDeclaration final : public Node {
+    public:
+        uint64_t startPos{};
+        uint64_t endPos{};
+        Path path;
+        std::shared_ptr<UseMap> uses;
+        std::vector<EnumDeclaration> enumDeclarations;
+        std::vector<InterfaceDeclaration> interfaceDeclarations;
+        std::vector<StructDeclaration> structDeclarations;
+        std::vector<FunctionDeclaration> functionDeclarations;
+        std::vector<AliasDeclaration> aliasDeclarations;
+        std::vector<ModuleVariableDeclaration> moduleVariableDeclarations;
+        std::vector<ImplBlock> implBlocks;
 
+        ModuleDeclaration();
 
-class ImplBlock;
-class ModuleVariableDeclaration;
-class AliasDeclaration;
-class FunctionDeclaration;
-class StructDeclaration;
-class InterfaceDeclaration;
-class EnumDeclaration;
-class UseMap;
+        ModuleDeclaration(const ModuleDeclaration &) = delete;
 
-class ModuleDeclaration final : public Node {
-public:
-    uint64_t startPos{};
-    uint64_t endPos{};
-    Path path;
-    std::shared_ptr<UseMap> uses;
-    std::vector<EnumDeclaration> enumDeclarations;
-    std::vector<InterfaceDeclaration> interfaceDeclarations;
-    std::vector<StructDeclaration> structDeclarations;
-    std::vector<FunctionDeclaration> functionDeclarations;
-    std::vector<AliasDeclaration> aliasDeclarations;
-    std::vector<ModuleVariableDeclaration> moduleVariableDeclarations;
-    std::vector<ImplBlock> implBlocks;
+        ModuleDeclaration &operator=(const ModuleDeclaration &) = delete;
 
-    ModuleDeclaration();
-    ModuleDeclaration(const ModuleDeclaration&) = delete;
-    ModuleDeclaration& operator=(const ModuleDeclaration&) = delete;
-    ModuleDeclaration(ModuleDeclaration&&) noexcept;
-    ModuleDeclaration& operator=(ModuleDeclaration&&) noexcept;
-    ~ModuleDeclaration() override;
+        ModuleDeclaration(ModuleDeclaration &&) noexcept;
 
-    explicit ModuleDeclaration(Path path);
+        ModuleDeclaration &operator=(ModuleDeclaration &&) noexcept;
 
-    [[nodiscard]] uint64_t start() const override;
+        ~ModuleDeclaration() override;
 
-    [[nodiscard]] uint64_t end() const override;
+        explicit ModuleDeclaration(Path path);
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
+        [[nodiscard]] uint64_t start() const override;
 
+        [[nodiscard]] uint64_t end() const override;
 
-    [[nodiscard]] std::string buildPathString() const;
-};
+        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+
+        [[nodiscard]] std::string buildPathString() const;
+    };
+
+}

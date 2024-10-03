@@ -5,17 +5,25 @@
 #include <string>
 #include <utility>
 
-class TypeVar {
-public:
-    std::string name;
-    WeakTypeRef type;
+namespace racc::registry {
 
-    explicit TypeVar(std::string name);
+    class TypeVar {
+    public:
+        std::string name;
+        WeakTypeRef type;
 
-    ~TypeVar();
-    TypeVar(const TypeVar&) = delete;
-    TypeVar& operator=(const TypeVar&) = delete;
-    TypeVar(TypeVar&&) noexcept;
-    TypeVar& operator=(TypeVar&&) noexcept;
+        explicit TypeVar(std::string name);
 
-};
+        ~TypeVar();
+
+        TypeVar(const TypeVar &) = delete;
+
+        TypeVar &operator=(const TypeVar &) = delete;
+
+        TypeVar(TypeVar &&) noexcept;
+
+        TypeVar &operator=(TypeVar &&) noexcept;
+
+    };
+
+}

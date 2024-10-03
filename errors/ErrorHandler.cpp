@@ -3,3 +3,5 @@
 //
 
 #include "ErrorHandler.h"
+
+namespace racc::errors {}

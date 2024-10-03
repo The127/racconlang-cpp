@@ -10,24 +10,32 @@
 #include "Identifier.h"
 #include "Signature.h"
 
+namespace racc::ast {
 
-class EnumMemberDeclaration final : public Node {
-public:
-    uint64_t startPos{};
-    uint64_t endPos{};
-    Identifier name;
-    std::vector<Signature> values;
+    class EnumMemberDeclaration final : public Node {
+    public:
+        uint64_t startPos{};
+        uint64_t endPos{};
+        Identifier name;
+        std::vector<Signature> values;
 
-    explicit EnumMemberDeclaration(Identifier name);
-    EnumMemberDeclaration(const EnumMemberDeclaration&) = delete;
-    EnumMemberDeclaration& operator=(const EnumMemberDeclaration&) = delete;
-    EnumMemberDeclaration(EnumMemberDeclaration&&) noexcept;
-    EnumMemberDeclaration& operator=(EnumMemberDeclaration&&) noexcept;
-    ~EnumMemberDeclaration() override;
+        explicit EnumMemberDeclaration(Identifier name);
 
-    [[nodiscard]] uint64_t start() const override;
-    [[nodiscard]] uint64_t end() const override;
+        EnumMemberDeclaration(const EnumMemberDeclaration &) = delete;
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
-};
+        EnumMemberDeclaration &operator=(const EnumMemberDeclaration &) = delete;
 
+        EnumMemberDeclaration(EnumMemberDeclaration &&) noexcept;
+
+        EnumMemberDeclaration &operator=(EnumMemberDeclaration &&) noexcept;
+
+        ~EnumMemberDeclaration() override;
+
+        [[nodiscard]] uint64_t start() const override;
+
+        [[nodiscard]] uint64_t end() const override;
+
+        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+    };
+
+}

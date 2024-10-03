@@ -7,26 +7,33 @@
 
 #include "TupleSignature.h"
 
-TupleSignature::TupleSignature() = default;
-TupleSignature::TupleSignature(TupleSignature &&) noexcept = default;
-TupleSignature & TupleSignature::operator=(TupleSignature &&) noexcept = default;
-TupleSignature::~TupleSignature() = default;
+namespace racc::ast {
 
-uint64_t TupleSignature::start() const {
-    return startPos;
-}
+    TupleSignature::TupleSignature() = default;
 
-uint64_t TupleSignature::end() const {
-    return endPos;
-}
+    TupleSignature::TupleSignature(TupleSignature &&) noexcept = default;
 
-std::string TupleSignature::toString(const SourceMap &sources, const int indent, const bool verbose) const {
-    std::string result = NodeUtils::nameString(*this, "TupleSignature", verbose) + "{\n";
+    TupleSignature &TupleSignature::operator=(TupleSignature &&) noexcept = default;
 
-    if(!types.empty()) {
-        result += std::string(indent, ' ') + "types: " + NodeUtils::nodeListString(sources, types, indent + 1, verbose) + "\n";
+    TupleSignature::~TupleSignature() = default;
+
+    uint64_t TupleSignature::start() const {
+        return startPos;
     }
 
-    result += std::string(indent - 1, ' ') + "}";
-    return result;
+    uint64_t TupleSignature::end() const {
+        return endPos;
+    }
+
+    std::string TupleSignature::toString(const sourcemap::SourceMap &sources, const int indent, const bool verbose) const {
+        std::string result = utils::node::nameString(*this, "TupleSignature", verbose) + "{\n";
+
+        if (!types.empty()) {
+            result += std::string(indent, ' ') + "types: " + utils::node::nodeListString(sources, types, indent + 1, verbose) + "\n";
+        }
+
+        result += std::string(indent - 1, ' ') + "}";
+        return result;
+    }
+
 }

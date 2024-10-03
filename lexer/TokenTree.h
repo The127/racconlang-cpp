@@ -4,27 +4,33 @@
 
 #pragma once
 
-#include <vector>
+#include "predeclare.h"
 
 #include "Token.h"
 #include "TokenResult.h"
 
-class TokenTreeNode;
+#include <vector>
 
-class TokenTree {
-public:
-    Token left;
-    std::vector<TokenTreeNode> tokens;
-    TokenResult right;
+namespace racc::lexer {
+    class TokenTree {
+    public:
+        Token left;
+        std::vector<TokenTreeNode> tokens;
+        TokenResult right;
 
-    explicit TokenTree(const Token &left);
-    TokenTree(const TokenTree&) = delete;
-    TokenTree& operator=(const TokenTree&) = delete;
-    TokenTree(TokenTree&&) noexcept;
-    TokenTree& operator=(TokenTree&&) noexcept;
-    ~TokenTree();
+        explicit TokenTree(const Token &left);
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, uint32_t indent = 0) const;
-};
+        TokenTree(const TokenTree &) = delete;
 
-#include "TokenTreeNode.h"
+        TokenTree &operator=(const TokenTree &) = delete;
+
+        TokenTree(TokenTree &&) noexcept;
+
+        TokenTree &operator=(TokenTree &&) noexcept;
+
+        ~TokenTree();
+
+        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, uint32_t indent = 0) const;
+    };
+
+}

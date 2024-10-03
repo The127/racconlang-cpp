@@ -10,27 +10,37 @@
 #include "Identifier.h"
 #include "Node.h"
 
+namespace racc::ast {
 
-class Path final : public Node {
-public:
-    std::optional<Token> rooted;
-    std::vector<Identifier> parts;
-    std::optional<Token> trailer;
+    class Path final : public Node {
+    public:
+        std::optional<lexer::Token> rooted;
+        std::vector<Identifier> parts;
+        std::optional<lexer::Token> trailer;
 
-    Path();
-    Path(const Path&) = delete;
-    Path& operator=(const Path&) = delete;
-    Path(Path&&) noexcept;
-    Path& operator=(Path&&) noexcept;
-    ~Path() override;
+        Path();
 
-    [[nodiscard]] bool isRooted() const;
-    [[nodiscard]] bool isTrailing() const;
+        Path(const Path &) = delete;
 
-    [[nodiscard]] uint64_t start() const override;
-    [[nodiscard]] uint64_t end() const override;
+        Path &operator=(const Path &) = delete;
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
+        Path(Path &&) noexcept;
 
-    [[nodiscard]] Path clone() const;
-};
+        Path &operator=(Path &&) noexcept;
+
+        ~Path() override;
+
+        [[nodiscard]] bool isRooted() const;
+
+        [[nodiscard]] bool isTrailing() const;
+
+        [[nodiscard]] uint64_t start() const override;
+
+        [[nodiscard]] uint64_t end() const override;
+
+        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+
+        [[nodiscard]] Path clone() const;
+    };
+
+}

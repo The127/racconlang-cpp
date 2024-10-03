@@ -7,29 +7,36 @@
 #include "utils/StringUtils.h"
 #include "utils/NodeUtils.h"
 
-UseNode::UseNode() = default;
-UseNode::UseNode(UseNode &&) noexcept = default;
-UseNode & UseNode::operator=(UseNode &&) noexcept = default;
-UseNode::~UseNode() = default;
+namespace racc::ast {
 
-uint64_t UseNode::start() const {
-    return startPos;
-}
+    UseNode::UseNode() = default;
 
-uint64_t UseNode::end() const {
-    return endPos;
-}
+    UseNode::UseNode(UseNode &&) noexcept = default;
 
-std::string UseNode::toString(const SourceMap &sources, const int indent, const bool verbose) const {
-    std::string result = NodeUtils::nameString(*this, "UseNode", verbose) + "{\n";
+    UseNode &UseNode::operator=(UseNode &&) noexcept = default;
 
-    result += std::string(indent, ' ') + "path: " + path.toString(sources, indent, verbose) + ",\n";
+    UseNode::~UseNode() = default;
+
+    uint64_t UseNode::start() const {
+        return startPos;
+    }
+
+    uint64_t UseNode::end() const {
+        return endPos;
+    }
+
+    std::string UseNode::toString(const sourcemap::SourceMap &sources, const int indent, const bool verbose) const {
+        std::string result = utils::node::nameString(*this, "UseNode", verbose) + "{\n";
+
+        result += std::string(indent, ' ') + "path: " + path.toString(sources, indent, verbose) + ",\n";
 
 
-    // TODO
+        // TODO
 //    if(!names.empty())
-//        result += std::string(indent, ' ') + "names: [" + StringUtils::join(names, ", ") + "],\n";
+//        result += std::string(indent, ' ') + "names: [" + utils::string::join(names, ", ") + "],\n";
 
-    result += std::string(indent - 1, ' ') + "}";
-    return result;
+        result += std::string(indent - 1, ' ') + "}";
+        return result;
+    }
+
 }

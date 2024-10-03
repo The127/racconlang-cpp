@@ -6,6 +6,9 @@
 
 #include "Node.h"
 
+namespace racc::ast {
 
-class GenericConstraintBase : public Node {
-};
+    class GenericConstraintBase : public Node {
+    };
+
+}

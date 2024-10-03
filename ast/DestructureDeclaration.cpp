@@ -6,26 +6,33 @@
 
 #include "utils/NodeUtils.h"
 
-DestructureDeclaration::DestructureDeclaration() = default;
-DestructureDeclaration::DestructureDeclaration(DestructureDeclaration &&) noexcept = default;
-DestructureDeclaration & DestructureDeclaration::operator=(DestructureDeclaration &&) noexcept = default;
-DestructureDeclaration::~DestructureDeclaration() = default;
+namespace racc::ast {
 
-uint64_t DestructureDeclaration::start() const {
-    return startPos;
-}
+    DestructureDeclaration::DestructureDeclaration() = default;
 
-uint64_t DestructureDeclaration::end() const {
-    return endPos;
-}
+    DestructureDeclaration::DestructureDeclaration(DestructureDeclaration &&) noexcept = default;
 
-std::string DestructureDeclaration::toString(const SourceMap &sources, int indent, bool verbose) const {
-    std::string result = NodeUtils::nameString(*this, "DestructureDeclaration", verbose) + "{\n";
+    DestructureDeclaration &DestructureDeclaration::operator=(DestructureDeclaration &&) noexcept = default;
 
-    if(name) {
-        result += std::string(indent, ' ') + "name: " + std::string(name->name) + ",\n";
+    DestructureDeclaration::~DestructureDeclaration() = default;
+
+    uint64_t DestructureDeclaration::start() const {
+        return startPos;
     }
 
-    result += std::string(indent - 1, ' ') + "}";
-    return result;
+    uint64_t DestructureDeclaration::end() const {
+        return endPos;
+    }
+
+    std::string DestructureDeclaration::toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const {
+        std::string result = utils::node::nameString(*this, "DestructureDeclaration", verbose) + "{\n";
+
+        if (name) {
+            result += std::string(indent, ' ') + "name: " + std::string(name->name) + ",\n";
+        }
+
+        result += std::string(indent - 1, ' ') + "}";
+        return result;
+    }
+
 }

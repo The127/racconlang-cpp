@@ -6,30 +6,37 @@
 
 #include "utils/NodeUtils.h"
 
-ConstraintDeclaration::ConstraintDeclaration() = default;
-ConstraintDeclaration::ConstraintDeclaration(ConstraintDeclaration &&) noexcept = default;
-ConstraintDeclaration & ConstraintDeclaration::operator=(ConstraintDeclaration &&) noexcept = default;
-ConstraintDeclaration::~ConstraintDeclaration() = default;
+namespace racc::ast {
 
-uint64_t ConstraintDeclaration::start() const {
-    return startPos;
-}
+    ConstraintDeclaration::ConstraintDeclaration() = default;
 
-uint64_t ConstraintDeclaration::end() const {
-    return endPos;
-}
+    ConstraintDeclaration::ConstraintDeclaration(ConstraintDeclaration &&) noexcept = default;
 
-std::string ConstraintDeclaration::toString(const SourceMap &sources, int indent, bool verbose) const {
-    std::string result = NodeUtils::nameString(*this, "ConstraintDeclaration", verbose) + "{\n";
+    ConstraintDeclaration &ConstraintDeclaration::operator=(ConstraintDeclaration &&) noexcept = default;
 
-    if(name) {
-        result += std::string(indent, ' ') + "name: " + name->toString(sources, indent+1, verbose) + ",\n";
+    ConstraintDeclaration::~ConstraintDeclaration() = default;
+
+    uint64_t ConstraintDeclaration::start() const {
+        return startPos;
     }
 
-    if(!constraints.empty()) {
-        result += std::string(indent, ' ') + "constraints: " + NodeUtils::nodeListString(sources, constraints, indent + 1, verbose) + "\n";
+    uint64_t ConstraintDeclaration::end() const {
+        return endPos;
     }
 
-    result += std::string(indent - 1, ' ') + "}";
-    return result;
+    std::string ConstraintDeclaration::toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const {
+        std::string result = utils::node::nameString(*this, "ConstraintDeclaration", verbose) + "{\n";
+
+        if (name) {
+            result += std::string(indent, ' ') + "name: " + name->toString(sources, indent + 1, verbose) + ",\n";
+        }
+
+        if (!constraints.empty()) {
+            result += std::string(indent, ' ') + "constraints: " + utils::node::nodeListString(sources, constraints, indent + 1, verbose) + "\n";
+        }
+
+        result += std::string(indent - 1, ' ') + "}";
+        return result;
+    }
+
 }

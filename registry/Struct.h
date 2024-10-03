@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "predeclare.h"
+
 #include "TypeRef.h"
 
 #include <cstdint>
@@ -14,45 +16,41 @@
 #include <map>
 #include <optional>
 
+namespace racc::registry {
+    class Struct {
+    public:
+        std::string name;
+        std::string_view modulePath;
+        uint8_t arity;
+        bool isPublic;
+        ast::StructDeclaration *declaration;
+        std::shared_ptr<sourcemap::Source> source;
+        std::shared_ptr<ast::UseMap> useMap;
+        std::vector<TypeRef> genericParams;
+        std::map<std::string, TypeRef, std::less<>> genericParamsMap;
+        std::vector<StructMember> members;
+        std::map<std::string, StructMember *, std::less<>> memberMap;
+        std::optional<std::shared_ptr<Struct>> genericBase;
+        WeakTypeRef type;
 
-class StructDeclaration;
-class Source;
-class UseMap;
-class StructMember;
-class ModuleRegistry;
+        Struct(std::string name, std::string_view module, uint8_t arity, ast::StructDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
+               std::shared_ptr<ast::UseMap> useMap);
 
-class Struct {
-public:
-    std::string name;
-    std::string_view modulePath;
-    uint8_t arity;
-    bool isPublic;
-    StructDeclaration *declaration;
-    std::shared_ptr<Source> source;
-    std::shared_ptr<UseMap> useMap;
-    std::vector<TypeRef> genericParams;
-    std::map<std::string, TypeRef, std::less<>> genericParamsMap;
-    std::vector<StructMember> members;
-    std::map<std::string, StructMember *, std::less<>> memberMap;
-    std::optional<std::shared_ptr<Struct>> genericBase;
-    WeakTypeRef type;
+        Struct(const Struct &) = delete;
 
-    Struct(std::string name, std::string_view module, uint8_t arity, StructDeclaration *declaration, std::shared_ptr<Source> source,
-           std::shared_ptr<UseMap> useMap);
+        Struct &operator=(const Struct &) = delete;
 
-    Struct(const Struct &) = delete;
+        Struct(Struct &&) noexcept;
 
-    Struct &operator=(const Struct &) = delete;
+        Struct &operator=(Struct &&) noexcept;
 
-    Struct(Struct &&) noexcept;
+        ~Struct();
 
-    Struct &operator=(Struct &&) noexcept;
+        void populate(ModuleRegistry &registry);
 
-    ~Struct();
+        [[nodiscard]] TypeRef concretize(ModuleRegistry &registry, std::vector<TypeRef> args) const;
 
-    void populate(ModuleRegistry &registry);
+        [[nodiscard]] TypeRef substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const;
+    };
 
-    [[nodiscard]] TypeRef concretize(ModuleRegistry &registry, std::vector<TypeRef> args) const;
-
-    [[nodiscard]] TypeRef substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const;
-};
+}

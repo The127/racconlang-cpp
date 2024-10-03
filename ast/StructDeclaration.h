@@ -3,35 +3,45 @@
 //
 
 #pragma once
-#include <string>
-#include <vector>
+
+#include "predeclare.h"
+
 #include "Identifier.h"
 #include "Node.h"
 
-class PropertyDeclaration;
-class ConstraintDeclaration;
+#include <string>
+#include <vector>
 
-class StructDeclaration final : public Node {
-public:
-    uint64_t startPos{};
-    uint64_t endPos{};
-    bool isPublic{};
-    bool isValue{};
-    std::optional<Identifier> name;
-    std::vector<Identifier> genericParams;
-    std::vector<ConstraintDeclaration> genericConstraints;
-    std::vector<PropertyDeclaration> propertyDeclarations;
-    std::vector<Identifier> destructureProperties;
+namespace racc::ast {
+    class StructDeclaration final : public Node {
+    public:
+        uint64_t startPos{};
+        uint64_t endPos{};
+        bool isPublic{};
+        bool isValue{};
+        std::optional<Identifier> name;
+        std::vector<Identifier> genericParams;
+        std::vector<ConstraintDeclaration> genericConstraints;
+        std::vector<PropertyDeclaration> propertyDeclarations;
+        std::vector<Identifier> destructureProperties;
 
-    StructDeclaration();
-    StructDeclaration(const StructDeclaration&) = delete;
-    StructDeclaration& operator=(const StructDeclaration&) = delete;
-    StructDeclaration(StructDeclaration&&) noexcept;
-    StructDeclaration& operator=(StructDeclaration&&) noexcept;
-    ~StructDeclaration() override;
+        StructDeclaration();
 
-    [[nodiscard]] uint64_t start() const override;
-    [[nodiscard]] uint64_t end() const override;
+        StructDeclaration(const StructDeclaration &) = delete;
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
-};
+        StructDeclaration &operator=(const StructDeclaration &) = delete;
+
+        StructDeclaration(StructDeclaration &&) noexcept;
+
+        StructDeclaration &operator=(StructDeclaration &&) noexcept;
+
+        ~StructDeclaration() override;
+
+        [[nodiscard]] uint64_t start() const override;
+
+        [[nodiscard]] uint64_t end() const override;
+
+        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+    };
+
+}

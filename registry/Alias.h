@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "predeclare.h"
+
 #include "ModuleRegistry.h"
 #include "TypeRef.h"
 
@@ -13,36 +15,40 @@
 #include <string>
 #include <optional>
 
+namespace racc::registry {
+    class Alias {
+    public:
+        std::string name;
+        std::string_view modulePath;
+        uint8_t arity;
+        bool isPublic;
+        std::unique_ptr<TypeRef> aliasedType;
+        ast::AliasDeclaration *declaration;
+        std::shared_ptr<sourcemap::Source> source;
+        std::shared_ptr<ast::UseMap> useMap;
+        std::vector<TypeRef> genericParams;
+        std::map<std::string, TypeRef, std::less<>> genericParamsMap;
+        std::optional<std::shared_ptr<Alias>> genericBase;
+        WeakTypeRef type;
 
-class Source;
-class AliasDeclaration;
-class UseMap;
+        Alias(std::string name, std::string_view module, uint8_t arity, ast::AliasDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
+              std::shared_ptr<ast::UseMap> useMap);
 
-class Alias {
-public:
-    std::string name;
-    std::string_view modulePath;
-    uint8_t arity;
-    bool isPublic;
-    std::unique_ptr<TypeRef> aliasedType;
-    AliasDeclaration* declaration;
-    std::shared_ptr<Source> source;
-    std::shared_ptr<UseMap> useMap;
-    std::vector<TypeRef> genericParams;
-    std::map<std::string, TypeRef, std::less<>> genericParamsMap;
-    std::optional<std::shared_ptr<Alias>> genericBase;
-    WeakTypeRef type;
+        Alias(const Alias &) = delete;
 
-    Alias(std::string name, std::string_view module, uint8_t arity, AliasDeclaration* declaration, std::shared_ptr<Source> source, std::shared_ptr<UseMap> useMap);
-    Alias(const Alias&) = delete;
-    Alias& operator=(const Alias&) = delete;
-    Alias(Alias&&) noexcept;
-    Alias& operator=(Alias&&) noexcept;
-    ~Alias();
+        Alias &operator=(const Alias &) = delete;
 
-    void populate(ModuleRegistry& registry);
+        Alias(Alias &&) noexcept;
 
-    TypeRef concretize(ModuleRegistry& registry, std::vector<TypeRef> args) const;
+        Alias &operator=(Alias &&) noexcept;
 
-    TypeRef substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef>& generics) const;
-};
+        ~Alias();
+
+        void populate(ModuleRegistry &registry);
+
+        TypeRef concretize(ModuleRegistry &registry, std::vector<TypeRef> args) const;
+
+        TypeRef substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const;
+    };
+
+}

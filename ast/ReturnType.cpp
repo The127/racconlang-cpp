@@ -6,29 +6,33 @@
 
 #include "ReturnType.h"
 
-ReturnType::ReturnType(Signature type) : type(std::move(type)) {};
+namespace racc::ast {
 
-ReturnType::ReturnType(ReturnType &&) noexcept = default;
+    ReturnType::ReturnType(Signature type) : type(std::move(type)) {};
 
-ReturnType & ReturnType::operator=(ReturnType &&) noexcept = default;
+    ReturnType::ReturnType(ReturnType &&) noexcept = default;
 
-ReturnType::~ReturnType() = default;
+    ReturnType &ReturnType::operator=(ReturnType &&) noexcept = default;
 
-uint64_t ReturnType::start() const {
-    return startPos;
-}
+    ReturnType::~ReturnType() = default;
 
-uint64_t ReturnType::end() const {
-    return endPos;
-}
+    uint64_t ReturnType::start() const {
+        return startPos;
+    }
 
-std::string ReturnType::toString(const SourceMap &sources, const int indent, const bool verbose) const {
-    std::string result = NodeUtils::nameString(*this, "ReturnType", verbose) + "{\n";
+    uint64_t ReturnType::end() const {
+        return endPos;
+    }
 
-    result += std::string(indent, ' ') + "isMut: " + std::to_string(isMut) + ",\n";
+    std::string ReturnType::toString(const sourcemap::SourceMap &sources, const int indent, const bool verbose) const {
+        std::string result = utils::node::nameString(*this, "ReturnType", verbose) + "{\n";
 
-    result += std::string(indent, ' ') + "type: " + type.toString(sources, indent+1, verbose) + "\n";
+        result += std::string(indent, ' ') + "isMut: " + std::to_string(isMut) + ",\n";
 
-    result += std::string(indent - 1, ' ') + "}";
-    return result;
+        result += std::string(indent, ' ') + "type: " + type.toString(sources, indent + 1, verbose) + "\n";
+
+        result += std::string(indent - 1, ' ') + "}";
+        return result;
+    }
+
 }

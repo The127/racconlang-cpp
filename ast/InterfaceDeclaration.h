@@ -3,39 +3,46 @@
 //
 
 #pragma once
-#include <string>
-#include <vector>
+
+#include "predeclare.h"
 
 #include "Identifier.h"
 #include "TypeSignature.h"
 
-class InterfaceSetterDeclaration;
-class InterfaceGetterDeclaration;
-class InterfaceMethodDeclaration;
-class ConstraintDeclaration;
+#include <string>
+#include <vector>
 
-class InterfaceDeclaration final :public Node {
-public:
-    uint64_t startPos{};
-    uint64_t endPos{};
-    bool isPublic{};
-    std::optional<Identifier> name;
-    std::vector<Identifier> genericParams;
-    std::vector<ConstraintDeclaration> genericConstraints;
-    std::vector<TypeSignature> requiredInterfaces;
-    std::vector<InterfaceMethodDeclaration> methods;
-    std::vector<InterfaceGetterDeclaration> getters;
-    std::vector<InterfaceSetterDeclaration> setters;
+namespace racc::ast {
+    class InterfaceDeclaration final : public Node {
+    public:
+        uint64_t startPos{};
+        uint64_t endPos{};
+        bool isPublic{};
+        std::optional<Identifier> name;
+        std::vector<Identifier> genericParams;
+        std::vector<ConstraintDeclaration> genericConstraints;
+        std::vector<TypeSignature> requiredInterfaces;
+        std::vector<InterfaceMethodDeclaration> methods;
+        std::vector<InterfaceGetterDeclaration> getters;
+        std::vector<InterfaceSetterDeclaration> setters;
 
-    InterfaceDeclaration();
-    InterfaceDeclaration(const InterfaceDeclaration&) = delete;
-    InterfaceDeclaration& operator=(const InterfaceDeclaration&) = delete;
-    InterfaceDeclaration(InterfaceDeclaration&&) noexcept;
-    InterfaceDeclaration& operator=(InterfaceDeclaration&&) noexcept;
-    ~InterfaceDeclaration() override;
+        InterfaceDeclaration();
 
-    [[nodiscard]] uint64_t start() const override;
-    [[nodiscard]] uint64_t end() const override;
+        InterfaceDeclaration(const InterfaceDeclaration &) = delete;
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
-};
+        InterfaceDeclaration &operator=(const InterfaceDeclaration &) = delete;
+
+        InterfaceDeclaration(InterfaceDeclaration &&) noexcept;
+
+        InterfaceDeclaration &operator=(InterfaceDeclaration &&) noexcept;
+
+        ~InterfaceDeclaration() override;
+
+        [[nodiscard]] uint64_t start() const override;
+
+        [[nodiscard]] uint64_t end() const override;
+
+        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+    };
+
+}

@@ -8,37 +8,44 @@
 
 #include "utils/NodeUtils.h"
 
-EnumDeclaration::EnumDeclaration() = default;
-EnumDeclaration::EnumDeclaration(EnumDeclaration &&) noexcept = default;
-EnumDeclaration & EnumDeclaration::operator=(EnumDeclaration &&) noexcept = default;
-EnumDeclaration::~EnumDeclaration() = default;
+namespace racc::ast {
 
-uint64_t EnumDeclaration::start() const {
-    return startPos;
-}
+    EnumDeclaration::EnumDeclaration() = default;
 
-uint64_t EnumDeclaration::end() const {
-    return endPos;
-}
+    EnumDeclaration::EnumDeclaration(EnumDeclaration &&) noexcept = default;
 
-std::string EnumDeclaration::toString(const SourceMap &sources, const int indent, const bool verbose) const {
-    std::string result = NodeUtils::nameString(*this, "EnumDeclaration", verbose) + "{\n";
+    EnumDeclaration &EnumDeclaration::operator=(EnumDeclaration &&) noexcept = default;
 
-    result += std::string(indent, ' ') + "isPublic: " + std::to_string(isPublic) + ",\n";
+    EnumDeclaration::~EnumDeclaration() = default;
 
-    if(name) {
-        result += std::string(indent, ' ') + "name: " + std::string(name->name) + ",\n";
-    };
+    uint64_t EnumDeclaration::start() const {
+        return startPos;
+    }
 
-    if(!genericParams.empty())
-        result += std::string(indent, ' ') + "genericParams: " + NodeUtils::nodeListString(sources, genericParams, indent + 1, verbose) + "\n";
+    uint64_t EnumDeclaration::end() const {
+        return endPos;
+    }
 
-    if(!genericConstraints.empty())
-        result += std::string(indent, ' ') + "genericConstraints: " + NodeUtils::nodeListString(sources, genericConstraints, indent + 1, verbose) + "\n";
+    std::string EnumDeclaration::toString(const sourcemap::SourceMap &sources, const int indent, const bool verbose) const {
+        std::string result = utils::node::nameString(*this, "EnumDeclaration", verbose) + "{\n";
 
-    if(!memberDeclarations.empty())
-        result += std::string(indent, ' ') + "memberDeclarations: " + NodeUtils::nodeListString(sources, memberDeclarations, indent + 1, verbose) + "\n";
+        result += std::string(indent, ' ') + "isPublic: " + std::to_string(isPublic) + ",\n";
 
-    result += std::string(indent - 1, ' ') + "}";
-    return result;
+        if (name) {
+            result += std::string(indent, ' ') + "name: " + std::string(name->name) + ",\n";
+        };
+
+        if (!genericParams.empty())
+            result += std::string(indent, ' ') + "genericParams: " + utils::node::nodeListString(sources, genericParams, indent + 1, verbose) + "\n";
+
+        if (!genericConstraints.empty())
+            result += std::string(indent, ' ') + "genericConstraints: " + utils::node::nodeListString(sources, genericConstraints, indent + 1, verbose) + "\n";
+
+        if (!memberDeclarations.empty())
+            result += std::string(indent, ' ') + "memberDeclarations: " + utils::node::nodeListString(sources, memberDeclarations, indent + 1, verbose) + "\n";
+
+        result += std::string(indent - 1, ' ') + "}";
+        return result;
+    }
+
 }

@@ -6,66 +6,72 @@
 
 #include <string>
 
-enum class TokenType {
-    Bof,            // beginning of file
-    Eof,            // end of file
+namespace racc::lexer {
 
-    Identifier,
-    Discard,        // _
+    enum class TokenType {
+        Bof,            // beginning of file
+        Eof,            // end of file
 
-    Use,            // use
-    Mod,            // mod
-    Enum,           // enum
-    Interface,      // interface
-    Fn,             // fn
-    Struct,         // struct
-    Destructures,   // destructures
-    Into,           // into
-    DestructuresInto, // destructures into
-    Alias,          // alias
-    Let,            // let
-    Pub,            // pub
-    Where,          // where
-    Get,            // get
-    Set,            // set
-    Mut,            // mut
-    Ref,            // ref
-    Impl,           // impl
-    On,             // on
-    Static,         // static
-    For,            // for
-    Value,          // value
-    As,          // as
+        Identifier,
+        Discard,        // _
 
-    Colon,          // :
-    PathSeparator,  // ::
+        Use,            // use
+        Mod,            // mod
+        Enum,           // enum
+        Interface,      // interface
+        Fn,             // fn
+        Struct,         // struct
+        Destructures,   // destructures
+        Into,           // into
+        DestructuresInto, // destructures into
+        Alias,          // alias
+        Let,            // let
+        Pub,            // pub
+        Where,          // where
+        Get,            // get
+        Set,            // set
+        Mut,            // mut
+        Ref,            // ref
+        Impl,           // impl
+        On,             // on
+        Static,         // static
+        For,            // for
+        Value,          // value
+        As,          // as
 
-    DashArrow,      // ->
+        Colon,          // :
+        PathSeparator,  // ::
 
-    Tilde,         // ~
+        DashArrow,      // ->
 
-    Equals,         // =
-    EqualArrow,     // =>
+        Tilde,         // ~
 
-    Semicolon,      // ;
-    Comma,          // ,
+        Equals,         // =
+        EqualArrow,     // =>
 
-    OpenCurly,      // {
-    CloseCurly,     // }
-    OpenParen,      // (
-    CloseParen,     // )
-    OpenAngle,      // <
-    CloseAngle,     // >
+        Semicolon,      // ;
+        Comma,          // ,
 
-    LessThan,       // <
-    GreaterThan,    // >
+        OpenCurly,      // {
+        CloseCurly,     // }
+        OpenParen,      // (
+        CloseParen,     // )
+        OpenAngle,      // <
+        CloseAngle,     // >
 
-    LineComment,    // //
-    MultiLineComment, // /* ... */
+        LessThan,       // <
+        GreaterThan,    // >
 
-    Error,
-};
+        LineComment,    // //
+        MultiLineComment, // /* ... */
 
-std::string_view TokenTypeName(TokenType type);
-std::string_view TokenTypeString(TokenType type);
-std::string TokenTypeStringQuoted(TokenType type);
+        Error,
+    };
+
+    std::string_view TokenTypeName(TokenType type);
+
+    std::string_view TokenTypeString(TokenType type);
+
+    std::string TokenTypeStringQuoted(TokenType type);
+
+}

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "predeclare.h"
+
 #include "TypeRef.h"
 
 #include <string>
@@ -12,41 +14,40 @@
 #include <memory>
 #include <map>
 
-class Struct;
-class Enum;
-class Alias;
-class Interface;
-class Source;
-class StructDeclaration;
-class EnumDeclaration;
-class AliasDeclaration;
-class InterfaceDeclaration;
-class UseMap;
-class Type;
-class ModuleRegistry;
+namespace racc::registry {
+    class Module {
+    public:
+        std::string path;
+        std::map<std::pair<std::string, uint8_t>, TypeRef, std::less<>> types;
 
-class Module {
-public:
-    std::string path;
-    std::map<std::pair<std::string, uint8_t>, TypeRef, std::less<>> types;
+        // std::map<std::string, Variable, std::less<>> vars;
+        // std::map<std::string, FunctionGroup, std::less<>> funcs;
 
-    // std::map<std::string, Variable, std::less<>> vars;
-    // std::map<std::string, FunctionGroup, std::less<>> funcs;
+        explicit Module(std::string name);
 
-    explicit Module(std::string  name);
-    Module(const Module&) = delete;
-    Module& operator=(const Module&) = delete;
-    Module(Module&&) noexcept;
-    Module& operator=(Module&&) noexcept;
-    ~Module();
+        Module(const Module &) = delete;
 
-    void addStruct(const std::shared_ptr<Source> &source, StructDeclaration &decl, const std::shared_ptr<UseMap> &useMap);
-    void addEnum(const std::shared_ptr<Source> &source, EnumDeclaration &decl, const std::shared_ptr<UseMap> &useMap);
-    void addAlias(const std::shared_ptr<Source> &source, AliasDeclaration &decl, const std::shared_ptr<UseMap> &useMap);
-    void addInterface(const std::shared_ptr<Source> &source, InterfaceDeclaration &decl, const std::shared_ptr<UseMap> &useMap);
+        Module &operator=(const Module &) = delete;
 
-    std::optional<TypeRef> getType(const std::string& name, uint8_t arity);
+        Module(Module &&) noexcept;
 
-    void populate(ModuleRegistry& registry);
-    void populateStructs();
-};
+        Module &operator=(Module &&) noexcept;
+
+        ~Module();
+
+        void addStruct(const std::shared_ptr<sourcemap::Source> &source, ast::StructDeclaration &decl, const std::shared_ptr<ast::UseMap> &useMap);
+
+        void addEnum(const std::shared_ptr<sourcemap::Source> &source, ast::EnumDeclaration &decl, const std::shared_ptr<ast::UseMap> &useMap);
+
+        void addAlias(const std::shared_ptr<sourcemap::Source> &source, ast::AliasDeclaration &decl, const std::shared_ptr<ast::UseMap> &useMap);
+
+        void addInterface(const std::shared_ptr<sourcemap::Source> &source, ast::InterfaceDeclaration &decl, const std::shared_ptr<ast::UseMap> &useMap);
+
+        std::optional<TypeRef> getType(const std::string &name, uint8_t arity);
+
+        void populate(ModuleRegistry &registry);
+
+        void populateStructs();
+    };
+
+}

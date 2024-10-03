@@ -7,20 +7,29 @@
 #include "GenericConstraintBase.h"
 #include "TypeSignature.h"
 
+namespace racc::ast {
 
-class InterfaceConstraint final : public GenericConstraintBase {
-public:
-    TypeSignature typeSignature;
+    class InterfaceConstraint final : public GenericConstraintBase {
+    public:
+        TypeSignature typeSignature;
 
-    [[nodiscard]] uint64_t start() const override;
-    [[nodiscard]] uint64_t end() const override;
+        [[nodiscard]] uint64_t start() const override;
 
-    InterfaceConstraint();
-    InterfaceConstraint(const InterfaceConstraint&) = delete;
-    InterfaceConstraint& operator=(const InterfaceConstraint&) = delete;
-    InterfaceConstraint(InterfaceConstraint&& other) noexcept;
-    InterfaceConstraint& operator=(InterfaceConstraint&& other) noexcept;
-    ~InterfaceConstraint() override;
+        [[nodiscard]] uint64_t end() const override;
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
-};
+        InterfaceConstraint();
+
+        InterfaceConstraint(const InterfaceConstraint &) = delete;
+
+        InterfaceConstraint &operator=(const InterfaceConstraint &) = delete;
+
+        InterfaceConstraint(InterfaceConstraint &&other) noexcept;
+
+        InterfaceConstraint &operator=(InterfaceConstraint &&other) noexcept;
+
+        ~InterfaceConstraint() override;
+
+        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+    };
+
+}

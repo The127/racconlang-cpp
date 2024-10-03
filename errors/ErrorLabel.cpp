@@ -4,26 +4,30 @@
 
 #include "ErrorLabel.h"
 
-ErrorLabel::ErrorLabel(SimpleErrorLabel label)
-    : item(std::move(label)) {
-}
+namespace racc::errors {
 
-ErrorLabel::ErrorLabel(ErrorLabelGroup group)
-    : item(std::move(group)) {
-}
+    ErrorLabel::ErrorLabel(SimpleErrorLabel label)
+            : item(std::move(label)) {
+    }
 
-bool ErrorLabel::isSimpleLabel() const {
-    return std::holds_alternative<SimpleErrorLabel>(item);
-}
+    ErrorLabel::ErrorLabel(ErrorLabelGroup group)
+            : item(std::move(group)) {
+    }
 
-bool ErrorLabel::isLabelGroup() const {
-    return std::holds_alternative<ErrorLabelGroup>(item);
-}
+    bool ErrorLabel::isSimpleLabel() const {
+        return std::holds_alternative<SimpleErrorLabel>(item);
+    }
 
-const SimpleErrorLabel & ErrorLabel::simpleLabel() const {
-    return std::get<SimpleErrorLabel>(item);
-}
+    bool ErrorLabel::isLabelGroup() const {
+        return std::holds_alternative<ErrorLabelGroup>(item);
+    }
 
-const ErrorLabelGroup & ErrorLabel::labelGroup() const {
-    return std::get<ErrorLabelGroup>(item);
+    const SimpleErrorLabel &ErrorLabel::simpleLabel() const {
+        return std::get<SimpleErrorLabel>(item);
+    }
+
+    const ErrorLabelGroup &ErrorLabel::labelGroup() const {
+        return std::get<ErrorLabelGroup>(item);
+    }
+
 }

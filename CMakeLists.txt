@@ -22,7 +22,7 @@ add_library(racc STATIC
         ast/AliasDeclaration.cpp
         ast/ModuleVariableDeclaration.cpp
         ast/ConstraintDeclaration.cpp
-        ast/GenericConstraint.cpp
+        ast/GenericConstraintBase.cpp
         ast/InterfaceConstraint.cpp
         ast/Signature.cpp
         ast/TypeSignature.cpp
@@ -71,15 +71,9 @@ add_library(racc STATIC
         registry/EnumMember.cpp
         registry/TypeRef.cpp
         registry/BuiltinType.cpp
-        registry/BuiltinType.h
         registry/InterfaceGetter.cpp
-        registry/InterfaceGetter.h
         registry/InterfaceSetter.cpp
-        registry/InterfaceSetter.h
         registry/InterfaceMethod.cpp
-        registry/InterfaceMethod.h
-        registry/Argument.cpp
-        registry/Argument.h
 )
 
 

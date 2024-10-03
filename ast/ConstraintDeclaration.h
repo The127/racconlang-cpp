@@ -13,23 +13,32 @@
 
 #include "GenericConstraintBase.h"
 
-class ConstraintDeclaration final : public Node {
-public:
-    uint64_t startPos;
-    uint64_t endPos;
-    std::optional<Identifier> name;
-    std::vector<std::unique_ptr<GenericConstraintBase>> constraints;
+namespace racc::ast {
 
-    ConstraintDeclaration();
-    ConstraintDeclaration(const ConstraintDeclaration&) = delete;
-    ConstraintDeclaration& operator=(const ConstraintDeclaration&) = delete;
-    ConstraintDeclaration(ConstraintDeclaration&&) noexcept;
-    ConstraintDeclaration& operator=(ConstraintDeclaration&&) noexcept;
-    ~ConstraintDeclaration() override;
+    class ConstraintDeclaration final : public Node {
+    public:
+        uint64_t startPos;
+        uint64_t endPos;
+        std::optional<Identifier> name;
+        std::vector<std::unique_ptr<GenericConstraintBase>> constraints;
 
-    [[nodiscard]] uint64_t start() const override;
+        ConstraintDeclaration();
 
-    [[nodiscard]] uint64_t end() const override;
+        ConstraintDeclaration(const ConstraintDeclaration &) = delete;
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
-};
+        ConstraintDeclaration &operator=(const ConstraintDeclaration &) = delete;
+
+        ConstraintDeclaration(ConstraintDeclaration &&) noexcept;
+
+        ConstraintDeclaration &operator=(ConstraintDeclaration &&) noexcept;
+
+        ~ConstraintDeclaration() override;
+
+        [[nodiscard]] uint64_t start() const override;
+
+        [[nodiscard]] uint64_t end() const override;
+
+        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+    };
+
+}

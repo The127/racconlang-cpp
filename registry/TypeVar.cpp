@@ -1,9 +1,13 @@
 #include "TypeVar.h"
 
-TypeVar::TypeVar(std::string name) : name(std::move(name)) {}
+namespace racc::registry {
 
-TypeVar &TypeVar::operator=(TypeVar &&) noexcept = default;
+    TypeVar::TypeVar(std::string name) : name(std::move(name)) {}
 
-TypeVar::TypeVar(TypeVar &&) noexcept = default;
+    TypeVar &TypeVar::operator=(TypeVar &&) noexcept = default;
 
-TypeVar::~TypeVar() = default;
+    TypeVar::TypeVar(TypeVar &&) noexcept = default;
+
+    TypeVar::~TypeVar() = default;
+
+}

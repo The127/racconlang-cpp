@@ -4,54 +4,67 @@
 
 
 #pragma once
+
+#include "predeclare.h"
+
+#include "ErrorCode.h"
+
 #include <cstdint>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "ErrorCode.h"
-#include "ErrorLabel.h"
-#include "../lexer/Token.h"
-#include "../lexer/TokenResult.h"
-#include "../lexer/TokenTree.h"
-
-class CompilerError {
-public:
-    ErrorCode code;
-    uint64_t position;
-    std::vector<ErrorLabel> labels;
-    std::optional<std::string> note;
 #ifndef NDEBUG
-    std::stacktrace stacktrace;
+#include <stacktrace>
 #endif
 
 
-    CompilerError(ErrorCode code, uint64_t position);
-    CompilerError(ErrorCode code, const Token &token);
-    CompilerError(const CompilerError&) = delete;
-    CompilerError& operator=(const CompilerError&) = delete;
-    CompilerError(CompilerError&&) noexcept;
-    CompilerError& operator=(CompilerError&&) noexcept;
-    ~CompilerError();
+namespace racc::errors {
+    class CompilerError {
+    public:
+        ErrorCode code;
+        uint64_t position;
+        std::vector<ErrorLabel> labels;
+        std::optional<std::string> note;
+#ifndef NDEBUG
+        std::stacktrace stacktrace;
+#endif
 
-    void addLabel(const ErrorLabel &label);
 
-    void addLabel(const std::string &text, uint64_t start, uint64_t end);
+        CompilerError(ErrorCode code, uint64_t position);
 
-    void addLabel(const std::string &text, uint64_t pos);
+        CompilerError(ErrorCode code, const lexer::Token &token);
 
-    void addLabel(const std::string &text, const Token &startToken, const Token &endToken);
+        CompilerError(const CompilerError &) = delete;
 
-    void addLabel(const std::string &text, const Token &token);
+        CompilerError &operator=(const CompilerError &) = delete;
 
-    void addLabel(const std::string &text, const TokenResult &result);
+        CompilerError(CompilerError &&) noexcept;
 
-    void addLabel(const std::string &text, const TokenResult &startResult, const TokenResult &endResult);
+        CompilerError &operator=(CompilerError &&) noexcept;
 
-    void addLabel(const std::string &text, const TokenTree &tree);
+        ~CompilerError();
 
-    void addLabel(const std::string &text, const TokenTreeNode &node);
+        void addLabel(const ErrorLabel &label);
 
-    void setNote(const std::string& note);
-};
+        void addLabel(const std::string &text, uint64_t start, uint64_t end);
+
+        void addLabel(const std::string &text, uint64_t pos);
+
+        void addLabel(const std::string &text, const lexer::Token &startToken, const lexer::Token &endToken);
+
+        void addLabel(const std::string &text, const lexer::Token &token);
+
+        void addLabel(const std::string &text, const lexer::TokenResult &result);
+
+        void addLabel(const std::string &text, const lexer::TokenResult &startResult, const lexer::TokenResult &endResult);
+
+        void addLabel(const std::string &text, const lexer::TokenTree &tree);
+
+        void addLabel(const std::string &text, const lexer::TokenTreeNode &node);
+
+        void setNote(const std::string &note);
+    };
+
+}

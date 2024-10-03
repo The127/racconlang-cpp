@@ -7,25 +7,34 @@
 #include "Node.h"
 #include "ReturnType.h"
 
+namespace racc::ast {
 
-class InterfaceGetterDeclaration final : public Node {
-public:
-    uint64_t startPos{};
-    uint64_t endPos{};
-    bool isMut{};
-    std::optional<Identifier> name;
-    std::optional<ReturnType> returnType;
+    class InterfaceGetterDeclaration final : public Node {
+    public:
+        uint64_t startPos{};
+        uint64_t endPos{};
+        bool isMut{};
+        std::optional<Identifier> name;
+        std::optional<ReturnType> returnType;
 
-    InterfaceGetterDeclaration();
-    InterfaceGetterDeclaration(const InterfaceGetterDeclaration&) = delete;
-    InterfaceGetterDeclaration& operator=(const InterfaceGetterDeclaration&) = delete;
-    InterfaceGetterDeclaration(InterfaceGetterDeclaration&&) noexcept;
-    InterfaceGetterDeclaration& operator=(InterfaceGetterDeclaration&&) noexcept;
-    ~InterfaceGetterDeclaration() override;
+        InterfaceGetterDeclaration();
 
-    [[nodiscard]] uint64_t start() const override;
-    [[nodiscard]] uint64_t end() const override;
+        InterfaceGetterDeclaration(const InterfaceGetterDeclaration &) = delete;
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
+        InterfaceGetterDeclaration &operator=(const InterfaceGetterDeclaration &) = delete;
 
-};
+        InterfaceGetterDeclaration(InterfaceGetterDeclaration &&) noexcept;
+
+        InterfaceGetterDeclaration &operator=(InterfaceGetterDeclaration &&) noexcept;
+
+        ~InterfaceGetterDeclaration() override;
+
+        [[nodiscard]] uint64_t start() const override;
+
+        [[nodiscard]] uint64_t end() const override;
+
+        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+
+    };
+
+}

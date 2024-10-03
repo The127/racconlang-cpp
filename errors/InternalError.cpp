@@ -3,3 +3,5 @@
 //
 
 #include "InternalError.h"
+
+namespace racc::errors {}

@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace StringUtils {
+namespace racc::utils::string {
 
     template<typename T1, typename T2>
     static std::string join(const T1 &values, const T2 &delimiter) {
@@ -28,18 +28,4 @@ namespace StringUtils {
         return result.str();
     }
 
-
-//    template<typename T>
-//    static std::string join(const std::vector<T>& values, const std::string &delimiter) {
-//        std::stringstream result;
-//
-//        for (const auto &value : values) {
-//            result << value;
-//            if(&value != &values.back()) {
-//                result << delimiter;
-//            }
-//        }
-//
-//        return result.str();
-//    }
 }

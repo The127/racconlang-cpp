@@ -9,24 +9,34 @@
 #include "Identifier.h"
 #include "ReturnType.h"
 
-class ImplGetter final : public Node {
-public:
-    uint64_t startPos{};
-    uint64_t endPos{};
-    bool isPublic{};
-    bool isMut{};
-    std::optional<Identifier> name;
-    std::optional<ReturnType> returnType;
+namespace racc::ast {
 
-    ImplGetter();
-    ImplGetter(const ImplGetter&) = delete;
-    ImplGetter& operator=(const ImplGetter&) = delete;
-    ImplGetter(ImplGetter&&) noexcept;
-    ImplGetter& operator=(ImplGetter&&) noexcept;
-    ~ImplGetter() override;
+    class ImplGetter final : public Node {
+    public:
+        uint64_t startPos{};
+        uint64_t endPos{};
+        bool isPublic{};
+        bool isMut{};
+        std::optional<Identifier> name;
+        std::optional<ReturnType> returnType;
 
-    [[nodiscard]] uint64_t start() const override;
-    [[nodiscard]] uint64_t end() const override;
+        ImplGetter();
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
-};
+        ImplGetter(const ImplGetter &) = delete;
+
+        ImplGetter &operator=(const ImplGetter &) = delete;
+
+        ImplGetter(ImplGetter &&) noexcept;
+
+        ImplGetter &operator=(ImplGetter &&) noexcept;
+
+        ~ImplGetter() override;
+
+        [[nodiscard]] uint64_t start() const override;
+
+        [[nodiscard]] uint64_t end() const override;
+
+        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+    };
+
+}

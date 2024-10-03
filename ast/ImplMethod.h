@@ -4,36 +4,44 @@
 
 
 #pragma once
+
+#include "predeclare.h"
+
 #include "Node.h"
 #include "Identifier.h"
 #include "ReturnType.h"
 
+namespace racc::ast {
+    class ImplMethod final : public Node {
+    public:
+        uint64_t startPos{};
+        uint64_t endPos{};
+        bool isPublic{};
+        bool isStatic{};
+        bool isMut{};
+        std::optional<Identifier> name;
+        std::vector<Identifier> genericParams;
+        std::vector<ConstraintDeclaration> genericConstraints;
+        std::vector<Parameter> parameters;
+        std::optional<ReturnType> returnType;
 
-class Parameter;
-class ConstraintDeclaration;
+        ImplMethod();
 
-class ImplMethod final : public Node {
-public:
-    uint64_t startPos{};
-    uint64_t endPos{};
-    bool isPublic{};
-    bool isStatic{};
-    bool isMut{};
-    std::optional<Identifier> name;
-    std::vector<Identifier> genericParams;
-    std::vector<ConstraintDeclaration> genericConstraints;
-    std::vector<Parameter> parameters;
-    std::optional<ReturnType> returnType;
+        ImplMethod(const ImplMethod &) = delete;
 
-    ImplMethod();
-    ImplMethod(const ImplMethod&) = delete;
-    ImplMethod& operator=(const ImplMethod&) = delete;
-    ImplMethod(ImplMethod&&) noexcept;
-    ImplMethod& operator=(ImplMethod&&) noexcept;
-    ~ImplMethod() override;
+        ImplMethod &operator=(const ImplMethod &) = delete;
 
-    [[nodiscard]] uint64_t start() const override;
-    [[nodiscard]] uint64_t end() const override;
+        ImplMethod(ImplMethod &&) noexcept;
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
-};
+        ImplMethod &operator=(ImplMethod &&) noexcept;
+
+        ~ImplMethod() override;
+
+        [[nodiscard]] uint64_t start() const override;
+
+        [[nodiscard]] uint64_t end() const override;
+
+        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+    };
+
+}

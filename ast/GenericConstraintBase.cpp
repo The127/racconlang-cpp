@@ -3,3 +3,5 @@
 //
 
 #include "GenericConstraintBase.h"
+
+namespace racc::ast {}

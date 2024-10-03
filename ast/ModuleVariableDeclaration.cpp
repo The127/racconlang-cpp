@@ -6,32 +6,39 @@
 
 #include "utils/NodeUtils.h"
 
-ModuleVariableDeclaration::ModuleVariableDeclaration() = default;
-ModuleVariableDeclaration::ModuleVariableDeclaration(ModuleVariableDeclaration &&) noexcept = default;
-ModuleVariableDeclaration & ModuleVariableDeclaration::operator=(ModuleVariableDeclaration &&) noexcept = default;
-ModuleVariableDeclaration::~ModuleVariableDeclaration() = default;
+namespace racc::ast {
 
-uint64_t ModuleVariableDeclaration::start() const {
-    return startPos;
-}
+    ModuleVariableDeclaration::ModuleVariableDeclaration() = default;
 
-uint64_t ModuleVariableDeclaration::end() const {
-    return endPos;
-}
+    ModuleVariableDeclaration::ModuleVariableDeclaration(ModuleVariableDeclaration &&) noexcept = default;
 
-std::string ModuleVariableDeclaration::toString(const SourceMap &sources, const int indent, const bool verbose) const {
-    std::string result = NodeUtils::nameString(*this, "ModuleVariableDeclaration", verbose) + "{\n";
+    ModuleVariableDeclaration &ModuleVariableDeclaration::operator=(ModuleVariableDeclaration &&) noexcept = default;
 
-    result += std::string(indent, ' ') + "isPublic: " + std::to_string(isPublic) + ",\n";
+    ModuleVariableDeclaration::~ModuleVariableDeclaration() = default;
 
-    if (name) {
-        result += std::string(indent, ' ') + "name: " + std::string(name->name) + ",\n";
+    uint64_t ModuleVariableDeclaration::start() const {
+        return startPos;
     }
 
-    if (type) {
-        result += std::string(indent, ' ') + "returnType: " + (*type).toString(sources, indent + 1, verbose) + "\n";
+    uint64_t ModuleVariableDeclaration::end() const {
+        return endPos;
     }
 
-    result += std::string(indent - 1, ' ') + "}";
-    return result;
+    std::string ModuleVariableDeclaration::toString(const sourcemap::SourceMap &sources, const int indent, const bool verbose) const {
+        std::string result = utils::node::nameString(*this, "ModuleVariableDeclaration", verbose) + "{\n";
+
+        result += std::string(indent, ' ') + "isPublic: " + std::to_string(isPublic) + ",\n";
+
+        if (name) {
+            result += std::string(indent, ' ') + "name: " + std::string(name->name) + ",\n";
+        }
+
+        if (type) {
+            result += std::string(indent, ' ') + "returnType: " + (*type).toString(sources, indent + 1, verbose) + "\n";
+        }
+
+        result += std::string(indent - 1, ' ') + "}";
+        return result;
+    }
+
 }

@@ -1,25 +1,33 @@
 #pragma once
 
-#include <string>
+#include "predeclare.h"
 
 #include "TypeRefImpl.h"
 
-class Interface;
+#include <string>
+#include <memory>
+
+namespace racc::registry {
+    class InterfaceMethod {
+    public:
+        std::string name;
+        bool mutReturn;
+        std::unique_ptr<TypeRef> returnType;
 
 
-class InterfaceMethod {
-public:
-    std::string name;
-    bool mutReturn;
-    TypeRef returnType;
+        Interface *interface;
 
+        InterfaceMethod();
 
-    Interface* interface;
+        ~InterfaceMethod();
 
-    InterfaceMethod();
-    ~InterfaceMethod();
-    InterfaceMethod(const InterfaceMethod&) = delete;
-    InterfaceMethod& operator=(const InterfaceMethod&) = delete;
-    InterfaceMethod(InterfaceMethod&&) noexcept;
-    InterfaceMethod& operator=(InterfaceMethod&&) noexcept;
-};
+        InterfaceMethod(const InterfaceMethod &) = delete;
+
+        InterfaceMethod &operator=(const InterfaceMethod &) = delete;
+
+        InterfaceMethod(InterfaceMethod &&) noexcept;
+
+        InterfaceMethod &operator=(InterfaceMethod &&) noexcept;
+    };
+
+}

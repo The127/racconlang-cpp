@@ -8,21 +8,26 @@
 
 #include "SimpleErrorLabel.h"
 
+namespace racc::errors {
 
-class ErrorLabelGroup {
-public:
+    class ErrorLabelGroup {
+    public:
 
-    ErrorLabelGroup(std::string text, uint64_t start, uint64_t end);
+        ErrorLabelGroup(std::string text, uint64_t start, uint64_t end);
 
-    void addLabel(SimpleErrorLabel label);
+        void addLabel(SimpleErrorLabel label);
 
-    [[nodiscard]] uint64_t start() const;
-    [[nodiscard]] uint64_t end() const;
-    [[nodiscard]] std::string_view text() const;
+        [[nodiscard]] uint64_t start() const;
 
-private:
-    std::string _text;
-    uint64_t _start;
-    uint64_t _end;
-    std::vector<SimpleErrorLabel> labels;
-};
+        [[nodiscard]] uint64_t end() const;
+
+        [[nodiscard]] std::string_view text() const;
+
+    private:
+        std::string _text;
+        uint64_t _start;
+        uint64_t _end;
+        std::vector<SimpleErrorLabel> labels;
+    };
+
+}

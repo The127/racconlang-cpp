@@ -6,24 +6,31 @@
 
 #include "utils/NodeUtils.h"
 
-uint64_t InterfaceConstraint::start() const {
-    return typeSignature.start();
-}
+namespace racc::ast {
 
-uint64_t InterfaceConstraint::end() const {
-    return typeSignature.end();
-}
+    uint64_t InterfaceConstraint::start() const {
+        return typeSignature.start();
+    }
 
-InterfaceConstraint::InterfaceConstraint() = default;
-InterfaceConstraint::InterfaceConstraint(InterfaceConstraint &&other) noexcept = default;
-InterfaceConstraint & InterfaceConstraint::operator=(InterfaceConstraint &&other) noexcept = default;
-InterfaceConstraint::~InterfaceConstraint() = default;
+    uint64_t InterfaceConstraint::end() const {
+        return typeSignature.end();
+    }
 
-std::string InterfaceConstraint::toString(const SourceMap &sources, int indent, bool verbose) const {
-    std::string result = NodeUtils::nameString(*this, "InterfaceConstraint", verbose) + "{\n";
+    InterfaceConstraint::InterfaceConstraint() = default;
 
-    result += std::string(indent, ' ') + "typeSignature: " + typeSignature.toString(sources, indent+1, verbose) + ",\n";
+    InterfaceConstraint::InterfaceConstraint(InterfaceConstraint &&other) noexcept = default;
 
-    result += std::string(indent - 1, ' ') + "}";
-    return result;
+    InterfaceConstraint &InterfaceConstraint::operator=(InterfaceConstraint &&other) noexcept = default;
+
+    InterfaceConstraint::~InterfaceConstraint() = default;
+
+    std::string InterfaceConstraint::toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const {
+        std::string result = utils::node::nameString(*this, "InterfaceConstraint", verbose) + "{\n";
+
+        result += std::string(indent, ' ') + "typeSignature: " + typeSignature.toString(sources, indent + 1, verbose) + ",\n";
+
+        result += std::string(indent - 1, ' ') + "}";
+        return result;
+    }
+
 }

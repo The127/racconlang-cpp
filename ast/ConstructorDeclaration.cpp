@@ -7,38 +7,45 @@
 
 #include "utils/NodeUtils.h"
 
-ConstructorDeclaration::ConstructorDeclaration() = default;
-ConstructorDeclaration::ConstructorDeclaration(ConstructorDeclaration &&) noexcept = default;
-ConstructorDeclaration & ConstructorDeclaration::operator=(ConstructorDeclaration &&) noexcept = default;
-ConstructorDeclaration::~ConstructorDeclaration() = default;
+namespace racc::ast {
 
-uint64_t ConstructorDeclaration::start() const {
-    return startPos;
-}
+    ConstructorDeclaration::ConstructorDeclaration() = default;
 
-uint64_t ConstructorDeclaration::end() const {
-    return endPos;
-}
+    ConstructorDeclaration::ConstructorDeclaration(ConstructorDeclaration &&) noexcept = default;
 
-std::string ConstructorDeclaration::toString(const SourceMap &sources, const int indent, const bool verbose) const {
-    std::string result = NodeUtils::nameString(*this, "ConstructorDeclaration", verbose) + "{\n";
+    ConstructorDeclaration &ConstructorDeclaration::operator=(ConstructorDeclaration &&) noexcept = default;
 
-    result += std::string(indent, ' ') + "isPublic: " + std::to_string(isPublic) + ",\n";
+    ConstructorDeclaration::~ConstructorDeclaration() = default;
 
-    if(name) {
-        result += std::string(indent, ' ') + "name: " + std::string(name->name) + ",\n";
+    uint64_t ConstructorDeclaration::start() const {
+        return startPos;
     }
 
-    if(!parameters.empty()) {
-        result += std::string(indent, ' ') + "parameters: " + NodeUtils::nodeListString(sources, parameters, indent + 1, verbose) + "\n";
+    uint64_t ConstructorDeclaration::end() const {
+        return endPos;
     }
 
-    if(otherName) {
-        result += std::string(indent, ' ') + "otherName: " + std::string(otherName->name) + ",\n";
+    std::string ConstructorDeclaration::toString(const sourcemap::SourceMap &sources, const int indent, const bool verbose) const {
+        std::string result = utils::node::nameString(*this, "ConstructorDeclaration", verbose) + "{\n";
+
+        result += std::string(indent, ' ') + "isPublic: " + std::to_string(isPublic) + ",\n";
+
+        if (name) {
+            result += std::string(indent, ' ') + "name: " + std::string(name->name) + ",\n";
+        }
+
+        if (!parameters.empty()) {
+            result += std::string(indent, ' ') + "parameters: " + utils::node::nodeListString(sources, parameters, indent + 1, verbose) + "\n";
+        }
+
+        if (otherName) {
+            result += std::string(indent, ' ') + "otherName: " + std::string(otherName->name) + ",\n";
+        }
+
+        //TODO: expressions for other name
+
+        result += std::string(indent - 1, ' ') + "}";
+        return result;
     }
 
-    //TODO: expressions for other name
-
-    result += std::string(indent - 1, ' ') + "}";
-    return result;
 }

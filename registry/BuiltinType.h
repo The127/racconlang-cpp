@@ -2,18 +2,26 @@
 
 #include "TypeRef.h"
 
-class BuiltinType {
-public:
-    std::string name;
-    size_t size;
-    WeakTypeRef type;
+namespace racc::registry {
 
-    BuiltinType(std::string name, size_t size);
+    class BuiltinType {
+    public:
+        std::string name;
+        size_t size;
+        WeakTypeRef type;
 
-    ~BuiltinType();
-    BuiltinType(const BuiltinType&) = delete;
-    BuiltinType& operator=(const BuiltinType&) = delete;
-    BuiltinType(BuiltinType&&) noexcept;
-    BuiltinType& operator=(BuiltinType&&) noexcept;
+        BuiltinType(std::string name, size_t size);
 
-};
+        ~BuiltinType();
+
+        BuiltinType(const BuiltinType &) = delete;
+
+        BuiltinType &operator=(const BuiltinType &) = delete;
+
+        BuiltinType(BuiltinType &&) noexcept;
+
+        BuiltinType &operator=(BuiltinType &&) noexcept;
+
+    };
+
+}

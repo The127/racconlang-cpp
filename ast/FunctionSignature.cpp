@@ -9,30 +9,37 @@
 
 #include "FunctionSignature.h"
 
-FunctionSignature::FunctionSignature() = default;
-FunctionSignature::FunctionSignature(FunctionSignature &&) noexcept = default;
-FunctionSignature & FunctionSignature::operator=(FunctionSignature &&) noexcept = default;
-FunctionSignature::~FunctionSignature() = default;
+namespace racc::ast {
 
-uint64_t FunctionSignature::start() const {
-    return startPos;
-}
+    FunctionSignature::FunctionSignature() = default;
 
-uint64_t FunctionSignature::end() const {
-    return endPos;
-}
+    FunctionSignature::FunctionSignature(FunctionSignature &&) noexcept = default;
 
-std::string FunctionSignature::toString(const SourceMap &sources, int indent, bool verbose) const {
-    std::string result = NodeUtils::nameString(*this, "FunctionSignature", verbose) + "{\n";
+    FunctionSignature &FunctionSignature::operator=(FunctionSignature &&) noexcept = default;
 
-    if(!parameterTypes.empty()) {
-        result += std::string(indent, ' ') + "parameterTypes: " + NodeUtils::nodeListString(sources, parameterTypes, indent + 1, verbose) + "\n";
+    FunctionSignature::~FunctionSignature() = default;
+
+    uint64_t FunctionSignature::start() const {
+        return startPos;
     }
 
-    if(returnType) {
-        result += (*returnType).toString(sources, indent + 1, verbose) + "\n";
+    uint64_t FunctionSignature::end() const {
+        return endPos;
     }
 
-    result += std::string(indent - 1, ' ') + "}";
-    return result;
+    std::string FunctionSignature::toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const {
+        std::string result = utils::node::nameString(*this, "FunctionSignature", verbose) + "{\n";
+
+        if (!parameterTypes.empty()) {
+            result += std::string(indent, ' ') + "parameterTypes: " + utils::node::nodeListString(sources, parameterTypes, indent + 1, verbose) + "\n";
+        }
+
+        if (returnType) {
+            result += (*returnType).toString(sources, indent + 1, verbose) + "\n";
+        }
+
+        result += std::string(indent - 1, ' ') + "}";
+        return result;
+    }
+
 }

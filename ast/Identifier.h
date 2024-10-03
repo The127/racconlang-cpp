@@ -4,34 +4,44 @@
 
 
 #pragma once
-#include <string_view>
+
+#include "predeclare.h"
 
 #include "Node.h"
 #include "lexer/Token.h"
 
+#include <string_view>
+#include <memory>
 
-class Source;
+namespace racc::ast {
 
-class Identifier final : public Node {
-public:
-    Token identifier;
-    std::string_view name;
+    class Identifier final : public Node {
+    public:
+        lexer::Token identifier;
+        std::string_view name;
 
-    Identifier(const Identifier&);
-    Identifier& operator=(const Identifier&);
-    Identifier(Identifier&&) noexcept;
-    Identifier& operator=(Identifier&&) noexcept;
-    ~Identifier() override;
+        Identifier(const Identifier &);
 
-    static Identifier make(const Token &identifier, const std::shared_ptr<Source> &source);
+        Identifier &operator=(const Identifier &);
 
-    [[nodiscard]] uint64_t start() const override;
-    [[nodiscard]] uint64_t end() const override;
+        Identifier(Identifier &&) noexcept;
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
+        Identifier &operator=(Identifier &&) noexcept;
 
-    friend std::ostream & operator<< (std::ostream &out, const Identifier &identifier);
+        ~Identifier() override;
 
-private:
-    Identifier(const Token &identifier, const std::string_view& name);
-};
+        static Identifier make(const lexer::Token &identifier, const std::shared_ptr<sourcemap::Source> &source);
+
+        [[nodiscard]] uint64_t start() const override;
+
+        [[nodiscard]] uint64_t end() const override;
+
+        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+
+        friend std::ostream &operator<<(std::ostream &out, const Identifier &identifier);
+
+    private:
+        Identifier(const lexer::Token &identifier, const std::string_view &name);
+    };
+
+}

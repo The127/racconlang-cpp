@@ -4,10 +4,14 @@
 
 #include "UseMap.h"
 
-std::optional<std::string> UseMap::lookup(std::string_view name) const {
-    auto it = uses.find(name);
-    if (it == uses.end()) {
-        return std::nullopt;
+namespace racc::ast {
+
+    std::optional<std::string> UseMap::lookup(std::string_view name) const {
+        auto it = uses.find(name);
+        if (it == uses.end()) {
+            return std::nullopt;
+        }
+        return it->second;
     }
-    return it->second;
+
 }

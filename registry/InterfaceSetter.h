@@ -1,6 +1,9 @@
 #pragma once
 
+namespace racc::registry {
 
-class InterfaceSetterDeclaration {
+    class InterfaceSetterDeclaration {
 
-};
+    };
+
+}

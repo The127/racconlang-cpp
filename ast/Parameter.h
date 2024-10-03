@@ -11,26 +11,34 @@
 #include <optional>
 #include <memory>
 
+namespace racc::ast {
 
-class Parameter final : Node {
-public:
-    uint64_t startPos{};
-    uint64_t endPos{};
-    bool isMut{};
-    bool isRef{};
-    Identifier name;
-    std::optional<Signature> type;
+    class Parameter final : Node {
+    public:
+        uint64_t startPos{};
+        uint64_t endPos{};
+        bool isMut{};
+        bool isRef{};
+        Identifier name;
+        std::optional<Signature> type;
 
-    explicit Parameter(Identifier name);
-    Parameter(const Parameter&) = delete;
-    Parameter& operator=(const Parameter&) = delete;
-    Parameter(Parameter&&) noexcept;
-    Parameter& operator=(Parameter&&) noexcept;
-    ~Parameter() override;
+        explicit Parameter(Identifier name);
 
-    [[nodiscard]] uint64_t start() const override;
+        Parameter(const Parameter &) = delete;
 
-    [[nodiscard]] uint64_t end() const override;
+        Parameter &operator=(const Parameter &) = delete;
 
-    [[nodiscard]] std::string toString(const SourceMap &sources, int indent, bool verbose) const override;
-};
+        Parameter(Parameter &&) noexcept;
+
+        Parameter &operator=(Parameter &&) noexcept;
+
+        ~Parameter() override;
+
+        [[nodiscard]] uint64_t start() const override;
+
+        [[nodiscard]] uint64_t end() const override;
+
+        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+    };
+
+}
