@@ -2,24 +2,24 @@
 // Created by zoe on 12.09.24.
 //
 
-#include "InterfaceGetter.h"
+#include "InterfaceGetterDeclaration.h"
 
 #include "utils/NodeUtils.h"
 
-InterfaceGetter::InterfaceGetter() = default;
-InterfaceGetter::InterfaceGetter(InterfaceGetter &&) noexcept = default;
-InterfaceGetter & InterfaceGetter::operator=(InterfaceGetter &&) noexcept = default;
-InterfaceGetter::~InterfaceGetter() = default;
+InterfaceGetterDeclaration::InterfaceGetterDeclaration() = default;
+InterfaceGetterDeclaration::InterfaceGetterDeclaration(InterfaceGetterDeclaration &&) noexcept = default;
+InterfaceGetterDeclaration & InterfaceGetterDeclaration::operator=(InterfaceGetterDeclaration &&) noexcept = default;
+InterfaceGetterDeclaration::~InterfaceGetterDeclaration() = default;
 
-uint64_t InterfaceGetter::start() const {
+uint64_t InterfaceGetterDeclaration::start() const {
     return startPos;
 }
 
-uint64_t InterfaceGetter::end() const {
+uint64_t InterfaceGetterDeclaration::end() const {
     return endPos;
 }
 
-std::string InterfaceGetter::toString(const SourceMap &sources, const int indent, const bool verbose) const {
+std::string InterfaceGetterDeclaration::toString(const SourceMap &sources, const int indent, const bool verbose) const {
     std::string result = NodeUtils::nameString(*this, "InterfaceGetter", verbose) + "{\n";
 
     result += std::string(indent, ' ') + "isMut: " + std::to_string(isMut) + ",\n";

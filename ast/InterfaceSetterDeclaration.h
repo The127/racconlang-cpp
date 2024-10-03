@@ -9,19 +9,19 @@
 #include "Parameter.h"
 
 
-class InterfaceSetter final : public Node {
+class InterfaceSetterDeclaration final : public Node {
 public:
     uint64_t startPos{};
     uint64_t endPos{};
     std::optional<Identifier> name;
     std::optional<Parameter> parameter;
 
-    InterfaceSetter();
-    InterfaceSetter(const InterfaceSetter&) = delete;
-    InterfaceSetter& operator=(const InterfaceSetter&) = delete;
-    InterfaceSetter(InterfaceSetter&&) noexcept;
-    InterfaceSetter& operator=(InterfaceSetter&&) noexcept;
-    ~InterfaceSetter() override;
+    InterfaceSetterDeclaration();
+    InterfaceSetterDeclaration(const InterfaceSetterDeclaration&) = delete;
+    InterfaceSetterDeclaration& operator=(const InterfaceSetterDeclaration&) = delete;
+    InterfaceSetterDeclaration(InterfaceSetterDeclaration&&) noexcept;
+    InterfaceSetterDeclaration& operator=(InterfaceSetterDeclaration&&) noexcept;
+    ~InterfaceSetterDeclaration() override;
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;

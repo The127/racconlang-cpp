@@ -9,8 +9,8 @@
 #include "Identifier.h"
 #include "TypeSignature.h"
 
-class InterfaceSetter;
-class InterfaceGetter;
+class InterfaceSetterDeclaration;
+class InterfaceGetterDeclaration;
 class InterfaceMethodDeclaration;
 class ConstraintDeclaration;
 
@@ -24,8 +24,8 @@ public:
     std::vector<ConstraintDeclaration> genericConstraints;
     std::vector<TypeSignature> requiredInterfaces;
     std::vector<InterfaceMethodDeclaration> methods;
-    std::vector<InterfaceGetter> getters;
-    std::vector<InterfaceSetter> setters;
+    std::vector<InterfaceGetterDeclaration> getters;
+    std::vector<InterfaceSetterDeclaration> setters;
 
     InterfaceDeclaration();
     InterfaceDeclaration(const InterfaceDeclaration&) = delete;

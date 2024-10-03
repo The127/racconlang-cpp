@@ -72,6 +72,14 @@ add_library(racc STATIC
         registry/TypeRef.cpp
         registry/BuiltinType.cpp
         registry/BuiltinType.h
+        registry/InterfaceGetter.cpp
+        registry/InterfaceGetter.h
+        registry/InterfaceSetter.cpp
+        registry/InterfaceSetter.h
+        registry/InterfaceMethod.cpp
+        registry/InterfaceMethod.h
+        registry/Argument.cpp
+        registry/Argument.h
 )
 
 

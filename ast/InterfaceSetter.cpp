@@ -2,24 +2,24 @@
 // Created by zoe on 12.09.24.
 //
 
-#include "InterfaceSetter.h"
+#include "InterfaceSetterDeclaration.h"
 
 #include "utils/NodeUtils.h"
 
-InterfaceSetter::InterfaceSetter() = default;
-InterfaceSetter::InterfaceSetter(InterfaceSetter &&) noexcept = default;
-InterfaceSetter & InterfaceSetter::operator=(InterfaceSetter &&) noexcept = default;
-InterfaceSetter::~InterfaceSetter() = default;
+InterfaceSetterDeclaration::InterfaceSetterDeclaration() = default;
+InterfaceSetterDeclaration::InterfaceSetterDeclaration(InterfaceSetterDeclaration &&) noexcept = default;
+InterfaceSetterDeclaration & InterfaceSetterDeclaration::operator=(InterfaceSetterDeclaration &&) noexcept = default;
+InterfaceSetterDeclaration::~InterfaceSetterDeclaration() = default;
 
-uint64_t InterfaceSetter::start() const {
+uint64_t InterfaceSetterDeclaration::start() const {
     return startPos;
 }
 
-uint64_t InterfaceSetter::end() const {
+uint64_t InterfaceSetterDeclaration::end() const {
     return endPos;
 }
 
-std::string InterfaceSetter::toString(const SourceMap &sources, const int indent, const bool verbose) const {
+std::string InterfaceSetterDeclaration::toString(const SourceMap &sources, const int indent, const bool verbose) const {
     std::string result = NodeUtils::nameString(*this, "InterfaceSetter", verbose) + "{\n";
 
     if(name) {

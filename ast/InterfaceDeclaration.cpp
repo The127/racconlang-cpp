@@ -4,9 +4,9 @@
 
 #include "InterfaceDeclaration.h"
 #include "ConstraintDeclaration.h"
-#include "InterfaceGetter.h"
+#include "InterfaceGetterDeclaration.h"
 #include "InterfaceMethodDeclaration.h"
-#include "InterfaceSetter.h"
+#include "InterfaceSetterDeclaration.h"
 
 #include "utils/NodeUtils.h"
 

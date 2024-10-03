@@ -29,8 +29,8 @@ class ModuleDeclaration;
 class Source;
 class ReturnType;
 class PropertyDeclaration;
-class InterfaceSetter;
-class InterfaceGetter;
+class InterfaceSetterDeclaration;
+class InterfaceGetterDeclaration;
 class InterfaceMethodDeclaration;
 class EnumMemberDeclaration;
 class ConstraintDeclaration;
@@ -76,8 +76,8 @@ private:
 
     void interfaceRule(TokenTreeIterator& it, std::vector<Token> modifiers);
     InterfaceMethodDeclaration interfaceMethodRule(TokenTreeIterator& it, std::vector<Token> modifiers);
-    InterfaceGetter interfaceGetterRule(TokenTreeIterator& it, std::vector<Token> modifiers);
-    InterfaceSetter interfaceSetterRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    InterfaceGetterDeclaration interfaceGetterRule(TokenTreeIterator& it, std::vector<Token> modifiers);
+    InterfaceSetterDeclaration interfaceSetterRule(TokenTreeIterator& it, std::vector<Token> modifiers);
 
 
     void structRule(TokenTreeIterator& it, std::vector<Token> modifiers);

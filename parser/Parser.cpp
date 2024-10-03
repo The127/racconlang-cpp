@@ -21,9 +21,9 @@
 #include "ast/FunctionSignature.h"
 #include "ast/InterfaceConstraint.h"
 #include "ast/InterfaceDeclaration.h"
-#include "ast/InterfaceGetter.h"
+#include "ast/InterfaceGetterDeclaration.h"
 #include "ast/InterfaceMethodDeclaration.h"
-#include "ast/InterfaceSetter.h"
+#include "ast/InterfaceSetterDeclaration.h"
 #include "ast/ModuleDeclaration.h"
 #include "ast/ModuleVariableDeclaration.h"
 #include "ast/PropertyDeclaration.h"
@@ -738,10 +738,10 @@ InterfaceMethodDeclaration Parser::interfaceMethodRule(TokenTreeIterator &it,
     return decl;
 }
 
-InterfaceGetter Parser::interfaceGetterRule(TokenTreeIterator &it,
-                                            std::vector<Token> modifiers) {
+InterfaceGetterDeclaration Parser::interfaceGetterRule(TokenTreeIterator &it,
+                                                       std::vector<Token> modifiers) {
     auto getToken = consumeToken(it, TokenType::Get);
-    auto decl = InterfaceGetter();
+    auto decl = InterfaceGetterDeclaration();
     decl.startPos = getToken.start;
 
     validateModifiers(modifiers, {TokenType::Pub, TokenType::Mut});
@@ -803,10 +803,10 @@ InterfaceGetter Parser::interfaceGetterRule(TokenTreeIterator &it,
     return decl;
 }
 
-InterfaceSetter Parser::interfaceSetterRule(TokenTreeIterator &it,
-                                            std::vector<Token> modifiers) {
+InterfaceSetterDeclaration Parser::interfaceSetterRule(TokenTreeIterator &it,
+                                                       std::vector<Token> modifiers) {
     auto setToken = consumeToken(it, TokenType::Set);
-    auto decl = InterfaceSetter();
+    auto decl = InterfaceSetterDeclaration();
     decl.startPos = setToken.start;
 
     validateModifiers(modifiers, {TokenType::Pub});

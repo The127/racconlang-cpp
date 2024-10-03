@@ -8,7 +8,7 @@
 #include "ReturnType.h"
 
 
-class InterfaceGetter final : public Node {
+class InterfaceGetterDeclaration final : public Node {
 public:
     uint64_t startPos{};
     uint64_t endPos{};
@@ -16,12 +16,12 @@ public:
     std::optional<Identifier> name;
     std::optional<ReturnType> returnType;
 
-    InterfaceGetter();
-    InterfaceGetter(const InterfaceGetter&) = delete;
-    InterfaceGetter& operator=(const InterfaceGetter&) = delete;
-    InterfaceGetter(InterfaceGetter&&) noexcept;
-    InterfaceGetter& operator=(InterfaceGetter&&) noexcept;
-    ~InterfaceGetter() override;
+    InterfaceGetterDeclaration();
+    InterfaceGetterDeclaration(const InterfaceGetterDeclaration&) = delete;
+    InterfaceGetterDeclaration& operator=(const InterfaceGetterDeclaration&) = delete;
+    InterfaceGetterDeclaration(InterfaceGetterDeclaration&&) noexcept;
+    InterfaceGetterDeclaration& operator=(InterfaceGetterDeclaration&&) noexcept;
+    ~InterfaceGetterDeclaration() override;
 
     [[nodiscard]] uint64_t start() const override;
     [[nodiscard]] uint64_t end() const override;

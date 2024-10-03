@@ -10,7 +10,6 @@
 #include "ast/PropertyDeclaration.h"
 #include "ModuleRegistry.h"
 #include "TypeRefImpl.h"
-#include "TypeVar.h"
 #include "StructMember.h"
 
 
