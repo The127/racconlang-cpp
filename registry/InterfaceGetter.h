@@ -1,9 +1,7 @@
 #pragma once
 
-namespace racc::registry {
+#include "predeclare.h"
 
-    class InterfaceGetterDeclaration {
+class racc::registry::InterfaceGetter {
 
-    };
-
-}
+};

@@ -12,33 +12,30 @@
 
 #include <vector>
 
-namespace racc::ast {
-    class ConstructorDeclaration final : public Node {
-    public:
-        uint64_t startPos{};
-        uint64_t endPos{};
-        bool isPublic{};
-        std::optional<Identifier> name;
-        std::vector<Parameter> parameters;
-        std::optional<Identifier> otherName;
+class racc::ast::ConstructorDeclaration final : public Node {
+public:
+    uint64_t startPos{};
+    uint64_t endPos{};
+    bool isPublic{};
+    std::optional<Identifier> name;
+    std::vector<Parameter> parameters;
+    std::optional<Identifier> otherName;
 
-        ConstructorDeclaration();
+    ConstructorDeclaration();
 
-        ConstructorDeclaration(const ConstructorDeclaration &) = delete;
+    ConstructorDeclaration(const ConstructorDeclaration &) = delete;
 
-        ConstructorDeclaration &operator=(const ConstructorDeclaration &) = delete;
+    ConstructorDeclaration &operator=(const ConstructorDeclaration &) = delete;
 
-        ConstructorDeclaration(ConstructorDeclaration &&) noexcept;
+    ConstructorDeclaration(ConstructorDeclaration &&) noexcept;
 
-        ConstructorDeclaration &operator=(ConstructorDeclaration &&) noexcept;
+    ConstructorDeclaration &operator=(ConstructorDeclaration &&) noexcept;
 
-        ~ConstructorDeclaration() override;
+    ~ConstructorDeclaration() override;
 
-        [[nodiscard]] uint64_t start() const override;
+    [[nodiscard]] uint64_t start() const override;
 
-        [[nodiscard]] uint64_t end() const override;
+    [[nodiscard]] uint64_t end() const override;
 
-        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
-    };
-
-}
+    [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+};

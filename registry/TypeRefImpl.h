@@ -14,99 +14,90 @@
 #include <memory>
 #include <variant>
 
-namespace racc::registry {
+class racc::registry::TypeRef {
+private:
+    std::shared_ptr<TypeVariant> _type;
 
-    class TypeRef {
-    private:
-        std::shared_ptr<TypeVariant> type;
+    static TypeRef unknownRef;
 
-        static TypeRef unknownRef;
+    TypeRef() : _type(nullptr) {}
 
+public:
 
-        TypeRef() : type(nullptr) {}
+    explicit TypeRef(const std::weak_ptr<TypeVariant> &ptr) : _type(ptr) {}
 
-    public:
-        using Weak = std::weak_ptr<TypeVariant>;
+    template<typename T, typename...Args>
+    [[nodiscard]] static TypeRef make(Args &&...args) {
+        TypeRef t;
+        t._type = std::make_shared<TypeVariant>(T(std::forward<Args>(args)...));
+        std::get<T>(*t._type).type = t._type;
+        return t;
+    }
 
+    template<typename...Args>
+    [[nodiscard]] static TypeRef var(Args &&...args) {
+        return make<TypeVar>(std::forward<Args>(args)...);
+    }
 
-        explicit TypeRef(const std::weak_ptr<TypeVariant> &ptr) : type(ptr) {}
+    template<typename...Args>
+    [[nodiscard]] static TypeRef builtin(Args &&...args) {
+        return make<BuiltinType>(std::forward<Args>(args)...);
+    }
 
-        template<typename T, typename...Args>
-        [[nodiscard]] static TypeRef make(Args &&...args) {
-            TypeRef t;
-            t.type = std::make_shared<TypeVariant>(T(std::forward<Args>(args)...));
-            std::get<T>(*t.type).type = t.type;
-            return t;
+    [[nodiscard]] static TypeRef unknown() {
+        return unknownRef;
+    }
+
+    template<typename T>
+    [[nodiscard]] std::optional<std::shared_ptr<T>> as() {
+        if (_type && std::holds_alternative<T>(*_type)) {
+            return std::shared_ptr<T>(_type, &std::get<T>(*_type));
         }
+        return std::nullopt;
+    }
 
-        template<typename...Args>
-        [[nodiscard]] static TypeRef var(Args &&...args) {
-            return make<TypeVar>(std::forward<Args>(args)...);
+    template<typename T>
+    [[nodiscard]] std::optional<std::shared_ptr<const T>> as() const {
+        if (_type && std::holds_alternative<T>(*_type)) {
+            return std::shared_ptr<const T>(_type, &std::get<T>(*_type));
         }
+        return std::nullopt;
+    }
 
-        template<typename...Args>
-        [[nodiscard]] static TypeRef builtin(Args &&...args) {
-            return make<BuiltinType>(std::forward<Args>(args)...);
-        }
+    template<typename T>
+    [[nodiscard]] bool is() const {
+        return _type && std::holds_alternative<T>(*_type);
+    }
 
-        [[nodiscard]] static TypeRef unknown() {
-            return unknownRef;
-        }
+    void populate(ModuleRegistry &registry);
 
-        template<typename T>
-        [[nodiscard]] std::optional<std::shared_ptr<T>> as() {
-            if (type && std::holds_alternative<T>(*type)) {
-                return std::shared_ptr<T>(type, &std::get<T>(*type));
-            }
-            return std::nullopt;
-        }
+    [[nodiscard]] TypeRef concretize(ModuleRegistry &registry, const std::vector<TypeRef> &args) const;
 
-        template<typename T>
-        [[nodiscard]] std::optional<std::shared_ptr<const T>> as() const {
-            if (type && std::holds_alternative<T>(*type)) {
-                return std::shared_ptr<const T>(type, &std::get<T>(*type));
-            }
-            return std::nullopt;
-        }
+    [[nodiscard]] TypeRef substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const;
 
-        template<typename T>
-        [[nodiscard]] bool is() const {
-            return type && std::holds_alternative<T>(*type);
-        }
+    bool operator==(const TypeRef &other) const {
+        return _type == other._type;
+    }
 
-        void populate(ModuleRegistry &registry);
+    bool operator!=(const TypeRef &other) const {
+        return _type != other._type;
+    }
 
-        [[nodiscard]] TypeRef concretize(ModuleRegistry &registry, const std::vector<TypeRef> &args) const;
+    bool operator<(const TypeRef &other) const {
+        return _type < other._type;
+    }
 
-        [[nodiscard]] TypeRef substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const;
+    [[nodiscard]] bool isUnknown() const {
+        return _type == nullptr;
+    }
 
-        bool operator==(const TypeRef &other) const {
-            return type == other.type;
-        }
+    explicit operator bool() {
+        return _type != nullptr;
+    }
 
-        bool operator!=(const TypeRef &other) const {
-            return type != other.type;
-        }
+    [[nodiscard]] std::string_view declModulePath() const;
 
-        bool operator<(const TypeRef &other) const {
-            return type < other.type;
-        }
+    [[nodiscard]] bool isPublic() const;
 
-        [[nodiscard]] bool isUnknown() const {
-            return type == nullptr;
-        }
-
-        explicit operator bool() {
-            return type != nullptr;
-        }
-
-        [[nodiscard]] std::string_view declModulePath() const;
-
-        [[nodiscard]] bool isPublic() const;
-
-        [[nodiscard]] uint64_t declStart() const;
-    };
-
-    using WeakTypeRef = TypeRef::Weak;
-
-}
+    [[nodiscard]] uint64_t declStart() const;
+};

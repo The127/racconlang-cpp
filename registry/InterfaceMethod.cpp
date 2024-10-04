@@ -1,5 +1,9 @@
 #include "InterfaceMethod.h"
 
+#include "Parameter.h"
+
+
+
 namespace racc::registry {
 
     InterfaceMethod::InterfaceMethod() {

@@ -9,24 +9,21 @@
 #include <vector>
 #include <memory>
 
-namespace racc::errors {
-    class ErrorContext {
-    public:
-        std::vector<CompilerError> errors;
+class racc::errors::ErrorContext {
+public:
+    std::vector<CompilerError> errors;
 
-        ErrorContext();
+    ErrorContext();
 
-        ErrorContext(const ErrorContext &) = delete;
+    ErrorContext(const ErrorContext &) = delete;
 
-        ErrorContext &operator=(const ErrorContext &) = delete;
+    ErrorContext &operator=(const ErrorContext &) = delete;
 
-        ErrorContext(ErrorContext &&) noexcept;
+    ErrorContext(ErrorContext &&) noexcept;
 
-        ErrorContext &operator=(ErrorContext &&) noexcept;
+    ErrorContext &operator=(ErrorContext &&) noexcept;
 
-        void addError(CompilerError error);
+    void addError(CompilerError error);
 
-        void apply(const std::shared_ptr<sourcemap::Source> &source);
-    };
-
-}
+    void apply(const std::shared_ptr<sourcemap::Source> &source);
+};

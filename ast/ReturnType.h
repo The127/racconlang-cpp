@@ -4,35 +4,32 @@
 
 
 #pragma once
+
 #include "Node.h"
 #include "Signature.h"
 
-namespace racc::ast {
+class racc::ast::ReturnType final : public Node {
+public:
+    uint64_t startPos{};
+    uint64_t endPos{};
+    bool isMut{};
+    Signature type;
 
-    class ReturnType final : public Node {
-    public:
-        uint64_t startPos{};
-        uint64_t endPos{};
-        bool isMut{};
-        Signature type;
+    explicit ReturnType(Signature type);
 
-        explicit ReturnType(Signature type);
+    ReturnType(const ReturnType &) = delete;
 
-        ReturnType(const ReturnType &) = delete;
+    ReturnType &operator=(const ReturnType &) = delete;
 
-        ReturnType &operator=(const ReturnType &) = delete;
+    ReturnType(ReturnType &&) noexcept;
 
-        ReturnType(ReturnType &&) noexcept;
+    ReturnType &operator=(ReturnType &&) noexcept;
 
-        ReturnType &operator=(ReturnType &&) noexcept;
+    ~ReturnType() override;
 
-        ~ReturnType() override;
+    [[nodiscard]] uint64_t start() const override;
 
-        [[nodiscard]] uint64_t start() const override;
+    [[nodiscard]] uint64_t end() const override;
 
-        [[nodiscard]] uint64_t end() const override;
-
-        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
-    };
-
-}
+    [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+};

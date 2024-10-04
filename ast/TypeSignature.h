@@ -11,35 +11,32 @@
 #include <string>
 #include <vector>
 
-namespace racc::ast {
-    class TypeSignature final : public Node {
-    public:
-        uint64_t startPos{};
-        uint64_t endPos{};
+class racc::ast::TypeSignature final : public Node {
+public:
+    uint64_t startPos{};
+    uint64_t endPos{};
 
-        uint64_t genericStartPos{};
-        uint64_t genericEndPos{};
+    uint64_t genericStartPos{};
+    uint64_t genericEndPos{};
 
-        Path path;
-        std::vector<Signature> genericArguments;
+    Path path;
+    std::vector<Signature> genericArguments;
 
-        TypeSignature();
+    TypeSignature();
 
-        TypeSignature(const TypeSignature &) = delete;
+    TypeSignature(const TypeSignature &) = delete;
 
-        TypeSignature &operator=(const TypeSignature &) = delete;
+    TypeSignature &operator=(const TypeSignature &) = delete;
 
-        TypeSignature(TypeSignature &&) noexcept;
+    TypeSignature(TypeSignature &&) noexcept;
 
-        TypeSignature &operator=(TypeSignature &&) noexcept;
+    TypeSignature &operator=(TypeSignature &&) noexcept;
 
-        ~TypeSignature() override;
+    ~TypeSignature() override;
 
-        [[nodiscard]] uint64_t start() const override;
+    [[nodiscard]] uint64_t start() const override;
 
-        [[nodiscard]] uint64_t end() const override;
+    [[nodiscard]] uint64_t end() const override;
 
-        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
-    };
-
-}
+    [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+};

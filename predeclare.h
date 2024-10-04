@@ -52,6 +52,7 @@ namespace racc {
     namespace lexer {
         class Lexer;
         class LexerErr;
+        enum class LexerErrReason;
         class Token;
         class TokenResult;
         class TokenTree;
@@ -76,6 +77,8 @@ namespace racc {
         class InterfaceSetter;
         class Module;
         class ModuleRegistry;
+        class Parameter;
+        enum class ParameterMode;
         class Struct;
         class StructMember;
         class TupleType;

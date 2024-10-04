@@ -15,35 +15,32 @@
 #include <string>
 #include <vector>
 
-namespace racc::ast {
-    class InterfaceMethodDeclaration final : public Node {
-    public:
-        uint64_t startPos{};
-        uint64_t endPos{};
-        bool isMut{};
-        std::optional<Identifier> name;
-        std::vector<Identifier> genericParams;
-        std::vector<ConstraintDeclaration> genericConstraints;
-        std::vector<Parameter> parameters;
-        std::optional<ReturnType> returnType;
+class racc::ast::InterfaceMethodDeclaration final : public Node {
+public:
+    uint64_t startPos{};
+    uint64_t endPos{};
+    bool isMut{};
+    std::optional<Identifier> name;
+    std::vector<Identifier> genericParams;
+    std::vector<ConstraintDeclaration> genericConstraints;
+    std::vector<Parameter> parameters;
+    std::optional<ReturnType> returnType;
 
-        InterfaceMethodDeclaration();
+    InterfaceMethodDeclaration();
 
-        InterfaceMethodDeclaration(const InterfaceMethodDeclaration &) = delete;
+    InterfaceMethodDeclaration(const InterfaceMethodDeclaration &) = delete;
 
-        InterfaceMethodDeclaration &operator=(const InterfaceMethodDeclaration &) = delete;
+    InterfaceMethodDeclaration &operator=(const InterfaceMethodDeclaration &) = delete;
 
-        InterfaceMethodDeclaration(InterfaceMethodDeclaration &&) noexcept;
+    InterfaceMethodDeclaration(InterfaceMethodDeclaration &&) noexcept;
 
-        InterfaceMethodDeclaration &operator=(InterfaceMethodDeclaration &&other) noexcept;
+    InterfaceMethodDeclaration &operator=(InterfaceMethodDeclaration &&other) noexcept;
 
-        ~InterfaceMethodDeclaration() override;
+    ~InterfaceMethodDeclaration() override;
 
-        [[nodiscard]] uint64_t start() const override;
+    [[nodiscard]] uint64_t start() const override;
 
-        [[nodiscard]] uint64_t end() const override;
+    [[nodiscard]] uint64_t end() const override;
 
-        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
-    };
-
-}
+    [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+};

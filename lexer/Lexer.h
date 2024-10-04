@@ -7,47 +7,43 @@
 #include "TokenTree.h"
 #include "sourceMap/Source.h"
 
-namespace racc::lexer {
+class racc::lexer::Lexer {
+public:
+    std::shared_ptr<sourcemap::Source> source;
 
-    class Lexer {
-    public:
-        std::shared_ptr<sourcemap::Source> source;
+    explicit Lexer(std::shared_ptr<sourcemap::Source> source);
 
-        explicit Lexer(std::shared_ptr<sourcemap::Source> source);
+    Lexer(const Lexer &) = delete;
 
-        Lexer(const Lexer &) = delete;
+    Lexer &operator=(const Lexer &) = delete;
 
-        Lexer &operator=(const Lexer &) = delete;
+    Lexer(Lexer &&) noexcept;
 
-        Lexer(Lexer &&) noexcept;
+    Lexer &operator=(Lexer &&) noexcept;
 
-        Lexer &operator=(Lexer &&) noexcept;
+    ~Lexer();
 
-        ~Lexer();
+    void tokenize();
 
-        void tokenize();
+private:
+    uint32_t position = 0;
+    std::optional<TokenResult> peeked;
 
-    private:
-        uint32_t position = 0;
-        std::optional<TokenResult> peeked;
+    TokenResult nextToken();
 
-        TokenResult nextToken();
+    void consumeWhitespace();
 
-        void consumeWhitespace();
+    const TokenResult &peekToken();
 
-        const TokenResult &peekToken();
+    [[nodiscard]] TokenResult colonRule() const;
 
-        [[nodiscard]] TokenResult colonRule() const;
+    [[nodiscard]] TokenResult dashRule() const;
 
-        [[nodiscard]] TokenResult dashRule() const;
+    [[nodiscard]] TokenResult equalsRule() const;
 
-        [[nodiscard]] TokenResult equalsRule() const;
+    [[nodiscard]] TokenResult slashRule() const;
 
-        [[nodiscard]] TokenResult slashRule() const;
+    [[nodiscard]] TokenResult identifierRule() const;
 
-        [[nodiscard]] TokenResult identifierRule() const;
-
-        TokenResult quotedStringRule();
-    };
-
-}
+    TokenResult quotedStringRule();
+};

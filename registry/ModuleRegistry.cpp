@@ -14,11 +14,34 @@
 #include "ast/UseMap.h"
 #include "utils/StringUtils.h"
 #include "errors/ErrorCode.h"
+#include "Parameter.h"
 
 namespace racc::registry {
 
-    ModuleRegistry::ModuleRegistry() : tupleTypes(tuple_typelist_compare), functionTypes(function_typelist_compare) {
-        builtinTypes.emplace("int", TypeRef::builtin("int", 4)); // TODO
+    ModuleRegistry::ModuleRegistry() {
+        // TODO builtin types need to be done properly
+
+        builtinTypes.emplace("bool", TypeRef::builtin("bool", 1));
+
+        builtinTypes.emplace("byte", TypeRef::builtin("byte", 1));
+
+        builtinTypes.emplace("rune", TypeRef::builtin("rune", 4));
+
+        builtinTypes.emplace("ptr", TypeRef::builtin("ptr", 8));
+
+        builtinTypes.emplace("u8", TypeRef::builtin("u8", 1));
+        builtinTypes.emplace("s8", TypeRef::builtin("s8", 1));
+        builtinTypes.emplace("u16", TypeRef::builtin("u16", 2));
+        builtinTypes.emplace("s16", TypeRef::builtin("s16", 2));
+        builtinTypes.emplace("u32", TypeRef::builtin("u32", 4));
+        builtinTypes.emplace("s32", TypeRef::builtin("s32", 4));
+        builtinTypes.emplace("u64", TypeRef::builtin("u64", 8));
+        builtinTypes.emplace("s64", TypeRef::builtin("s64", 8));
+        builtinTypes.emplace("u128", TypeRef::builtin("u128", 16));
+        builtinTypes.emplace("s128", TypeRef::builtin("s128", 16));
+
+        builtinTypes.emplace("f32", TypeRef::builtin("f32", 4));
+        builtinTypes.emplace("f64", TypeRef::builtin("f64", 8));
     }
 
     ModuleRegistry::~ModuleRegistry() = default;
@@ -94,7 +117,8 @@ namespace racc::registry {
     }
 
     std::expected<TypeRef, errors::CompilerError>
-    ModuleRegistry::lookupTupleType(const ast::TupleSignature &signature, const std::map<std::string, TypeRef, std::less<>> &generics, std::string_view moduleName,
+    ModuleRegistry::lookupTupleType(const ast::TupleSignature &signature, const std::map<std::string, TypeRef, std::less<>> &generics,
+                                    std::string_view moduleName,
                                     const ast::UseMap &uses) {
         std::vector<TypeRef> types;
 
@@ -190,7 +214,7 @@ namespace racc::registry {
                 }
             } else {
                 auto path = utils::string::join(signature.path.parts
-                                              | std::ranges::views::transform([](const auto &i) { return i.name; }), "::");
+                                                | std::ranges::views::transform([](const auto &i) { return i.name; }), "::");
 
                 auto res = lookupTypeByPath(path, arity);
                 if (res) {
@@ -241,7 +265,7 @@ namespace racc::registry {
 
             } else {
                 auto path = utils::string::join(signature.path.parts
-                                              | std::ranges::views::transform([](const auto &i) { return i.name; }), "::");
+                                                | std::ranges::views::transform([](const auto &i) { return i.name; }), "::");
                 auto maybeBuiltinType = lookupTypeByPath(path, arity);
 
                 auto firstPart = signature.path.parts[0].name;
@@ -300,19 +324,4 @@ namespace racc::registry {
             return t.concretize(*this, genericArgTypes);
         }
     }
-
-
-    bool tuple_typelist_compare(const std::vector<TypeRef> &a, const std::vector<TypeRef> &b) {
-        // TODO
-        COMPILER_ASSERT(false, "TODO: not implemented");
-        return false;
-    }
-
-    bool function_typelist_compare(const std::vector<std::pair<ParameterMode, TypeRef>> &a,
-                                   const std::vector<std::pair<ParameterMode, TypeRef>> &b) {
-        // TODO
-        COMPILER_ASSERT(false, "TODO: not implemented");
-        return false;
-    }
-
 }

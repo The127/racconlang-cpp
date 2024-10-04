@@ -7,32 +7,29 @@
 
 #include "predeclare.h"
 
-namespace racc::ast {
-    class FunctionSignature final : public Node {
-    public:
-        uint64_t startPos{};
-        uint64_t endPos{};
+class racc::ast::FunctionSignature final : public Node {
+public:
+    uint64_t startPos{};
+    uint64_t endPos{};
 
-        std::vector<NamelessParameter> parameterTypes;
-        std::unique_ptr<ReturnType> returnType; // this is a pointer to avoid circular nesting, nullptr means the function has no return type
+    std::vector<NamelessParameter> parameterTypes;
+    std::unique_ptr<ReturnType> returnType; // this is a pointer to avoid circular nesting, nullptr means the function has no return type
 
-        FunctionSignature();
+    FunctionSignature();
 
-        FunctionSignature(const FunctionSignature &) = delete;
+    FunctionSignature(const FunctionSignature &) = delete;
 
-        FunctionSignature &operator=(const FunctionSignature &) = delete;
+    FunctionSignature &operator=(const FunctionSignature &) = delete;
 
-        FunctionSignature(FunctionSignature &&) noexcept;
+    FunctionSignature(FunctionSignature &&) noexcept;
 
-        FunctionSignature &operator=(FunctionSignature &&) noexcept;
+    FunctionSignature &operator=(FunctionSignature &&) noexcept;
 
-        ~FunctionSignature() override;
+    ~FunctionSignature() override;
 
-        [[nodiscard]] uint64_t start() const override;
+    [[nodiscard]] uint64_t start() const override;
 
-        [[nodiscard]] uint64_t end() const override;
+    [[nodiscard]] uint64_t end() const override;
 
-        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
-    };
-
-}
+    [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+};

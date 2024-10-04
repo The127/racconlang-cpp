@@ -12,6 +12,7 @@
 #include <string>
 
 namespace racc::utils::node {
+
     static std::string nameString(const ast::Node &node, const std::string &name, const bool verbose) {
         std::string result = name;
         if (verbose) {

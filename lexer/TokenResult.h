@@ -4,52 +4,49 @@
 
 
 #pragma once
+
 #include <expected>
 
 #include "LexerErr.h"
 #include "sourceMap/Location.h"
 
-namespace racc::lexer {
+class racc::lexer::TokenResult {
+public:
+    std::expected<Token, LexerErr> value;
 
-    class TokenResult {
-    public:
-        std::expected<Token, LexerErr> value;
+    explicit(false) TokenResult(const Token &token);
 
-        explicit(false) TokenResult(const Token &token);
+    explicit(false) TokenResult(LexerErr err);
 
-        explicit(false) TokenResult(LexerErr err);
+    TokenResult(const TokenResult &) = delete;
 
-        TokenResult(const TokenResult &) = delete;
+    TokenResult &operator=(const TokenResult &) = delete;
 
-        TokenResult &operator=(const TokenResult &) = delete;
+    TokenResult(TokenResult &&) noexcept;
 
-        TokenResult(TokenResult &&) noexcept;
+    TokenResult &operator=(TokenResult &&) noexcept;
 
-        TokenResult &operator=(TokenResult &&) noexcept;
+    ~TokenResult();
 
-        ~TokenResult();
+    [[nodiscard]] uint64_t getStart() const;
 
-        [[nodiscard]] uint64_t getStart() const;
+    [[nodiscard]] uint64_t getEnd() const;
 
-        [[nodiscard]] uint64_t getEnd() const;
+    [[nodiscard]] bool isError() const;
 
-        [[nodiscard]] bool isError() const;
+    [[nodiscard]] bool isToken() const;
 
-        [[nodiscard]] bool isToken() const;
+    [[nodiscard]] bool isToken(TokenType) const;
 
-        [[nodiscard]] bool isToken(TokenType) const;
+    [[nodiscard]] Token &get();
 
-        [[nodiscard]] Token &get();
+    [[nodiscard]] const Token &get() const;
 
-        [[nodiscard]] const Token &get() const;
+    [[nodiscard]] const LexerErr &getError() const;
 
-        [[nodiscard]] const LexerErr &getError() const;
+    [[nodiscard]] const Token &getOrErrorToken() const;
 
-        [[nodiscard]] const Token &getOrErrorToken() const;
+    [[nodiscard]] sourcemap::Location getLocation(const sourcemap::SourceMap &sources) const;
 
-        [[nodiscard]] sourcemap::Location getLocation(const sourcemap::SourceMap &sources) const;
-
-        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources) const;
-    };
-
-}
+    [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources) const;
+};

@@ -12,34 +12,30 @@
 #include "Signature.h"
 #include "Node.h"
 
-namespace racc::ast {
+class racc::ast::PropertyDeclaration final : public Node {
+public:
+    uint64_t startPos{};
+    uint64_t endPos{};
+    bool isPublic = false;
+    bool isMutable = false;
+    Identifier name;
+    std::optional<Signature> type;
 
-    class PropertyDeclaration final : public Node {
-    public:
-        uint64_t startPos{};
-        uint64_t endPos{};
-        bool isPublic = false;
-        bool isMutable = false;
-        Identifier name;
-        std::optional<Signature> type;
+    explicit PropertyDeclaration(const Identifier &name);
 
-        explicit PropertyDeclaration(const Identifier &name);
+    PropertyDeclaration(const PropertyDeclaration &) = delete;
 
-        PropertyDeclaration(const PropertyDeclaration &) = delete;
+    PropertyDeclaration &operator=(const PropertyDeclaration &) = delete;
 
-        PropertyDeclaration &operator=(const PropertyDeclaration &) = delete;
+    PropertyDeclaration(PropertyDeclaration &&) noexcept;
 
-        PropertyDeclaration(PropertyDeclaration &&) noexcept;
+    PropertyDeclaration &operator=(PropertyDeclaration &&) noexcept;
 
-        PropertyDeclaration &operator=(PropertyDeclaration &&) noexcept;
+    ~PropertyDeclaration() override;
 
-        ~PropertyDeclaration() override;
+    [[nodiscard]] uint64_t start() const override;
 
-        [[nodiscard]] uint64_t start() const override;
+    [[nodiscard]] uint64_t end() const override;
 
-        [[nodiscard]] uint64_t end() const override;
-
-        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
-    };
-
-}
+    [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+};

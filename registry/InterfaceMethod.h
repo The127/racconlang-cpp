@@ -7,27 +7,23 @@
 #include <string>
 #include <memory>
 
-namespace racc::registry {
-    class InterfaceMethod {
-    public:
-        std::string name;
-        bool mutReturn;
-        std::unique_ptr<TypeRef> returnType;
+class racc::registry::InterfaceMethod {
+public:
+    std::string name;
+    bool mutReturn;
+    std::vector<Parameter> params;
+    std::unique_ptr<TypeRef> returnType;
+    Interface *interface;
 
+    InterfaceMethod();
 
-        Interface *interface;
+    ~InterfaceMethod();
 
-        InterfaceMethod();
+    InterfaceMethod(const InterfaceMethod &) = delete;
 
-        ~InterfaceMethod();
+    InterfaceMethod &operator=(const InterfaceMethod &) = delete;
 
-        InterfaceMethod(const InterfaceMethod &) = delete;
+    InterfaceMethod(InterfaceMethod &&) noexcept;
 
-        InterfaceMethod &operator=(const InterfaceMethod &) = delete;
-
-        InterfaceMethod(InterfaceMethod &&) noexcept;
-
-        InterfaceMethod &operator=(InterfaceMethod &&) noexcept;
-    };
-
-}
+    InterfaceMethod &operator=(InterfaceMethod &&) noexcept;
+};

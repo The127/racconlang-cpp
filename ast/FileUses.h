@@ -13,24 +13,21 @@
 
 #include <map>
 
-namespace racc::ast {
-    class FileUses {
-    public:
-        std::vector<UseNode> uses;
+class racc::ast::FileUses {
+public:
+    std::vector<UseNode> uses;
 
-        FileUses();
+    FileUses();
 
-        FileUses(const FileUses &) = delete;
+    FileUses(const FileUses &) = delete;
 
-        FileUses &operator=(const FileUses &) = delete;
+    FileUses &operator=(const FileUses &) = delete;
 
-        FileUses(FileUses &&other) noexcept;
+    FileUses(FileUses &&other) noexcept;
 
-        FileUses &operator=(FileUses &&other) noexcept;
+    FileUses &operator=(FileUses &&other) noexcept;
 
-        ~FileUses();
+    ~FileUses();
 
-        std::shared_ptr<UseMap> toMap();
-    };
-
-}
+    std::shared_ptr<UseMap> toMap();
+};

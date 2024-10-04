@@ -12,36 +12,33 @@
 #include <string>
 #include <vector>
 
-namespace racc::ast {
-    class StructDeclaration final : public Node {
-    public:
-        uint64_t startPos{};
-        uint64_t endPos{};
-        bool isPublic{};
-        bool isValue{};
-        std::optional<Identifier> name;
-        std::vector<Identifier> genericParams;
-        std::vector<ConstraintDeclaration> genericConstraints;
-        std::vector<PropertyDeclaration> propertyDeclarations;
-        std::vector<Identifier> destructureProperties;
+class racc::ast::StructDeclaration final : public Node {
+public:
+    uint64_t startPos{};
+    uint64_t endPos{};
+    bool isPublic{};
+    bool isValue{};
+    std::optional<Identifier> name;
+    std::vector<Identifier> genericParams;
+    std::vector<ConstraintDeclaration> genericConstraints;
+    std::vector<PropertyDeclaration> propertyDeclarations;
+    std::vector<Identifier> destructureProperties;
 
-        StructDeclaration();
+    StructDeclaration();
 
-        StructDeclaration(const StructDeclaration &) = delete;
+    StructDeclaration(const StructDeclaration &) = delete;
 
-        StructDeclaration &operator=(const StructDeclaration &) = delete;
+    StructDeclaration &operator=(const StructDeclaration &) = delete;
 
-        StructDeclaration(StructDeclaration &&) noexcept;
+    StructDeclaration(StructDeclaration &&) noexcept;
 
-        StructDeclaration &operator=(StructDeclaration &&) noexcept;
+    StructDeclaration &operator=(StructDeclaration &&) noexcept;
 
-        ~StructDeclaration() override;
+    ~StructDeclaration() override;
 
-        [[nodiscard]] uint64_t start() const override;
+    [[nodiscard]] uint64_t start() const override;
 
-        [[nodiscard]] uint64_t end() const override;
+    [[nodiscard]] uint64_t end() const override;
 
-        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
-    };
-
-}
+    [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+};

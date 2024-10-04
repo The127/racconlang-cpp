@@ -4,12 +4,13 @@
 
 
 #pragma once
+
+#include "predeclare.h"
+
 #include <cstdint>
 #include <string>
 
-namespace racc::errors {
-
-    class SimpleErrorLabel {
+    class racc::errors::SimpleErrorLabel {
     public:
         SimpleErrorLabel(std::string text, uint64_t start, uint64_t end);
 
@@ -24,5 +25,3 @@ namespace racc::errors {
         uint64_t _start;
         uint64_t _end;
     };
-
-}

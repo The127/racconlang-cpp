@@ -15,42 +15,38 @@
 #include <vector>
 #include <map>
 
-namespace racc::sourcemap {
+class racc::sourcemap::Source {
+public:
+    std::string fileName;
+    std::string text;
+    uint64_t offset;
+    std::vector<uint32_t> lineBreaks;
+    std::map<uint32_t, lexer::Token> lineComments;
 
-    class Source {
-    public:
-        std::string fileName;
-        std::string text;
-        uint64_t offset;
-        std::vector<uint32_t> lineBreaks;
-        std::map<uint32_t, lexer::Token> lineComments;
+    std::optional<lexer::TokenTree> tokenTree;
+    std::vector<errors::CompilerError> errors;
 
-        std::optional<lexer::TokenTree> tokenTree;
-        std::vector<errors::CompilerError> errors;
+    Source(std::string fileName, std::string text, uint64_t offset);
 
-        Source(std::string fileName, std::string text, uint64_t offset);
+    Source(const Source &) = delete;
 
-        Source(const Source &) = delete;
+    Source &operator=(const Source &) = delete;
 
-        Source &operator=(const Source &) = delete;
+    Source(Source &&) noexcept;
 
-        Source(Source &&) noexcept;
+    Source &operator=(Source &&) noexcept;
 
-        Source &operator=(Source &&) noexcept;
+    ~Source();
 
-        ~Source();
+    void addLineBreak(uint32_t position);
 
-        void addLineBreak(uint32_t position);
+    void addLineComment(uint32_t line, const lexer::Token &comment);
 
-        void addLineComment(uint32_t line, const lexer::Token &comment);
+    void addError(errors::CompilerError error);
 
-        void addError(errors::CompilerError error);
+    [[nodiscard]] Location getLocation(uint32_t position) const;
 
-        [[nodiscard]] Location getLocation(uint32_t position) const;
+    [[nodiscard]] std::string_view getText(uint32_t start, uint32_t end) const;
 
-        [[nodiscard]] std::string_view getText(uint32_t start, uint32_t end) const;
-
-        [[nodiscard]] std::string_view getLine(uint32_t position) const;
-    };
-
-}
+    [[nodiscard]] std::string_view getLine(uint32_t position) const;
+};

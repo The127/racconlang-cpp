@@ -11,26 +11,23 @@
 
 #include <vector>
 
-namespace racc::lexer {
-    class TokenTree {
-    public:
-        Token left;
-        std::vector<TokenTreeNode> tokens;
-        TokenResult right;
+class racc::lexer::TokenTree {
+public:
+    Token left;
+    std::vector<TokenTreeNode> tokens;
+    TokenResult right;
 
-        explicit TokenTree(const Token &left);
+    explicit TokenTree(const Token &left);
 
-        TokenTree(const TokenTree &) = delete;
+    TokenTree(const TokenTree &) = delete;
 
-        TokenTree &operator=(const TokenTree &) = delete;
+    TokenTree &operator=(const TokenTree &) = delete;
 
-        TokenTree(TokenTree &&) noexcept;
+    TokenTree(TokenTree &&) noexcept;
 
-        TokenTree &operator=(TokenTree &&) noexcept;
+    TokenTree &operator=(TokenTree &&) noexcept;
 
-        ~TokenTree();
+    ~TokenTree();
 
-        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, uint32_t indent = 0) const;
-    };
-
-}
+    [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, uint32_t indent = 0) const;
+};

@@ -4,34 +4,31 @@
 
 
 #pragma once
+
 #include "Identifier.h"
 #include "Node.h"
 
-namespace racc::ast {
+class racc::ast::DestructureDeclaration final : public Node {
+public:
+    uint64_t startPos{};
+    uint64_t endPos{};
+    std::optional<Identifier> name;
 
-    class DestructureDeclaration final : public Node {
-    public:
-        uint64_t startPos{};
-        uint64_t endPos{};
-        std::optional<Identifier> name;
+    DestructureDeclaration();
 
-        DestructureDeclaration();
+    DestructureDeclaration(const DestructureDeclaration &) = delete;
 
-        DestructureDeclaration(const DestructureDeclaration &) = delete;
+    DestructureDeclaration &operator=(const DestructureDeclaration &) = delete;
 
-        DestructureDeclaration &operator=(const DestructureDeclaration &) = delete;
+    DestructureDeclaration(DestructureDeclaration &&) noexcept;
 
-        DestructureDeclaration(DestructureDeclaration &&) noexcept;
+    DestructureDeclaration &operator=(DestructureDeclaration &&) noexcept;
 
-        DestructureDeclaration &operator=(DestructureDeclaration &&) noexcept;
+    ~DestructureDeclaration() override;
 
-        ~DestructureDeclaration() override;
+    [[nodiscard]] uint64_t start() const override;
 
-        [[nodiscard]] uint64_t start() const override;
+    [[nodiscard]] uint64_t end() const override;
 
-        [[nodiscard]] uint64_t end() const override;
-
-        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
-    };
-
-}
+    [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources, int indent, bool verbose) const override;
+};

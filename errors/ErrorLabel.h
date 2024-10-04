@@ -4,14 +4,15 @@
 
 
 #pragma once
-#include <variant>
+
+#include "predeclare.h"
 
 #include "ErrorLabelGroup.h"
 #include "SimpleErrorLabel.h"
 
-namespace racc::errors {
+#include <variant>
 
-    class ErrorLabel {
+    class racc::errors::ErrorLabel {
     public:
         explicit(false) ErrorLabel(SimpleErrorLabel label);
 
@@ -28,5 +29,3 @@ namespace racc::errors {
     private:
         std::variant<SimpleErrorLabel, ErrorLabelGroup> item;
     };
-
-}

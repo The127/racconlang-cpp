@@ -4,69 +4,71 @@
 
 #pragma once
 
+#include "predeclare.h"
+
 #include <string>
 
+enum class racc::lexer::TokenType {
+    Bof,            // beginning of file
+    Eof,            // end of file
+
+    Identifier,
+    Discard,        // _
+
+    Use,            // use
+    Mod,            // mod
+    Enum,           // enum
+    Interface,      // interface
+    Fn,             // fn
+    Struct,         // struct
+    Destructures,   // destructures
+    Into,           // into
+    DestructuresInto, // destructures into
+    Alias,          // alias
+    Let,            // let
+    Pub,            // pub
+    Where,          // where
+    Get,            // get
+    Set,            // set
+    Mut,            // mut
+    Ref,            // ref
+    Impl,           // impl
+    On,             // on
+    Static,         // static
+    For,            // for
+    Value,          // value
+    As,          // as
+
+    Colon,          // :
+    PathSeparator,  // ::
+
+    DashArrow,      // ->
+
+    Tilde,         // ~
+
+    Equals,         // =
+    EqualArrow,     // =>
+
+    Semicolon,      // ;
+    Comma,          // ,
+
+    OpenCurly,      // {
+    CloseCurly,     // }
+    OpenParen,      // (
+    CloseParen,     // )
+    OpenAngle,      // <
+    CloseAngle,     // >
+
+    LessThan,       // <
+    GreaterThan,    // >
+
+    LineComment,    // //
+    MultiLineComment, // /* ... */
+
+    Error,
+};
+
 namespace racc::lexer {
-
-    enum class TokenType {
-        Bof,            // beginning of file
-        Eof,            // end of file
-
-        Identifier,
-        Discard,        // _
-
-        Use,            // use
-        Mod,            // mod
-        Enum,           // enum
-        Interface,      // interface
-        Fn,             // fn
-        Struct,         // struct
-        Destructures,   // destructures
-        Into,           // into
-        DestructuresInto, // destructures into
-        Alias,          // alias
-        Let,            // let
-        Pub,            // pub
-        Where,          // where
-        Get,            // get
-        Set,            // set
-        Mut,            // mut
-        Ref,            // ref
-        Impl,           // impl
-        On,             // on
-        Static,         // static
-        For,            // for
-        Value,          // value
-        As,          // as
-
-        Colon,          // :
-        PathSeparator,  // ::
-
-        DashArrow,      // ->
-
-        Tilde,         // ~
-
-        Equals,         // =
-        EqualArrow,     // =>
-
-        Semicolon,      // ;
-        Comma,          // ,
-
-        OpenCurly,      // {
-        CloseCurly,     // }
-        OpenParen,      // (
-        CloseParen,     // )
-        OpenAngle,      // <
-        CloseAngle,     // >
-
-        LessThan,       // <
-        GreaterThan,    // >
-
-        LineComment,    // //
-        MultiLineComment, // /* ... */
-
-        Error,
-    };
 
     std::string_view TokenTypeName(TokenType type);
 

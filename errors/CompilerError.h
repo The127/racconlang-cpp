@@ -16,55 +16,53 @@
 #include <vector>
 
 #ifndef NDEBUG
+
 #include <stacktrace>
+
 #endif
 
-
-namespace racc::errors {
-    class CompilerError {
-    public:
-        ErrorCode code;
-        uint64_t position;
-        std::vector<ErrorLabel> labels;
-        std::optional<std::string> note;
+class racc::errors::CompilerError {
+public:
+    ErrorCode code;
+    uint64_t position;
+    std::vector<ErrorLabel> labels;
+    std::optional<std::string> note;
 #ifndef NDEBUG
-        std::stacktrace stacktrace;
+    std::stacktrace stacktrace;
 #endif
 
 
-        CompilerError(ErrorCode code, uint64_t position);
+    CompilerError(ErrorCode code, uint64_t position);
 
-        CompilerError(ErrorCode code, const lexer::Token &token);
+    CompilerError(ErrorCode code, const lexer::Token &token);
 
-        CompilerError(const CompilerError &) = delete;
+    CompilerError(const CompilerError &) = delete;
 
-        CompilerError &operator=(const CompilerError &) = delete;
+    CompilerError &operator=(const CompilerError &) = delete;
 
-        CompilerError(CompilerError &&) noexcept;
+    CompilerError(CompilerError &&) noexcept;
 
-        CompilerError &operator=(CompilerError &&) noexcept;
+    CompilerError &operator=(CompilerError &&) noexcept;
 
-        ~CompilerError();
+    ~CompilerError();
 
-        void addLabel(const ErrorLabel &label);
+    void addLabel(const ErrorLabel &label);
 
-        void addLabel(const std::string &text, uint64_t start, uint64_t end);
+    void addLabel(const std::string &text, uint64_t start, uint64_t end);
 
-        void addLabel(const std::string &text, uint64_t pos);
+    void addLabel(const std::string &text, uint64_t pos);
 
-        void addLabel(const std::string &text, const lexer::Token &startToken, const lexer::Token &endToken);
+    void addLabel(const std::string &text, const lexer::Token &startToken, const lexer::Token &endToken);
 
-        void addLabel(const std::string &text, const lexer::Token &token);
+    void addLabel(const std::string &text, const lexer::Token &token);
 
-        void addLabel(const std::string &text, const lexer::TokenResult &result);
+    void addLabel(const std::string &text, const lexer::TokenResult &result);
 
-        void addLabel(const std::string &text, const lexer::TokenResult &startResult, const lexer::TokenResult &endResult);
+    void addLabel(const std::string &text, const lexer::TokenResult &startResult, const lexer::TokenResult &endResult);
 
-        void addLabel(const std::string &text, const lexer::TokenTree &tree);
+    void addLabel(const std::string &text, const lexer::TokenTree &tree);
 
-        void addLabel(const std::string &text, const lexer::TokenTreeNode &node);
+    void addLabel(const std::string &text, const lexer::TokenTreeNode &node);
 
-        void setNote(const std::string &note);
-    };
-
-}
+    void setNote(const std::string &note);
+};

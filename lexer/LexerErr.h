@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "predeclare.h"
+
 #include <utility>
 #include <vector>
 #include <map>
@@ -13,69 +15,65 @@
 
 // TODO: move to racc::errors?
 
-namespace racc::lexer {
+enum class racc::lexer::LexerErrReason {
+    UnclosedTokenTree,
+    UnexpectedInput,
+    UnexpectedEndOfInput,
+    InvalidIdentifier,
+};
 
-    enum class LexerErrReason {
-        UnclosedTokenTree,
-        UnexpectedInput,
-        UnexpectedEndOfInput,
-        InvalidIdentifier,
-    };
+class racc::lexer::LexerErr {
+public:
+    LexerErrReason reason;
+    lexer::Token got;
+    std::vector<std::string> expected;
 
-    class LexerErr {
-    public:
-        LexerErrReason reason;
-        lexer::Token got;
-        std::vector<std::string> expected;
+    LexerErr(LexerErrReason reason, const lexer::Token &got, std::vector<std::string> expected);
 
-        LexerErr(LexerErrReason reason, const lexer::Token &got, std::vector<std::string> expected);
+    LexerErr(const LexerErr &) = delete;
 
-        LexerErr(const LexerErr &) = delete;
+    LexerErr &operator=(const LexerErr &) = delete;
 
-        LexerErr &operator=(const LexerErr &) = delete;
+    LexerErr(LexerErr &&) noexcept;
 
-        LexerErr(LexerErr &&) noexcept;
+    LexerErr &operator=(LexerErr &&) noexcept;
 
-        LexerErr &operator=(LexerErr &&) noexcept;
+    ~LexerErr();
 
-        ~LexerErr();
+    static LexerErr UnclosedTokenTree(const lexer::Token &got, std::string expected);
 
-        static LexerErr UnclosedTokenTree(const lexer::Token &got, std::string expected);
+    static LexerErr UnclosedTokenTree(u_int64_t start, u_int64_t end, std::string expected);
 
-        static LexerErr UnclosedTokenTree(u_int64_t start, u_int64_t end, std::string expected);
+    static LexerErr UnexpectedInput(const lexer::Token &got, std::vector<std::string> expected);
 
-        static LexerErr UnexpectedInput(const lexer::Token &got, std::vector<std::string> expected);
+    static LexerErr UnexpectedInput(u_int64_t start, u_int64_t end, std::vector<std::string> expected);
 
-        static LexerErr UnexpectedInput(u_int64_t start, u_int64_t end, std::vector<std::string> expected);
+    static LexerErr UnexpectedInput(const lexer::Token &got, std::string expected);
 
-        static LexerErr UnexpectedInput(const lexer::Token &got, std::string expected);
+    static LexerErr UnexpectedInput(u_int64_t start, u_int64_t end, std::string expected);
 
-        static LexerErr UnexpectedInput(u_int64_t start, u_int64_t end, std::string expected);
+    static LexerErr UnexpectedInput(const lexer::Token &got);
 
-        static LexerErr UnexpectedInput(const lexer::Token &got);
+    static LexerErr UnexpectedInput(u_int64_t start, u_int64_t end);
 
-        static LexerErr UnexpectedInput(u_int64_t start, u_int64_t end);
+    static LexerErr UnexpectedEndOfInput(const lexer::Token &got, std::vector<std::string> expected);
 
-        static LexerErr UnexpectedEndOfInput(const lexer::Token &got, std::vector<std::string> expected);
+    static LexerErr UnexpectedEndOfInput(u_int64_t pos, std::vector<std::string> expected);
 
-        static LexerErr UnexpectedEndOfInput(u_int64_t pos, std::vector<std::string> expected);
+    static LexerErr UnexpectedEndOfInput(const lexer::Token &got, std::string expected);
 
-        static LexerErr UnexpectedEndOfInput(const lexer::Token &got, std::string expected);
+    static LexerErr UnexpectedEndOfInput(u_int64_t pos, std::string expected);
 
-        static LexerErr UnexpectedEndOfInput(u_int64_t pos, std::string expected);
+    static LexerErr UnexpectedEndOfInput(const lexer::Token &got);
 
-        static LexerErr UnexpectedEndOfInput(const lexer::Token &got);
+    static LexerErr UnexpectedEndOfInput(u_int64_t pos);
 
-        static LexerErr UnexpectedEndOfInput(u_int64_t pos);
+    static LexerErr InvalidIdentifier(const lexer::Token &got);
 
-        static LexerErr InvalidIdentifier(const lexer::Token &got);
+    static LexerErr InvalidIdentifier(u_int64_t start, u_int64_t end);
 
-        static LexerErr InvalidIdentifier(u_int64_t start, u_int64_t end);
+    [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources) const;
 
-        [[nodiscard]] std::string toString(const sourcemap::SourceMap &sources) const;
-
-    private:
-        [[nodiscard]] std::string expectedString() const;
-    };
-
-}
+private:
+    [[nodiscard]] std::string expectedString() const;
+};

@@ -2,6 +2,7 @@
 
 #include "ModuleRegistry.h"
 #include "TypeRefImpl.h"
+#include "Parameter.h"
 
 #include <utility>
 

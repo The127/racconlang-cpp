@@ -4,17 +4,15 @@
 
 #pragma once
 
+#include "predeclare.h"
+
 #include <map>
 #include <string>
 #include <optional>
 
-namespace racc::ast {
+class racc::ast::UseMap {
+public:
+    std::map<std::string, std::string, std::less<>> uses;
 
-    class UseMap {
-    public:
-        std::map<std::string, std::string, std::less<>> uses;
-
-        [[nodiscard]] std::optional<std::string> lookup(std::string_view name) const;
-    };
-
-}
+    [[nodiscard]] std::optional<std::string> lookup(std::string_view name) const;
+};

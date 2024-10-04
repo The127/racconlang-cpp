@@ -58,14 +58,19 @@ namespace racc::registry {
                 source->addError(std::move(typeResult.error()));
             }
 
-            auto &member = members.emplace_back(memberName, &decl, memberType, decl.isPublic, decl.isMutable);
-            const auto &[_, success] = memberMap.emplace(memberName, &member);
-            COMPILER_ASSERT(success, "insert into memberMap failed");
+            if (memberMap.contains(memberName)) {
+                source->addError(errors::CompilerError(errors::ErrorCode::DuplicateMemberName, decl.name.start()));
+            } else {
+                auto &member = members.emplace_back(memberName, &decl, memberType, decl.isPublic, decl.isMutable);
+                const auto &[_, success] = memberMap.emplace(memberName, &member);
 
-            if (isPublic && member.isPublic && !member.type.isPublic()) {
-                auto err = errors::CompilerError(errors::ErrorCode::InaccessibleType, decl.type->start());
-                err.setNote("types of public struct members must be publicly accessible");
-                source->addError(std::move(err));
+                COMPILER_ASSERT(success, "insert into memberMap failed");
+
+                if (isPublic && member.isPublic && !member.type.isPublic()) {
+                    auto err = errors::CompilerError(errors::ErrorCode::InaccessibleType, decl.type->start());
+                    err.setNote("types of public struct members must be publicly accessible");
+                    source->addError(std::move(err));
+                }
             }
         }
     }
