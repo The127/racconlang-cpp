@@ -11,6 +11,7 @@
 
 #include <string>
 #include <vector>
+#include <optional>
 
 class racc::ast::StructDeclaration final : public Node {
 public:

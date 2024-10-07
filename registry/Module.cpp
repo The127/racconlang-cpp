@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "TypeRefImpl.h"
+#include "TypeRef.h"
 #include "ast/EnumDeclaration.h"
 #include "ast/AliasDeclaration.h"
 #include "ast/InterfaceDeclaration.h"
@@ -15,6 +15,11 @@
 #include "parser/Parser.h"
 #include "registry/ModuleRegistry.h"
 #include "sourceMap/Source.h"
+#include "Struct.h"
+#include "Interface.h"
+#include "Enum.h"
+#include "TupleType.h"
+#include "Alias.h"
 
 namespace racc::registry {
 
@@ -37,7 +42,7 @@ namespace racc::registry {
             return;
         }
 
-        types.emplace(std::make_pair(name, arity), TypeRef::make<Struct>(name, path, arity, &decl, source, useMap));
+        types.emplace(std::make_pair(name, arity), TypeRef::makeStruct(name, path, arity, &decl, source, useMap).first);
     }
 
     void Module::addEnum(const std::shared_ptr<sourcemap::Source> &source, ast::EnumDeclaration &decl, const std::shared_ptr<ast::UseMap> &useMap) {
@@ -49,7 +54,7 @@ namespace racc::registry {
             return;
         }
 
-        types.emplace(std::make_pair(name, arity), TypeRef::make<Enum>(name, path, arity, &decl, source, useMap));
+        types.emplace(std::make_pair(name, arity), TypeRef::makeEnum(name, path, arity, &decl, source, useMap).first);
     }
 
     void Module::addAlias(const std::shared_ptr<sourcemap::Source> &source, ast::AliasDeclaration &decl, const std::shared_ptr<ast::UseMap> &useMap) {
@@ -61,7 +66,7 @@ namespace racc::registry {
             return;
         }
 
-        types.emplace(std::make_pair(name, arity), TypeRef::make<Alias>(name, path, arity, &decl, source, useMap));
+        types.emplace(std::make_pair(name, arity), TypeRef::makeAlias(name, path, arity, &decl, source, useMap).first);
     }
 
     void Module::addInterface(const std::shared_ptr<sourcemap::Source> &source, ast::InterfaceDeclaration &decl, const std::shared_ptr<ast::UseMap> &useMap) {
@@ -73,7 +78,7 @@ namespace racc::registry {
             return;
         }
 
-        types.emplace(std::make_pair(name, arity), TypeRef::make<Interface>(name, path, arity, &decl, source, useMap));
+        types.emplace(std::make_pair(name, arity), TypeRef::makeInterface(name, path, arity, &decl, source, useMap).first);
     }
 
     void Module::populate(ModuleRegistry &registry) {

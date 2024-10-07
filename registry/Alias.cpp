@@ -7,7 +7,7 @@
 #include "ast/AliasDeclaration.h"
 #include "ast/UseMap.h"
 #include "sourceMap/Source.h"
-#include "TypeRefImpl.h"
+#include "TypeRef.h"
 
 #include <utility>
 #include <algorithm>
@@ -19,10 +19,10 @@ namespace racc::registry {
             : name(std::move(name)),
               modulePath(module),
               arity(arity),
+              isPublic(declaration->isPublic),
               declaration(declaration),
               source(std::move(source)),
-              useMap(std::move(useMap)),
-              isPublic(declaration->isPublic) {
+              useMap(std::move(useMap)) {
 
         for (const auto &item: declaration->genericParams) {
             auto &t = genericParams.emplace_back(TypeRef::var(std::string(item.name)));
@@ -45,27 +45,25 @@ namespace racc::registry {
         }
     }
 
-    TypeRef Alias::concretize(ModuleRegistry &registry, std::vector<TypeRef> args) const {
+    TypeRef Alias::concretize(ModuleRegistry &registry, std::vector<TypeRef> args) {
         std::map<TypeRef, TypeRef> generics;
         COMPILER_ASSERT(genericParams.size() == args.size(), "wrong number of generic arguments");
         for (size_t i = 0; i < args.size(); ++i) {
             const auto &[_, success] = generics.emplace(genericParams[i], args[i]);
             COMPILER_ASSERT(success, "insert into generics failed");
         }
-        auto concretized = substituteGenerics(registry, generics);
+        auto [typeRef, alias] = substituteGenerics(registry, generics);
         if (isPublic) {
-            auto s = *concretized.as<Alias>();
-            s->isPublic = std::ranges::all_of(args, [](const auto &t) { return t.isPublic(); });
+            alias->isPublic = std::ranges::all_of(args, [](const auto &t) { return t.isPublic(); });
         }
-        return concretized;
+        return typeRef;
     }
 
-    TypeRef Alias::substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const {
-        auto typeRef = TypeRef::make<Alias>(name, modulePath, 0, declaration, source, useMap);
-        auto a = *typeRef.as<Alias>();
-        a->aliasedType = std::make_unique<TypeRef>(aliasedType->substituteGenerics(registry, generics));
-        a->genericBase = genericBase.value_or(*TypeRef(this->type).as<Alias>());
-        return typeRef;
+    std::pair<TypeRef, std::shared_ptr<Alias>> Alias::substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) {
+        auto [typeRef, alias] = TypeRef::makeAlias(name, modulePath, 0, declaration, source, useMap);
+        alias->aliasedType = std::make_unique<TypeRef>(aliasedType->substituteGenerics(registry, generics));
+        alias->genericBase = genericBase.value_or(ptr());
+        return {typeRef, alias};
     }
 
     Alias::~Alias() = default;

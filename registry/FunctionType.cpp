@@ -1,7 +1,7 @@
 #include "FunctionType.h"
 
 #include "ModuleRegistry.h"
-#include "TypeRefImpl.h"
+#include "TypeRef.h"
 #include "Parameter.h"
 
 #include <utility>
@@ -15,14 +15,14 @@ namespace racc::registry {
 
     }
 
-    TypeRef FunctionType::substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const {
+    std::pair<TypeRef, std::shared_ptr<FunctionType>> FunctionType::substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const {
         std::vector<std::pair<ParameterMode, TypeRef>> substitutedParameters;
         for (const auto &[mode, param]: parameters) {
             substitutedParameters.emplace_back(mode, param.substituteGenerics(registry, generics));
         }
-        auto typeRef = TypeRef::make<FunctionType>(substitutedParameters, returnType->substituteGenerics(registry, generics), returnMut);
-        auto e = *typeRef.as<FunctionType>();
-        return typeRef;
+        auto [typeRef, f] = TypeRef::makeFunction(substitutedParameters, returnType->substituteGenerics(registry, generics), returnMut);
+        // TODO
+        return {typeRef, f};
     }
 
     FunctionType::~FunctionType() = default;

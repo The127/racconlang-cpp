@@ -13,7 +13,9 @@ namespace racc::errors {
             : code(code),
               position(position)
 #ifndef NDEBUG
-            , stacktrace(std::stacktrace::current())
+#ifdef __cpp_lib_stacktrace
+    , stacktrace(std::stacktrace::current())
+#endif
 #endif
     {
     }

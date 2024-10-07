@@ -59,7 +59,7 @@ public:
     }
 
     bool operator==(const TokenTreeIterator &other) const {
-        return current == other.current || isEnd() && other.isEnd();
+        return current == other.current || (isEnd() && other.isEnd());
     }
 
     bool operator!=(const TokenTreeIterator &other) const {

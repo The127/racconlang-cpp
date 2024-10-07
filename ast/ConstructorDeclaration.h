@@ -11,6 +11,7 @@
 #include "Node.h"
 
 #include <vector>
+#include <optional>
 
 class racc::ast::ConstructorDeclaration final : public Node {
 public:

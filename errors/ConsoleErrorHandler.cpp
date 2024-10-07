@@ -36,7 +36,9 @@ namespace racc::errors {
         }
         std::cout << std::endl;
 #ifndef NDEBUG
+#ifdef __cpp_lib_stacktrace
         std::cout << error.stacktrace << std::endl;
+#endif
 #endif
     }
 

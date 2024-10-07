@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <optional>
 
 class racc::ast::EnumDeclaration final : public Node {
 public:

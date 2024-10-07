@@ -8,6 +8,7 @@
 #include "TokenTreeNode.h"
 
 #include <utility>
+#include <algorithm>
 
 
 namespace racc::lexer {
@@ -300,8 +301,8 @@ namespace racc::lexer {
 
     TokenResult Lexer::identifierRule() const {
         auto ch = source->text[position];
-        if (ch >= 'a' && ch <= 'z'
-            || ch >= 'A' && ch <= 'Z'
+        if ((ch >= 'a' && ch <= 'z')
+            || (ch >= 'A' && ch <= 'Z')
             || ch == '_'
             || ch == '@'
                 ) {
@@ -310,9 +311,9 @@ namespace racc::lexer {
 
             while (offset < remaining) {
                 ch = source->text[position + offset];
-                if (ch >= 'a' && ch <= 'z'
-                    || ch >= 'A' && ch <= 'Z'
-                    || ch >= '0' && ch <= '9'
+                if ((ch >= 'a' && ch <= 'z')
+                    || (ch >= 'A' && ch <= 'Z')
+                    || (ch >= '0' && ch <= '9')
                     || ch == '_'
                         ) {
                     offset = offset + 1;

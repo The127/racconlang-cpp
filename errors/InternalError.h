@@ -6,7 +6,9 @@
 #pragma once
 
 #include <iostream>
+#ifdef __cpp_lib_stacktrace
 #include <stacktrace>
+#endif
 
 #ifdef __cpp_lib_debugging
 #include <debugging>
@@ -24,7 +26,9 @@ namespace racc::errors {
 #endif
         std::cerr << "internal compiler error in " << filename << ":" << line << ": " << msg << std::endl << std::flush;
 #ifndef NDEBUG
+#ifdef __cpp_lib_stacktrace
         std::cerr << std::stacktrace::current() << std::endl << std::flush;
+#endif
 #endif
         std::exit(1);
     }

@@ -9,13 +9,14 @@
 
 #include "ModuleRegistry.h"
 #include "TypeRef.h"
+#include "TypeBase.h"
 
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <optional>
 
-class racc::registry::Alias {
+class racc::registry::Alias : public TypeBase<Alias> {
 public:
     std::string name;
     std::string_view modulePath;
@@ -28,7 +29,6 @@ public:
     std::vector<TypeRef> genericParams;
     std::map<std::string, TypeRef, std::less<>> genericParamsMap;
     std::optional<std::shared_ptr<Alias>> genericBase;
-    WeakTypeRef type;
 
     Alias(std::string name, std::string_view module, uint8_t arity, ast::AliasDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
           std::shared_ptr<ast::UseMap> useMap);
@@ -45,7 +45,7 @@ public:
 
     void populate(ModuleRegistry &registry);
 
-    TypeRef concretize(ModuleRegistry &registry, std::vector<TypeRef> args) const;
+    TypeRef concretize(ModuleRegistry &registry, std::vector<TypeRef> args);
 
-    TypeRef substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const;
+    std::pair<TypeRef, std::shared_ptr<Alias>> substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics);
 };

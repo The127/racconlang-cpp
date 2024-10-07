@@ -8,6 +8,7 @@
 #include "predeclare.h"
 
 #include "TypeRef.h"
+#include "TypeBase.h"
 
 #include <cstdint>
 #include <memory>
@@ -16,7 +17,7 @@
 #include <map>
 #include <optional>
 
-class racc::registry::Struct {
+class racc::registry::Struct : public TypeBase<Struct> {
 public:
     std::string name;
     std::string_view modulePath;
@@ -30,7 +31,6 @@ public:
     std::vector<StructMember> members;
     std::map<std::string, StructMember *, std::less<>> memberMap;
     std::optional<std::shared_ptr<Struct>> genericBase;
-    WeakTypeRef type;
 
     Struct(std::string name, std::string_view module, uint8_t arity, ast::StructDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
            std::shared_ptr<ast::UseMap> useMap);
@@ -47,7 +47,7 @@ public:
 
     void populate(ModuleRegistry &registry);
 
-    [[nodiscard]] TypeRef concretize(ModuleRegistry &registry, std::vector<TypeRef> args) const;
+    [[nodiscard]] TypeRef concretize(ModuleRegistry &registry, std::vector<TypeRef> args);
 
-    [[nodiscard]] TypeRef substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const;
+    [[nodiscard]] std::pair<TypeRef, std::shared_ptr<Struct>> substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics);
 };

@@ -9,6 +9,8 @@
 #include "TupleSignature.h"
 #include "FunctionSignature.h"
 
+#include <variant>
+
 class racc::ast::Signature : public Node {
 public:
     std::variant<TypeSignature, TupleSignature, FunctionSignature> signature;

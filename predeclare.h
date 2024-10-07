@@ -71,6 +71,7 @@ namespace racc {
         class Enum;
         class EnumMember;
         class FunctionType;
+        class Id;
         class Interface;
         class InterfaceGetter;
         class InterfaceMethod;
@@ -84,6 +85,7 @@ namespace racc {
         class TupleType;
         class TypeRef;
         class TypeVar;
+        struct TypeVariant;
     }
 
     namespace sourcemap {

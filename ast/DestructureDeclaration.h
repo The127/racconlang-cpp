@@ -8,6 +8,8 @@
 #include "Identifier.h"
 #include "Node.h"
 
+#include <optional>
+
 class racc::ast::DestructureDeclaration final : public Node {
 public:
     uint64_t startPos{};

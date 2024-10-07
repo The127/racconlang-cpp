@@ -1,6 +1,6 @@
 #include "EnumMember.h"
 
-#include "TypeRefImpl.h"
+#include "TypeRef.h"
 
 #include <utility>
 

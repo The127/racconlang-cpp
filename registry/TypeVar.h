@@ -1,14 +1,14 @@
 #pragma once
 
 #include "TypeRef.h"
+#include "TypeBase.h"
 
 #include <string>
 #include <utility>
 
-class racc::registry::TypeVar {
+class racc::registry::TypeVar : public TypeBase<TypeVar> {
 public:
     std::string name;
-    WeakTypeRef type;
 
     explicit TypeVar(std::string name);
 

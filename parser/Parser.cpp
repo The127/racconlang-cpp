@@ -4,7 +4,7 @@
 
 #include "Parser.h"
 
-#include <bits/ranges_algo.h>
+#include <algorithm>
 #include <utility>
 #include <ranges>
 
@@ -303,7 +303,7 @@ namespace racc::parser {
         // TODO: check that the order is correct (but still return all the valid modifiers)
         std::vector<lexer::Token> result;
         std::string note = "valid modifiers are: ";
-        for (int i{}; i < validTokenTypes.size(); ++i) {
+        for (size_t i = 0; i < validTokenTypes.size(); ++i) {
             note += TokenTypeStringQuoted(validTokenTypes[i]);
             if (i < validTokenTypes.size() - 2) {
                 note += ", ";

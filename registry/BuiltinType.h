@@ -1,12 +1,12 @@
 #pragma once
 
 #include "TypeRef.h"
+#include "TypeBase.h"
 
-class racc::registry::BuiltinType {
+class racc::registry::BuiltinType : public TypeBase<BuiltinType> {
 public:
     std::string name;
     size_t size;
-    WeakTypeRef type;
 
     BuiltinType(std::string name, size_t size);
 

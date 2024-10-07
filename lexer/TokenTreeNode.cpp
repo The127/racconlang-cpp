@@ -99,7 +99,7 @@ namespace racc::lexer {
     }
 
     bool TokenTreeNode::isSignatureStarter() const {
-        return isTokenTree(TokenType::OpenParen) || isToken() && getToken().isSignatureStarter();
+        return isTokenTree(TokenType::OpenParen) || (isToken() && getToken().isSignatureStarter());
     }
 
     bool TokenTreeNode::isTypeSignatureStarter() const {

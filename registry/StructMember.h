@@ -2,7 +2,7 @@
 
 #include "predeclare.h"
 
-#include "TypeRefImpl.h"
+#include "TypeRef.h"
 
 #include <string>
 

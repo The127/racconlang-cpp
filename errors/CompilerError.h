@@ -16,9 +16,9 @@
 #include <vector>
 
 #ifndef NDEBUG
-
+#ifdef __cpp_lib_stacktrace
 #include <stacktrace>
-
+#endif
 #endif
 
 class racc::errors::CompilerError {
@@ -28,7 +28,9 @@ public:
     std::vector<ErrorLabel> labels;
     std::optional<std::string> note;
 #ifndef NDEBUG
+#ifdef __cpp_lib_stacktrace
     std::stacktrace stacktrace;
+#endif
 #endif
 
 

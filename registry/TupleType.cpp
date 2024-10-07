@@ -1,6 +1,6 @@
 #include "TupleType.h"
 
-#include "TypeRefImpl.h"
+#include "TypeRef.h"
 
 namespace racc::registry {
 

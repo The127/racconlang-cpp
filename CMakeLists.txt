@@ -3,6 +3,10 @@ project(RaccoonLang)
 
 set(CMAKE_CXX_STANDARD 26)
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+endif ()
+
 add_library(racc STATIC
         lexer/Lexer.cpp
         lexer/TokenTree.cpp
@@ -79,7 +83,16 @@ add_library(racc STATIC
 
 
 target_include_directories(racc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_options(racc PRIVATE -Wpessimizing-move -Werror=return-type)
+target_compile_options(racc PRIVATE
+        -Wall
+        -Wextra
+        -pedantic
+        -Wno-unused-variable
+        -Wno-unused-parameter
+        -Wno-unused-function
+        -Wno-unused-but-set-variable
+        -Werror
+)
 target_link_libraries(racc PRIVATE stdc++exp)
 
 add_executable(racc_exe main.cpp)

@@ -36,6 +36,8 @@ pub struct Z {
     pub x: X<s32>;
 }
 
+mod std::foo;
+pub struct bar{}
 
 mod main;
 
@@ -67,11 +69,12 @@ pub interface Foo1<T> : Bar::foo, Bar2<T> where T : Asdf {
     pub get x() -> u8;
     pub mut get y() -> mut Bar<T>;
 
-    pub set x(a: s32);
-    pub set xy(y: u8);
+    pub set x(mut a: foobar);
+    pub set<T> xy(y: T);
 
-    set x(@value: u8);
+    set z(@value: u8);
 }
+
 
 let bar: T;
 mut let foo: u8;

@@ -5,7 +5,7 @@
 #include <ranges>
 #include "ModuleRegistry.h"
 
-#include "TypeRefImpl.h"
+#include "TypeRef.h"
 #include "Module.h"
 #include "TupleType.h"
 #include "ast/Signature.h"
@@ -21,27 +21,27 @@ namespace racc::registry {
     ModuleRegistry::ModuleRegistry() {
         // TODO builtin types need to be done properly
 
-        builtinTypes.emplace("bool", TypeRef::builtin("bool", 1));
+        builtinTypes.emplace("bool", TypeRef::makeBuiltin("bool", 1));
 
-        builtinTypes.emplace("byte", TypeRef::builtin("byte", 1));
+        builtinTypes.emplace("byte", TypeRef::makeBuiltin("byte", 1));
 
-        builtinTypes.emplace("rune", TypeRef::builtin("rune", 4));
+        builtinTypes.emplace("rune", TypeRef::makeBuiltin("rune", 4));
 
-        builtinTypes.emplace("ptr", TypeRef::builtin("ptr", 8));
+        builtinTypes.emplace("ptr", TypeRef::makeBuiltin("ptr", 8));
 
-        builtinTypes.emplace("u8", TypeRef::builtin("u8", 1));
-        builtinTypes.emplace("s8", TypeRef::builtin("s8", 1));
-        builtinTypes.emplace("u16", TypeRef::builtin("u16", 2));
-        builtinTypes.emplace("s16", TypeRef::builtin("s16", 2));
-        builtinTypes.emplace("u32", TypeRef::builtin("u32", 4));
-        builtinTypes.emplace("s32", TypeRef::builtin("s32", 4));
-        builtinTypes.emplace("u64", TypeRef::builtin("u64", 8));
-        builtinTypes.emplace("s64", TypeRef::builtin("s64", 8));
-        builtinTypes.emplace("u128", TypeRef::builtin("u128", 16));
-        builtinTypes.emplace("s128", TypeRef::builtin("s128", 16));
+        builtinTypes.emplace("u8", TypeRef::makeBuiltin("u8", 1));
+        builtinTypes.emplace("s8", TypeRef::makeBuiltin("s8", 1));
+        builtinTypes.emplace("u16", TypeRef::makeBuiltin("u16", 2));
+        builtinTypes.emplace("s16", TypeRef::makeBuiltin("s16", 2));
+        builtinTypes.emplace("u32", TypeRef::makeBuiltin("u32", 4));
+        builtinTypes.emplace("s32", TypeRef::makeBuiltin("s32", 4));
+        builtinTypes.emplace("u64", TypeRef::makeBuiltin("u64", 8));
+        builtinTypes.emplace("s64", TypeRef::makeBuiltin("s64", 8));
+        builtinTypes.emplace("u128", TypeRef::makeBuiltin("u128", 16));
+        builtinTypes.emplace("s128", TypeRef::makeBuiltin("s128", 16));
 
-        builtinTypes.emplace("f32", TypeRef::builtin("f32", 4));
-        builtinTypes.emplace("f64", TypeRef::builtin("f64", 8));
+        builtinTypes.emplace("f32", TypeRef::makeBuiltin("f32", 4));
+        builtinTypes.emplace("f64", TypeRef::makeBuiltin("f64", 8));
     }
 
     ModuleRegistry::~ModuleRegistry() = default;
@@ -64,7 +64,7 @@ namespace racc::registry {
     }
 
     TypeRef ModuleRegistry::getTupleType(const std::vector<TypeRef> &types) {
-        auto [it, inserted] = tupleTypes.emplace(types, TypeRef::make<TupleType>(TupleType(types)));
+        auto [it, inserted] = tupleTypes.emplace(types, TypeRef::makeTuple(types).first);
         if (!inserted) {
             it = tupleTypes.find(types);
         }
@@ -77,7 +77,7 @@ namespace racc::registry {
                                     bool returnMut) {
         auto types = argTypes;
         types.emplace_back(returnMut ? ParameterMode::Mut : ParameterMode::Normal, returnType);
-        auto [it, inserted] = functionTypes.emplace(types, TypeRef::make<FunctionType>(argTypes, returnType, returnMut));
+        auto [it, inserted] = functionTypes.emplace(types, TypeRef::makeFunction(argTypes, returnType, returnMut).first);
         if (!inserted) {
             it = functionTypes.find(types);
         }
@@ -271,7 +271,7 @@ namespace racc::registry {
                 auto firstPart = signature.path.parts[0].name;
                 auto usePath = uses.lookup(firstPart);
                 if (usePath) {
-                    auto fullPath = *usePath + utils::string::join(
+                    auto fullPath = *usePath + "::" + utils::string::join(
                             signature.path.parts | std::ranges::views::drop(1) | std::ranges::views::transform([](const auto &i) { return i.name; }), "::");
                     auto maybeType = lookupTypeByPath(fullPath, arity);
                     if (maybeType) {
@@ -302,7 +302,7 @@ namespace racc::registry {
             genericArgTypes.emplace_back(std::move(*res));
         }
 
-        if (!t.is<TypeVar>() && !t.is<BuiltinType>()) { // type vars and builtins don't need to worry about accessibility
+        if (!t.isVar() && !t.isBuiltin()) { // type vars and builtins don't need to worry about accessibility
             auto declModulePath = t.declModulePath();
 
             if (declModulePath.ends_with("::test") && !currentModuleName.ends_with("::test")) {
@@ -311,7 +311,7 @@ namespace racc::registry {
                 return std::unexpected(std::move(err));
             }
 
-            if (currentModuleName != declModulePath & currentModuleName != std::string(declModulePath) + "::test" && !t.isPublic()) {
+            if (currentModuleName != declModulePath && currentModuleName != std::string(declModulePath) + "::test" && !t.isPublic()) {
                 auto err = errors::CompilerError(errors::ErrorCode::InaccessibleType, signature.start());
                 err.addLabel(std::format("{} is defined here", "<TODO: typename>"), t.declStart());
                 return std::unexpected(std::move(err));

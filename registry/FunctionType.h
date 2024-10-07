@@ -3,17 +3,17 @@
 #include "predeclare.h"
 
 #include "TypeRef.h"
+#include "TypeBase.h"
 
 #include <vector>
 #include <memory>
 #include <map>
 
-class racc::registry::FunctionType {
+class racc::registry::FunctionType : public TypeBase<FunctionType> {
 public:
     std::vector<std::pair<ParameterMode, TypeRef>> parameters;
     std::unique_ptr<TypeRef> returnType;
     bool returnMut;
-    WeakTypeRef type;
 
     FunctionType(std::vector<std::pair<ParameterMode, TypeRef>> parameters, TypeRef returnType, bool returnMut);
 
@@ -27,5 +27,5 @@ public:
 
     FunctionType &operator=(FunctionType &&) noexcept;
 
-    [[nodiscard]] TypeRef substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const;
+    [[nodiscard]] std::pair<TypeRef, std::shared_ptr<FunctionType>> substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const;
 };

@@ -1,5 +1,7 @@
 #include "StructMember.h"
 
+#include <utility>
+
 namespace racc::registry {
 
     StructMember::StructMember(std::string name, ast::PropertyDeclaration *decl, TypeRef type, bool isPublic, bool isMutable)
@@ -7,7 +9,8 @@ namespace racc::registry {
               decl(decl),
               type(std::move(type)),
               isPublic(isPublic),
-              isMutable(isMutable) {}
+              isMutable(isMutable) {
+    }
 
     StructMember &StructMember::operator=(StructMember &&) noexcept = default;
 

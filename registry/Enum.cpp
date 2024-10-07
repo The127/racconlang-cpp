@@ -10,7 +10,7 @@
 #include "ast/EnumMemberDeclaration.h"
 #include "sourceMap/Source.h"
 #include "ModuleRegistry.h"
-#include "TypeRefImpl.h"
+#include "TypeRef.h"
 
 #include <utility>
 #include <memory>
@@ -23,10 +23,10 @@ namespace racc::registry {
             : name(std::move(name)),
               modulePath(module),
               arity(arity),
+              isPublic(declaration->isPublic),
               declaration(declaration),
               source(std::move(source)),
-              useMap(std::move(useMap)),
-              isPublic(declaration->isPublic) {
+              useMap(std::move(useMap)) {
 
         for (const auto &item: declaration->genericParams) {
             auto &t = genericParams.emplace_back(TypeRef::var(std::string(item.name)));
@@ -64,24 +64,22 @@ namespace racc::registry {
         }
     }
 
-    TypeRef Enum::concretize(ModuleRegistry &registry, std::vector<TypeRef> args) const {
+    TypeRef Enum::concretize(ModuleRegistry &registry, std::vector<TypeRef> args) {
         std::map<TypeRef, TypeRef> generics;
         COMPILER_ASSERT(genericParams.size() == args.size(), "wrong number of generic arguments");
         for (size_t i = 0; i < args.size(); ++i) {
             const auto &[_, success] = generics.emplace(genericParams[i], args[i]);
             COMPILER_ASSERT(success, "insert into generics failed");
         }
-        auto concretized = substituteGenerics(registry, generics);
+        auto [typeRef, e] = substituteGenerics(registry, generics);
         if (isPublic) {
-            auto s = *concretized.as<Enum>();
-            s->isPublic = std::ranges::all_of(args, [](const auto &t) { return t.isPublic(); });
+            e->isPublic = std::ranges::all_of(args, [](const auto &t) { return t.isPublic(); });
         }
-        return concretized;
+        return typeRef;
     }
 
-    TypeRef Enum::substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) const {
-        auto typeRef = TypeRef::make<Enum>(name, modulePath, 0, declaration, source, useMap);
-        auto e = *typeRef.as<Enum>();
+    std::pair<TypeRef, std::shared_ptr<Enum>> Enum::substituteGenerics(ModuleRegistry &registry, const std::map<TypeRef, TypeRef> &generics) {
+        auto [typeRef, e] = TypeRef::makeEnum(name, modulePath, 0, declaration, source, useMap);
         for (const auto &item: members) {
             std::vector<TypeRef> memberTypes;
             for (const auto &t: item.types) {
@@ -91,8 +89,8 @@ namespace racc::registry {
             const auto &[_, success] = e->memberMap.emplace(member.name, &member);
             COMPILER_ASSERT(success, "insert into s.memberMap failed");
         }
-        e->genericBase = genericBase.value_or(*TypeRef(this->type).as<Enum>());
-        return typeRef;
+        e->genericBase = genericBase.value_or(ptr());
+        return {typeRef, e};
     }
 
     Enum::~Enum() = default;

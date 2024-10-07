@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include<string>
-#include <vector>
-#include <memory>
-
 #include "Node.h"
 #include "Identifier.h"
-
 #include "GenericConstraintBase.h"
+
+#include <string>
+#include <vector>
+#include <memory>
+#include <optional>
 
 class racc::ast::ConstraintDeclaration final : public Node {
 public:
