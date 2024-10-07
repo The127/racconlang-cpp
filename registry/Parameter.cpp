@@ -6,7 +6,7 @@
 
 namespace racc::registry {
 
-    Parameter::Parameter(std::string name, TypeRef type, ParameterMode mode) : name(std::move(name)), type(std::move(type)), mode(mode) {}
+    Parameter::Parameter(Id name, TypeRef type, ParameterMode mode) : name(std::move(name)), type(std::move(type)), mode(mode) {}
 
     Parameter::~Parameter() = default;
 

@@ -17,7 +17,7 @@
 #include "Parameter.h"
 
 namespace racc::registry {
-    Interface::Interface(std::string name, std::string_view module, uint8_t arity, ast::InterfaceDeclaration *declaration,
+    Interface::Interface(Id name, Id module, uint8_t arity, ast::InterfaceDeclaration *declaration,
                          std::shared_ptr<sourcemap::Source> source,
                          std::shared_ptr<ast::UseMap> useMap)
             : name(std::move(name)),
@@ -29,8 +29,8 @@ namespace racc::registry {
               useMap(std::move(useMap)) {
 
         for (const auto &item: declaration->genericParams) {
-            auto &t = genericParams.emplace_back(TypeRef::var(std::string(item.name)));
-            const auto &[_, success] = genericParamsMap.emplace(item.name, t);
+            auto &t = genericParams.emplace_back(TypeRef::var(item));
+            const auto &[_, success] = genericParamsMap.emplace(item, t);
             COMPILER_ASSERT(success, "insert into genericParamsMap failed");
         }
     }

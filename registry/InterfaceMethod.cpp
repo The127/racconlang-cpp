@@ -23,9 +23,8 @@ namespace racc::registry {
 
         method.genericParamsMap = interface.genericParamsMap;
         for (const auto &param: decl.genericParams) {
-            auto paramName = std::string(param.name);
-            auto p = method.genericParams.emplace_back(TypeRef::var(paramName));
-            method.genericParamsMap.insert_or_assign(paramName, p);
+            auto p = method.genericParams.emplace_back(TypeRef::var(param));
+            method.genericParamsMap.insert_or_assign(param, p);
         }
 
         for (const auto &paramDecl: decl.parameters) {
@@ -41,7 +40,7 @@ namespace racc::registry {
 
             auto paramMode = paramDecl.isRef ? ParameterMode::Ref : (paramDecl.isMut ? ParameterMode::Mut : ParameterMode::Normal);
 
-            method.params.emplace_back(std::string(paramDecl.name.name), paramType, paramMode);
+            method.params.emplace_back(paramDecl.name, paramType, paramMode);
         }
 
         if (decl.returnType) {
@@ -57,7 +56,7 @@ namespace racc::registry {
         }
 
         if (decl.name) {
-            method.name = std::string(decl.name->name);
+            method.name = Id(*decl.name);
         }
 
         return method;

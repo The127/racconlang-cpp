@@ -12,7 +12,7 @@ namespace racc::registry {
         setter.interface = interface;
 
         if (decl.name) {
-            setter.name = decl.name->name;
+            setter.name = *decl.name;
         }
 
         if (decl.parameter) {
@@ -26,7 +26,7 @@ namespace racc::registry {
             }
 
             setter.argMut = decl.parameter->isMut;
-            setter.argName = decl.parameter->name.name;
+            setter.argName = decl.parameter->name;
         }
 
         return setter;

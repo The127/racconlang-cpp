@@ -4,7 +4,7 @@
 
 namespace racc::registry {
 
-    StructMember::StructMember(std::string name, ast::PropertyDeclaration *decl, TypeRef type, bool isPublic, bool isMutable)
+    StructMember::StructMember(Id name, ast::PropertyDeclaration *decl, TypeRef type, bool isPublic, bool isMutable)
             : name(std::move(name)),
               decl(decl),
               type(std::move(type)),

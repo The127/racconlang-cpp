@@ -123,11 +123,11 @@ private:
 
     bool recoverUntil(TokenTreeIterator &it, const RecoverPredicate &predicate);
 
-    static bool recoverUntil(TokenTreeIterator &it, const RecoverPredicate &predicate, errors::ErrorContext &errCtx);
+    bool recoverUntil(TokenTreeIterator &it, const RecoverPredicate &predicate, errors::ErrorContext &errCtx);
 
-    static lexer::Token consumeToken(TokenTreeIterator &it, lexer::TokenType type);
+    lexer::Token consumeToken(TokenTreeIterator &it, lexer::TokenType type) const;
 
-    static std::optional<lexer::Token> tryConsumeToken(TokenTreeIterator &it, lexer::TokenType type);
+    std::optional<lexer::Token> tryConsumeToken(TokenTreeIterator &it, lexer::TokenType type);
 
     const lexer::TokenTree &consumeTokenTree(TokenTreeIterator &it, lexer::TokenType type);
 

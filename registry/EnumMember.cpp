@@ -6,7 +6,7 @@
 
 namespace racc::registry {
 
-    EnumMember::EnumMember(std::string name, ast::EnumMemberDeclaration *decl, std::vector<TypeRef> types)
+    EnumMember::EnumMember(Id name, ast::EnumMemberDeclaration *decl, std::vector<TypeRef> types)
             : name(std::move(name)),
               decl(decl),
               types(std::move(types)) {

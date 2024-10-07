@@ -2,6 +2,7 @@
 
 #include "predeclare.h"
 
+#include "Id.h"
 #include "TypeRef.h"
 
 #include <string>
@@ -9,11 +10,11 @@
 
 class racc::registry::EnumMember {
 public:
-    std::string name;
+    Id name;
     ast::EnumMemberDeclaration *decl;
     std::vector<TypeRef> types;
 
-    EnumMember(std::string name, ast::EnumMemberDeclaration *decl, std::vector<TypeRef> types);
+    EnumMember(Id name, ast::EnumMemberDeclaration *decl, std::vector<TypeRef> types);
 
     EnumMember(const EnumMember &) = delete;
 

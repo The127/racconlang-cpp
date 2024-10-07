@@ -2,6 +2,7 @@
 
 #include "predeclare.h"
 
+#include "Id.h"
 #include "TypeRef.h"
 
 #include <string>
@@ -12,7 +13,7 @@ private:
     InterfaceMethod();
 
 public:
-    std::string name;
+    Id name;
     bool returnMut{};
     bool isMut{};
     std::vector<Parameter> params;
@@ -20,7 +21,7 @@ public:
     std::weak_ptr<Interface> interface;
     ast::InterfaceMethodDeclaration *decl{};
     std::vector<TypeRef> genericParams;
-    std::map<std::string, TypeRef, std::less<>> genericParamsMap;
+    std::map<Id, TypeRef, std::less<>> genericParamsMap;
     std::optional<std::shared_ptr<Interface>> genericBase;
 
     ~InterfaceMethod();

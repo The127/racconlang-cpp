@@ -2,7 +2,7 @@
 
 namespace racc::registry {
 
-    TypeVar::TypeVar(std::string name) : name(std::move(name)) {}
+    TypeVar::TypeVar(Id name) : name(std::move(name)) {}
 
     TypeVar &TypeVar::operator=(TypeVar &&) noexcept = default;
 

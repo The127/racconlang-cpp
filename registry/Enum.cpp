@@ -18,7 +18,7 @@
 
 namespace racc::registry {
 
-    Enum::Enum(std::string name, std::string_view module, uint8_t arity, ast::EnumDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
+    Enum::Enum(Id name, Id module, uint8_t arity, ast::EnumDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
                std::shared_ptr<ast::UseMap> useMap)
             : name(std::move(name)),
               modulePath(module),
@@ -29,7 +29,7 @@ namespace racc::registry {
               useMap(std::move(useMap)) {
 
         for (const auto &item: declaration->genericParams) {
-            auto &t = genericParams.emplace_back(TypeRef::var(std::string(item.name)));
+            auto &t = genericParams.emplace_back(TypeRef::var(item.name));
             const auto &[_, success] = genericParamsMap.emplace(item.name, t);
             COMPILER_ASSERT(success, "insert into genericParamsMap failed");
         }
@@ -37,7 +37,7 @@ namespace racc::registry {
 
     void Enum::populate(ModuleRegistry &registry) {
         for (auto &decl: declaration->memberDeclarations) {
-            auto memberName = std::string(decl.name.name);
+            auto memberName = Id(decl.name);
             std::vector<TypeRef> types;
             for (const auto &sig: decl.values) {
                 auto typeResult = registry.lookupType(sig, genericParamsMap, modulePath, *useMap);

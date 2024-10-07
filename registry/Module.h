@@ -7,6 +7,7 @@
 
 #include "predeclare.h"
 
+#include "Id.h"
 #include "TypeRef.h"
 
 #include <string>
@@ -16,13 +17,13 @@
 
 class racc::registry::Module {
 public:
-    std::string path;
-    std::map<std::pair<std::string, uint8_t>, TypeRef, std::less<>> types;
+    Id path;
+    std::map<std::pair<Id, uint8_t>, TypeRef, std::less<>> types;
 
-    // std::map<std::string, Variable, std::less<>> vars;
-    // std::map<std::string, FunctionGroup, std::less<>> funcs;
+    // std::map<Id, Variable, std::less<>> vars;
+    // std::map<Id, FunctionGroup, std::less<>> funcs;
 
-    explicit Module(std::string name);
+    explicit Module(Id name);
 
     Module(const Module &) = delete;
 
@@ -42,7 +43,7 @@ public:
 
     void addInterface(const std::shared_ptr<sourcemap::Source> &source, ast::InterfaceDeclaration &decl, const std::shared_ptr<ast::UseMap> &useMap);
 
-    std::optional<TypeRef> getType(const std::string &name, uint8_t arity);
+    std::optional<TypeRef> getType(const Id &name, uint8_t arity);
 
     void populate(ModuleRegistry &registry);
 

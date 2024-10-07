@@ -155,7 +155,8 @@ namespace racc::parser {
         use.endPos = use.path.end();
 
         recoverUntil(it, [](const auto &n) {
-            return n.isTopLevelStarter() || n.isToken(lexer::TokenType::Semicolon) || n.isToken(lexer::TokenType::As) || n.isTokenTree(lexer::TokenType::OpenCurly);
+            return n.isTopLevelStarter() || n.isToken(lexer::TokenType::Semicolon) || n.isToken(lexer::TokenType::As) ||
+                   n.isTokenTree(lexer::TokenType::OpenCurly);
         });
 
         if (it.isEnd() || it->isTopLevelStarter()) {
@@ -265,7 +266,7 @@ namespace racc::parser {
     }
 
     std::vector<lexer::Token> Parser::modifierRule(TokenTreeIterator &it,
-                                            const RecoverPredicate &recoverPredicate) {
+                                                   const RecoverPredicate &recoverPredicate) {
         std::vector<lexer::Token> result;
 
         while (it) {
@@ -640,7 +641,7 @@ namespace racc::parser {
 
 
     ast::InterfaceMethodDeclaration Parser::interfaceMethodRule(TokenTreeIterator &it,
-                                                           std::vector<lexer::Token> modifiers) {
+                                                                std::vector<lexer::Token> modifiers) {
         auto fnToken = consumeToken(it, lexer::TokenType::Fn);
         auto decl = ast::InterfaceMethodDeclaration();
         decl.startPos = fnToken.start;
@@ -742,7 +743,7 @@ namespace racc::parser {
     }
 
     ast::InterfaceGetterDeclaration Parser::interfaceGetterRule(TokenTreeIterator &it,
-                                                           std::vector<lexer::Token> modifiers) {
+                                                                std::vector<lexer::Token> modifiers) {
         auto getToken = consumeToken(it, lexer::TokenType::Get);
         auto decl = ast::InterfaceGetterDeclaration();
         decl.startPos = getToken.start;
@@ -807,7 +808,7 @@ namespace racc::parser {
     }
 
     ast::InterfaceSetterDeclaration Parser::interfaceSetterRule(TokenTreeIterator &it,
-                                                           std::vector<lexer::Token> modifiers) {
+                                                                std::vector<lexer::Token> modifiers) {
         auto setToken = consumeToken(it, lexer::TokenType::Set);
         auto decl = ast::InterfaceSetterDeclaration();
         decl.startPos = setToken.start;
@@ -823,6 +824,8 @@ namespace racc::parser {
             addError(std::move(error));
             return decl;
         }
+
+        recoverUntil(it, [](const auto &n) { return n.isToken(lexer::TokenType::Identifier) || n.isTokenTree(lexer::TokenType::OpenParen); });
 
         decl.name = identifierRule(it);
         if (!decl.name) {
@@ -1063,7 +1066,7 @@ namespace racc::parser {
     }
 
     std::vector<ast::ConstraintDeclaration> Parser::genericConstraintListRule(TokenTreeIterator &it,
-                                                                         const RecoverPredicate &recoverPredicate) {
+                                                                              const RecoverPredicate &recoverPredicate) {
         std::vector<ast::ConstraintDeclaration> result;
         while (it && it->isToken(lexer::TokenType::Where)) {
             auto constraint = genericConstraintRule(it);
@@ -2591,10 +2594,12 @@ namespace racc::parser {
         return beforeRecover != it;
     }
 
-    lexer::Token Parser::consumeToken(TokenTreeIterator &it, const lexer::TokenType type) {
-        COMPILER_ASSERT(it, std::format("trying to consume {} on empty iterator", TokenTypeName(type)));
+    lexer::Token Parser::consumeToken(TokenTreeIterator &it, const lexer::TokenType type) const {
+        COMPILER_ASSERT(it, std::format("trying to consume {} on empty iterator at {}", TokenTypeName(type),
+                                        source->getLocation((it - 1)->getEnd() - source->offset)));
         COMPILER_ASSERT(it->isToken(type),
-                        std::format("trying to consume {} but got {}", TokenTypeName(type), it->debugString()));
+                        std::format("trying to consume {} but got {} at {}", TokenTypeName(type), it->debugString(),
+                                    source->getLocation((it - 1)->getEnd() - source->offset)));
 
         auto token = it->getToken();
         it += 1;
@@ -2631,7 +2636,7 @@ namespace racc::parser {
     }
 
     std::optional<const lexer::TokenTree *> Parser::tryConsumeTokenTree(TokenTreeIterator &it,
-                                                                 const lexer::TokenType type) {
+                                                                        const lexer::TokenType type) {
         if (it.isEnd() || !it->isTokenTree(type)) {
             return std::nullopt;
         }

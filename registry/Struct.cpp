@@ -19,8 +19,8 @@
 
 namespace racc::registry {
 
-    Struct::Struct(std::string name,
-                   std::string_view module,
+    Struct::Struct(Id name,
+                   Id module,
                    const uint8_t arity,
                    ast::StructDeclaration *declaration,
                    std::shared_ptr<sourcemap::Source> source,
@@ -36,7 +36,7 @@ namespace racc::registry {
         COMPILER_ASSERT(!declaration->isValue, "value structs are not implemented yet");
 
         for (const auto &item: declaration->genericParams) {
-            auto &t = genericParams.emplace_back(TypeRef::var(std::string(item.name)));
+            auto &t = genericParams.emplace_back(TypeRef::var(item));
             const auto &[_, success] = genericParamsMap.emplace(item.name, t);
             COMPILER_ASSERT(success, "insert into genericParamsMap failed");
         }
@@ -48,7 +48,7 @@ namespace racc::registry {
                 source->addError(errors::CompilerError(errors::ErrorCode::PublicMemberOnNonPublicStruct, decl.start()));
             }
 
-            auto memberName = std::string(decl.name.name);
+            auto memberName = Id(decl.name);
             auto typeResult = registry.lookupType(*decl.type, genericParamsMap, modulePath, *useMap);
             auto memberType = TypeRef::unknown();
 

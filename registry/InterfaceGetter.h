@@ -2,6 +2,7 @@
 
 #include "predeclare.h"
 
+#include "Id.h"
 #include "TypeRef.h"
 
 #include <string>
@@ -10,7 +11,7 @@
 class racc::registry::InterfaceGetter {
 public:
 
-    std::string name;
+    Id name;
     TypeRef type;
     bool mut{};
     bool retMut{};

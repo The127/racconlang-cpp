@@ -7,6 +7,8 @@
 
 #include "predeclare.h"
 
+#include "Id.h"
+
 #include "ModuleRegistry.h"
 #include "TypeRef.h"
 #include "TypeBase.h"
@@ -18,8 +20,8 @@
 
 class racc::registry::Alias : public TypeBase<Alias> {
 public:
-    std::string name;
-    std::string_view modulePath;
+    Id name;
+    Id modulePath;
     uint8_t arity;
     bool isPublic;
     std::unique_ptr<TypeRef> aliasedType;
@@ -27,10 +29,10 @@ public:
     std::shared_ptr<sourcemap::Source> source;
     std::shared_ptr<ast::UseMap> useMap;
     std::vector<TypeRef> genericParams;
-    std::map<std::string, TypeRef, std::less<>> genericParamsMap;
+    std::map<Id, TypeRef, std::less<>> genericParamsMap;
     std::optional<std::shared_ptr<Alias>> genericBase;
 
-    Alias(std::string name, std::string_view module, uint8_t arity, ast::AliasDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
+    Alias(Id name, Id module, uint8_t arity, ast::AliasDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
           std::shared_ptr<ast::UseMap> useMap);
 
     Alias(const Alias &) = delete;

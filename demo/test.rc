@@ -16,8 +16,8 @@ fn asdf() {}
 struct tuples_test {
     a: (byte,byte);
     b: (byte,byte);
-    c: (byte,rune,s32);
-    d: (byte,rune,f32);
+    c: (byte,u16,i32);
+    d: (byte,u16,f32);
 }
 
 
@@ -33,7 +33,7 @@ pub struct X<T> {
 }
 
 pub struct Z {
-    pub x: X<s32>;
+    pub x: X<i32>;
 }
 
 mod std::foo;
@@ -49,17 +49,17 @@ pub enum Option<T>{
 
 let x: bar::asdf;
 
-struct ASDF<T> {
+struct Bar<T> {
     x: Option<T>;
     y: mycoollib::foobar::Z;
 }
 
-struct BLABLABLA {
-    x: ASDF<s32>;
+struct Baz {
+    x: Bar<i32>;
 }
 
 pub interface Foo1<T> : Bar::foo, Bar2<T> where T : Asdf {
-    pub fn foo(a: foo::bar, foo: s32);
+    pub fn foo(a: foo::bar, foo: i32);
     pub fn foo3() -> mut u8;
     mut pub fn foo2(a: u8, b: (u8, u8));
     pub fn bar<T>(t: T);
@@ -69,8 +69,8 @@ pub interface Foo1<T> : Bar::foo, Bar2<T> where T : Asdf {
     pub get x() -> u8;
     pub mut get y() -> mut Bar<T>;
 
-    pub set x(mut a: foobar);
-    pub set<T> xy(y: T);
+    pub set x(mut a: i32);
+    pub set xy(y: T);
 
     set z(@value: u8);
 }
@@ -80,11 +80,11 @@ let bar: T;
 mut let foo: u8;
 let x: Foo<T>;
 
-pub struct Foo2(x: s32, y: s32);
+pub struct Foo2(x: i32, y: i32);
 
 pub struct Foo3<T>  where T : Foobar {
-    foo: s32;
-    pub mut bar: s32;
+    foo: i32;
+    pub mut bar: i32;
 }
 
 pub struct Foo4<T> where T : Foobar {
@@ -99,32 +99,32 @@ alias bar<T> = (Foo2, std::map<Foo1<T>, T>) where T : numeric;
 fn foo(){}
 
 impl<T> Foo<T> on Bar<T> for Qux<T> {
-    Bar(ref i: s32){}
+    Bar(ref i: i32){}
     ~Bar(){}
     lol(){}
-    fn foo(a: s32) -> Bar => ;
+    fn foo(a: i32) -> Bar => ;
     fn foo2(b: string, t: T) {}
-    mut get a() -> s32 {}
-    set b(val: s32) => ;
+    mut get a() -> i32 {}
+    set b(val: i32) => ;
 }
 
-fn foo<T>(mut t: T, ref x: s32) {
+fn foo<T>(mut t: T, ref x: i32) {
     whatever
 }
 
-fn foo(t: fn(s32)->s32) {
+fn foo(t: fn(i32)->i32) {
 
 }
 
 
 
-fn asdf(x: s32) {
-    let f: fn(fn(s32)->s32) = foo(?);
+fn asdf(x: i32) {
+    let f: fn(fn(i32)->i32) = foo(?);
     foo(x);
-    foo<s32>(x);
+    foo<i32>(x);
 }
 
-fn foo(mapper: fn(s32)->s32) {
+fn foo(mapper: fn(i32)->i32) {
 
 }
 
@@ -137,7 +137,7 @@ struct Foo7<T1,T2> {
     b: T2;
 }
 
-alias Foo8<T2> = Foo7<T2, s32>;
+alias Foo8<T2> = Foo7<T2, i32>;
 
 
 mod foo;
@@ -194,5 +194,9 @@ impl Vector<T> {
     // ...
 }
 
+fn asdf(x: byte) {
 
-alias Pos32 = some::geometry::library::Point2d<s32>;
+}
+
+
+alias Poi32 = some::geometry::library::Point2d<i32>;

@@ -7,6 +7,7 @@
 
 #include "predeclare.h"
 
+#include "Id.h"
 #include "TypeRef.h"
 #include "TypeBase.h"
 
@@ -19,20 +20,20 @@
 
 class racc::registry::Struct : public TypeBase<Struct> {
 public:
-    std::string name;
-    std::string_view modulePath;
+    Id name;
+    Id modulePath;
     uint8_t arity;
     bool isPublic;
     ast::StructDeclaration *declaration;
     std::shared_ptr<sourcemap::Source> source;
     std::shared_ptr<ast::UseMap> useMap;
     std::vector<TypeRef> genericParams;
-    std::map<std::string, TypeRef, std::less<>> genericParamsMap;
+    std::map<Id, TypeRef, std::less<>> genericParamsMap;
     std::vector<StructMember> members;
-    std::map<std::string, StructMember *, std::less<>> memberMap;
+    std::map<Id, StructMember *, std::less<>> memberMap;
     std::optional<std::shared_ptr<Struct>> genericBase;
 
-    Struct(std::string name, std::string_view module, uint8_t arity, ast::StructDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
+    Struct(Id name, Id module, uint8_t arity, ast::StructDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
            std::shared_ptr<ast::UseMap> useMap);
 
     Struct(const Struct &) = delete;

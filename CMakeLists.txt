@@ -79,6 +79,8 @@ add_library(racc STATIC
         registry/InterfaceSetter.cpp
         registry/InterfaceMethod.cpp
         registry/Parameter.cpp
+        registry/Id.cpp
+        registry/Id.h
 )
 
 

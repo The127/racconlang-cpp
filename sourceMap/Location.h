@@ -6,6 +6,7 @@
 
 #include "predeclare.h"
 
+#include <format>
 #include <cstdint>
 #include <string>
 
@@ -16,6 +17,19 @@ public:
     uint32_t column;
 
     Location(std::string_view fileName, uint32_t line, uint32_t column);
+};
 
-    [[nodiscard]] std::string toString() const;
+
+
+template<class CharT>
+struct std::formatter<racc::sourcemap::Location, CharT> {
+    template <typename FormatParseContext>
+    constexpr auto parse(FormatParseContext &ctx) {
+        return ctx.begin();
+    }
+
+    template<typename FormatContext>
+    auto format(const racc::sourcemap::Location &loc, FormatContext &ctx) const {
+        return std::format_to(ctx.out(), "{}:{}:{}", loc.fileName, loc.line, loc.column);
+    }
 };

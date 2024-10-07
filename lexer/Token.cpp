@@ -112,13 +112,7 @@ namespace racc::lexer {
     }
 
     std::string Token::toString(const sourcemap::SourceMap &sources) const {
-        std::string result;
-        result += TokenTypeName(type);
-        result += " <";
-        result += sources.getText(start, end);
-        result += "> at ";
-        result += sources.getLocation(start).toString();
-        return result;
+        return std::format("{} <{}> at {}", TokenTypeName(type), sources.getText(start, end), sources.getLocation(start));
     }
 
 }

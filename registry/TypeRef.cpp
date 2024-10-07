@@ -116,7 +116,7 @@ namespace racc::registry {
         }, _type->val);
     }
 
-    std::string_view TypeRef::declModulePath() const {
+    Id TypeRef::declModulePath() const {
         if (!_type) {
             COMPILER_ASSERT(false, "type does not have a module");
         }
@@ -125,7 +125,7 @@ namespace racc::registry {
                 [&](Interface &x) { return x.modulePath; },
                 [&](Enum &x) { return x.modulePath; },
                 [&](Alias &x) { return x.modulePath; },
-                [](auto &) -> std::string_view { COMPILER_ASSERT(false, "this type does not have a module"); }
+                [](auto &) -> Id { COMPILER_ASSERT(false, "this type does not have a module"); }
         }, _type->val);
     }
 
@@ -150,21 +150,21 @@ namespace racc::registry {
         return emptyRef;
     }
 
-    TypeRef TypeRef::var(std::string name) {
+    TypeRef TypeRef::var(Id name) {
         TypeRef t { std::make_shared<TypeVariant>(std::monostate()) };
         auto& v = t._type->val.emplace<TypeVar>(name);
         v._typeref = t._type;
         return t;
     }
 
-    TypeRef TypeRef::makeBuiltin(std::string name, size_t size) {
+    TypeRef TypeRef::makeBuiltin(Id name, size_t size) {
         TypeRef t { std::make_shared<TypeVariant>(std::monostate()) };
         auto& v = t._type->val.emplace<BuiltinType>(name, size);
         v._typeref = t._type;
         return t;
     }
 
-    std::pair<TypeRef, std::shared_ptr<Alias>> TypeRef::makeAlias(std::string name, std::string_view module, int arity, ast::AliasDeclaration *decl, std::shared_ptr<sourcemap::Source> source,
+    std::pair<TypeRef, std::shared_ptr<Alias>> TypeRef::makeAlias(Id name, Id module, int arity, ast::AliasDeclaration *decl, std::shared_ptr<sourcemap::Source> source,
                                std::shared_ptr<ast::UseMap> useMap) {
         TypeRef t { std::make_shared<TypeVariant>(std::monostate()) };
         auto& v = t._type->val.emplace<Alias>(name, module, arity, decl, source, useMap);
@@ -172,7 +172,7 @@ namespace racc::registry {
         return {t, std::shared_ptr<Alias>(t._type, &v)};
     }
 
-    std::pair<TypeRef, std::shared_ptr<Enum>> TypeRef::makeEnum(std::string name, std::string_view module, int arity, ast::EnumDeclaration *decl, std::shared_ptr<sourcemap::Source> source,
+    std::pair<TypeRef, std::shared_ptr<Enum>> TypeRef::makeEnum(Id name, Id module, int arity, ast::EnumDeclaration *decl, std::shared_ptr<sourcemap::Source> source,
                               std::shared_ptr<ast::UseMap> useMap) {
         TypeRef t { std::make_shared<TypeVariant>(std::monostate()) };
         auto& v = t._type->val.emplace<Enum>(name, module, arity, decl, source, useMap);
@@ -180,7 +180,7 @@ namespace racc::registry {
         return {t, std::shared_ptr<Enum>(t._type, &v)};
     }
 
-    std::pair<TypeRef, std::shared_ptr<Struct>> TypeRef::makeStruct(std::basic_string<char> name, std::string_view module, unsigned long arity, ast::StructDeclaration *decl,
+    std::pair<TypeRef, std::shared_ptr<Struct>> TypeRef::makeStruct(Id name, Id module, unsigned long arity, ast::StructDeclaration *decl,
                                 const std::shared_ptr<sourcemap::Source> &source, const std::shared_ptr<ast::UseMap> &useMap) {
         TypeRef t { std::make_shared<TypeVariant>(std::monostate()) };
         auto& v = t._type->val.emplace<Struct>(name, module, arity, decl, source, useMap);
@@ -188,7 +188,7 @@ namespace racc::registry {
         return {t, std::shared_ptr<Struct>(t._type, &v)};
     }
 
-    std::pair<TypeRef, std::shared_ptr<Interface>> TypeRef::makeInterface(std::basic_string<char> name, std::string_view module, unsigned long arity, ast::InterfaceDeclaration *decl,
+    std::pair<TypeRef, std::shared_ptr<Interface>> TypeRef::makeInterface(Id name, Id module, unsigned long arity, ast::InterfaceDeclaration *decl,
                                    const std::shared_ptr<sourcemap::Source> &source, const std::shared_ptr<ast::UseMap> &useMap) {
         TypeRef t { std::make_shared<TypeVariant>(std::monostate()) };
         auto& v = t._type->val.emplace<Interface>(name, module, arity, decl, source, useMap);

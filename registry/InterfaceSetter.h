@@ -2,15 +2,16 @@
 
 #include "predeclare.h"
 
+#include "Id.h"
 #include "TypeRef.h"
 
 #include <string>
 
 class racc::registry::InterfaceSetter {
 public:
-    std::string name;
+    Id name;
     TypeRef type;
-    std::string argName;
+    Id argName;
     bool argMut{};
     ast::InterfaceSetterDeclaration* decl{};
     Interface* interface{};

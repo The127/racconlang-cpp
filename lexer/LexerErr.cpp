@@ -67,29 +67,29 @@ namespace racc::lexer {
     }
 
     std::string LexerErr::toString(const sourcemap::SourceMap &sources) const {
-        auto locStr = sources.getLocation(got.start).toString();
+        auto loc = sources.getLocation(got.start);
         switch (reason) {
             case LexerErrReason::UnclosedTokenTree:
                 COMPILER_ASSERT(!expected.empty(), "expected is empty for UnclosedTokenTree error");
-                return std::format("unclosed lexer::Token tree at {}, expected {}", locStr, expectedString());
+                return std::format("unclosed lexer::Token tree at {}, expected {}", loc, expectedString());
 
             case LexerErrReason::UnexpectedInput:
                 if (expected.empty()) {
-                    return std::format("unexpected input `{}` at {}", sources.getText(got), locStr);
+                    return std::format("unexpected input `{}` at {}", sources.getText(got), loc);
                 } else {
-                    return std::format("unexpected input `{}` at {}, expected {}", sources.getText(got), locStr, expectedString());
+                    return std::format("unexpected input `{}` at {}, expected {}", sources.getText(got), loc, expectedString());
                 }
 
             case LexerErrReason::UnexpectedEndOfInput:
                 if (expected.empty()) {
-                    return std::format("unexpected end of input at {}", locStr);
+                    return std::format("unexpected end of input at {}", loc);
                 } else {
-                    return std::format("unexpected end of input at {}, expected {}", locStr, expectedString());
+                    return std::format("unexpected end of input at {}, expected {}", loc, expectedString());
                 }
 
             case LexerErrReason::InvalidIdentifier:
                 COMPILER_ASSERT(expected.empty(), "expected is not empty for InvalidIdentifier error");
-                return std::format("invalid identifier `{}` at {}", sources.getText(got), locStr);
+                return std::format("invalid identifier `{}` at {}", sources.getText(got), loc);
 
             default:
                 COMPILER_ASSERT(false, "unhandled lexer error");

@@ -2,19 +2,20 @@
 
 #include "predeclare.h"
 
+#include "Id.h"
 #include "TypeRef.h"
 
 #include <string>
 
 class racc::registry::StructMember {
 public:
-    std::string name;
+    Id name;
     ast::PropertyDeclaration *decl;
     TypeRef type;
     bool isPublic;
     bool isMutable;
 
-    StructMember(std::string name,
+    StructMember(Id name,
                  ast::PropertyDeclaration *decl,
                  TypeRef type,
                  bool isPublic,

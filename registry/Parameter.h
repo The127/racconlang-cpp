@@ -2,6 +2,7 @@
 
 #include "predeclare.h"
 
+#include "Id.h"
 #include "TypeRef.h"
 
 #include <cstdint>
@@ -17,11 +18,11 @@ enum class racc::registry::ParameterMode {
 
 class racc::registry::Parameter {
 public:
-    std::string name;
+    Id name;
     TypeRef type;
     ParameterMode mode;
 
-    Parameter(std::string name, TypeRef type, ParameterMode mode);
+    Parameter(Id name, TypeRef type, ParameterMode mode);
     Parameter(const Parameter&) = delete;
     Parameter& operator=(const Parameter&) = delete;
     Parameter(Parameter&&) noexcept;

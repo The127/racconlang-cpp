@@ -7,6 +7,7 @@
 
 #include "predeclare.h"
 
+#include "Id.h"
 #include "parser/Parser.h"
 #include "sourceMap/Source.h"
 #include "FunctionType.h"
@@ -19,14 +20,14 @@
 class racc::registry::ModuleRegistry {
 
 public:
-    std::map<std::string, Module, std::less<>> modules;
+    std::map<Id, Module, std::less<>> modules;
 
     std::map<std::vector<TypeRef>, TypeRef> tupleTypes;
     std::map<std::vector<std::pair<ParameterMode, TypeRef>>, TypeRef> functionTypes;
 
     std::map<std::pair<TypeRef, std::vector<TypeRef>>, TypeRef> genericTypes;
 
-    std::map<std::string, TypeRef, std::less<>> builtinTypes;
+    std::map<Id, TypeRef, std::less<>> builtinTypes;
 
     ModuleRegistry();
 
@@ -40,7 +41,7 @@ public:
 
     ~ModuleRegistry();
 
-    Module &addModule(std::string path);
+    Module &addModule(Id path);
 
     template<typename T>
     Module &getModule(T path) {
@@ -57,7 +58,7 @@ public:
     }
 
     std::expected<TypeRef, errors::CompilerError>
-    lookupType(const ast::Signature &signature, const std::map<std::string, TypeRef, std::less<>> &generics, std::string_view moduleName,
+    lookupType(const ast::Signature &signature, const std::map<Id, TypeRef, std::less<>> &generics, Id moduleName,
                const ast::UseMap &uses);
 
     TypeRef getTupleType(const std::vector<TypeRef> &types);
@@ -73,15 +74,15 @@ public:
 
 private:
     std::expected<TypeRef, errors::CompilerError>
-    lookupTupleType(const ast::TupleSignature &signature, const std::map<std::string, TypeRef, std::less<>> &generics, std::string_view moduleName,
+    lookupTupleType(const ast::TupleSignature &signature, const std::map<Id, TypeRef, std::less<>> &generics, Id moduleName,
                     const ast::UseMap &uses);
 
     std::expected<TypeRef, errors::CompilerError>
-    lookupFunctionType(const ast::FunctionSignature &signature, const std::map<std::string, TypeRef, std::less<>> &generics, std::string_view moduleName,
+    lookupFunctionType(const ast::FunctionSignature &signature, const std::map<Id, TypeRef, std::less<>> &generics, Id moduleName,
                        const ast::UseMap &uses);
 
     std::expected<TypeRef, errors::CompilerError>
-    lookupNamedType(const ast::TypeSignature &signature, const std::map<std::string, TypeRef, std::less<>> &generics, std::string_view currentModuleName,
+    lookupNamedType(const ast::TypeSignature &signature, const std::map<Id, TypeRef, std::less<>> &generics, Id currentModuleName,
                     const ast::UseMap &uses);
 
 };

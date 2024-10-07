@@ -11,7 +11,7 @@ namespace racc::registry {
         getter.mut = decl.isMut;
 
         if (decl.name) {
-            getter.name = decl.name->name;
+            getter.name = *decl.name;
         }
 
         if (decl.returnType) {

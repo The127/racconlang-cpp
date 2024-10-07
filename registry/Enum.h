@@ -7,6 +7,7 @@
 
 #include "predeclare.h"
 
+#include "Id.h"
 #include "ModuleRegistry.h"
 #include "TypeRef.h"
 #include "TypeBase.h"
@@ -18,20 +19,20 @@
 
 class racc::registry::Enum : public TypeBase<Enum> {
 public:
-    std::string name;
-    std::string_view modulePath;
+    Id name;
+    Id modulePath;
     uint8_t arity;
     bool isPublic;
     ast::EnumDeclaration *declaration;
     std::shared_ptr<sourcemap::Source> source;
     std::shared_ptr<ast::UseMap> useMap;
     std::vector<TypeRef> genericParams;
-    std::map<std::string, TypeRef, std::less<>> genericParamsMap;
+    std::map<Id, TypeRef, std::less<>> genericParamsMap;
     std::vector<EnumMember> members;
-    std::map<std::string, EnumMember *, std::less<>> memberMap;
+    std::map<Id, EnumMember *, std::less<>> memberMap;
     std::optional<std::shared_ptr<Enum>> genericBase;
 
-    Enum(std::string name, std::string_view module, uint8_t arity, ast::EnumDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
+    Enum(Id name, Id module, uint8_t arity, ast::EnumDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
          std::shared_ptr<ast::UseMap> useMap);
 
     Enum(const Enum &) = delete;

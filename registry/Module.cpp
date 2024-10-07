@@ -23,8 +23,8 @@
 
 namespace racc::registry {
 
-    Module::Module(std::string path)
-            : path(std::move(path)) {
+    Module::Module(Id path)
+            : path(path) {
     }
 
     Module::~Module() = default;
@@ -35,7 +35,7 @@ namespace racc::registry {
 
     void Module::addStruct(const std::shared_ptr<sourcemap::Source> &source, ast::StructDeclaration &decl, const std::shared_ptr<ast::UseMap> &useMap) {
         COMPILER_ASSERT(decl.name.has_value(), "tried to add unnamed struct to registry");
-        auto name = std::string(decl.name->name);
+        auto name = Id(*decl.name);
         auto arity = decl.genericParams.size();
         if (types.contains({name, arity})) {
             source->errors.emplace_back(errors::ErrorCode::DuplicateTypeDeclaration, decl.start());
@@ -47,7 +47,7 @@ namespace racc::registry {
 
     void Module::addEnum(const std::shared_ptr<sourcemap::Source> &source, ast::EnumDeclaration &decl, const std::shared_ptr<ast::UseMap> &useMap) {
         COMPILER_ASSERT(decl.name.has_value(), "tried to add unnamed struct to registry");
-        auto name = std::string(decl.name->name);
+        auto name = Id(*decl.name);
         auto arity = decl.genericParams.size();
         if (types.contains({name, arity})) {
             source->errors.emplace_back(errors::ErrorCode::DuplicateTypeDeclaration, decl.start());
@@ -59,7 +59,7 @@ namespace racc::registry {
 
     void Module::addAlias(const std::shared_ptr<sourcemap::Source> &source, ast::AliasDeclaration &decl, const std::shared_ptr<ast::UseMap> &useMap) {
         COMPILER_ASSERT(decl.name.has_value(), "tried to add unnamed struct to registry");
-        auto name = std::string(decl.name->name);
+        auto name = Id(*decl.name);
         auto arity = decl.genericParams.size();
         if (types.contains({name, arity})) {
             source->errors.emplace_back(errors::ErrorCode::DuplicateTypeDeclaration, decl.start());
@@ -71,7 +71,7 @@ namespace racc::registry {
 
     void Module::addInterface(const std::shared_ptr<sourcemap::Source> &source, ast::InterfaceDeclaration &decl, const std::shared_ptr<ast::UseMap> &useMap) {
         COMPILER_ASSERT(decl.name.has_value(), "tried to add unnamed struct to registry");
-        auto name = std::string(decl.name->name);
+        auto name = Id(*decl.name);
         auto arity = decl.genericParams.size();
         if (types.contains({name, arity})) {
             source->errors.emplace_back(errors::ErrorCode::DuplicateTypeDeclaration, decl.start());
@@ -95,7 +95,7 @@ namespace racc::registry {
 //    }
     }
 
-    std::optional<TypeRef> Module::getType(const std::string &name, uint8_t arity) {
+    std::optional<TypeRef> Module::getType(const Id &name, uint8_t arity) {
         auto it = types.find({name, arity});
         if (it == types.end()) {
             return std::nullopt;

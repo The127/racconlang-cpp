@@ -2,7 +2,7 @@
 
 namespace racc::registry {
 
-    BuiltinType::BuiltinType(std::string name, size_t size)
+    BuiltinType::BuiltinType(Id name, size_t size)
             : name(std::move(name)),
               size(size) {
     }

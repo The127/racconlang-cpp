@@ -2,9 +2,11 @@
 // Created by zoe on 19.09.24.
 //
 
+#include <format>
 #include <ranges>
-#include "ModuleRegistry.h"
 
+#include "Id.h"
+#include "ModuleRegistry.h"
 #include "TypeRef.h"
 #include "Module.h"
 #include "TupleType.h"
@@ -25,20 +27,18 @@ namespace racc::registry {
 
         builtinTypes.emplace("byte", TypeRef::makeBuiltin("byte", 1));
 
-        builtinTypes.emplace("rune", TypeRef::makeBuiltin("rune", 4));
-
         builtinTypes.emplace("ptr", TypeRef::makeBuiltin("ptr", 8));
 
         builtinTypes.emplace("u8", TypeRef::makeBuiltin("u8", 1));
-        builtinTypes.emplace("s8", TypeRef::makeBuiltin("s8", 1));
+        builtinTypes.emplace("i8", TypeRef::makeBuiltin("i8", 1));
         builtinTypes.emplace("u16", TypeRef::makeBuiltin("u16", 2));
-        builtinTypes.emplace("s16", TypeRef::makeBuiltin("s16", 2));
+        builtinTypes.emplace("i16", TypeRef::makeBuiltin("i16", 2));
         builtinTypes.emplace("u32", TypeRef::makeBuiltin("u32", 4));
-        builtinTypes.emplace("s32", TypeRef::makeBuiltin("s32", 4));
+        builtinTypes.emplace("i32", TypeRef::makeBuiltin("i32", 4));
         builtinTypes.emplace("u64", TypeRef::makeBuiltin("u64", 8));
-        builtinTypes.emplace("s64", TypeRef::makeBuiltin("s64", 8));
+        builtinTypes.emplace("i64", TypeRef::makeBuiltin("i64", 8));
         builtinTypes.emplace("u128", TypeRef::makeBuiltin("u128", 16));
-        builtinTypes.emplace("s128", TypeRef::makeBuiltin("s128", 16));
+        builtinTypes.emplace("i128", TypeRef::makeBuiltin("i128", 16));
 
         builtinTypes.emplace("f32", TypeRef::makeBuiltin("f32", 4));
         builtinTypes.emplace("f64", TypeRef::makeBuiltin("f64", 8));
@@ -50,7 +50,7 @@ namespace racc::registry {
 
     ModuleRegistry &ModuleRegistry::operator=(ModuleRegistry &&) noexcept = default;
 
-    Module &ModuleRegistry::addModule(std::string path) {
+    Module &ModuleRegistry::addModule(Id path) {
         if (!modules.contains(path)) {
             modules.emplace(path, Module(path));
         }
@@ -99,7 +99,7 @@ namespace racc::registry {
 
 
     std::expected<TypeRef, errors::CompilerError>
-    ModuleRegistry::lookupType(const ast::Signature &signature, const std::map<std::string, TypeRef, std::less<>> &generics, std::string_view moduleName,
+    ModuleRegistry::lookupType(const ast::Signature &signature, const std::map<Id, TypeRef, std::less<>> &generics, Id moduleName,
                                const ast::UseMap &uses) {
         if (signature.isTuple()) {
             return lookupTupleType(signature.asTuple(), generics, moduleName, uses);
@@ -117,8 +117,8 @@ namespace racc::registry {
     }
 
     std::expected<TypeRef, errors::CompilerError>
-    ModuleRegistry::lookupTupleType(const ast::TupleSignature &signature, const std::map<std::string, TypeRef, std::less<>> &generics,
-                                    std::string_view moduleName,
+    ModuleRegistry::lookupTupleType(const ast::TupleSignature &signature, const std::map<Id, TypeRef, std::less<>> &generics,
+                                    Id moduleName,
                                     const ast::UseMap &uses) {
         std::vector<TypeRef> types;
 
@@ -135,8 +135,8 @@ namespace racc::registry {
     }
 
     std::expected<TypeRef, errors::CompilerError>
-    ModuleRegistry::lookupFunctionType(const ast::FunctionSignature &signature, const std::map<std::string, TypeRef, std::less<>> &generics,
-                                       std::string_view moduleName,
+    ModuleRegistry::lookupFunctionType(const ast::FunctionSignature &signature, const std::map<Id, TypeRef, std::less<>> &generics,
+                                       Id moduleName,
                                        const ast::UseMap &uses) {
         std::vector<std::pair<ParameterMode, TypeRef>> params;
         for (const auto &item: signature.parameterTypes) {
@@ -168,18 +168,18 @@ namespace racc::registry {
     }
 
     std::expected<TypeRef, errors::CompilerError>
-    ModuleRegistry::lookupNamedType(const ast::TypeSignature &signature, const std::map<std::string, TypeRef, std::less<>> &generics,
-                                    std::string_view currentModuleName,
+    ModuleRegistry::lookupNamedType(const ast::TypeSignature &signature, const std::map<Id, TypeRef, std::less<>> &generics,
+                                    Id currentModuleName,
                                     const ast::UseMap &uses) {
 
         uint8_t arity = signature.genericArguments.size();
 
-        auto lookupTypeByPath = [this](const std::string &path, uint8_t arity) -> std::optional<TypeRef> {
-            auto pos = path.rfind("::");
+        auto lookupTypeByPath = [this](const Id &path, uint8_t arity) -> std::optional<TypeRef> {
+            auto pos = path->rfind("::");
             COMPILER_ASSERT(pos != std::string::npos, "invalid module path");
 
-            auto moduleName = std::string_view(path).substr(0, pos);
-            auto typeName = std::string_view(path).substr(pos + 2);
+            auto moduleName = path.substr(0, pos);
+            auto typeName = path.substr(pos + 2);
 
             auto mod = modules.find(moduleName);
             if (mod == modules.end()) {
@@ -201,7 +201,7 @@ namespace racc::registry {
 
         if (signature.path.isRooted()) {
             if (signature.path.parts.size() == 1) {
-                auto &name = signature.path.parts[0].name;
+                auto name = Id(signature.path.parts[0]);
                 auto it = builtinTypes.find(name);
                 if (it != builtinTypes.end()) {
                     if (arity != 0) {
@@ -223,7 +223,7 @@ namespace racc::registry {
             }
         } else {
             if (signature.path.parts.size() == 1) {
-                auto name = signature.path.parts[0].name;
+                auto name = Id(signature.path.parts[0]);
                 {
                     auto it = generics.find(name);
                     if (it != generics.end()) {
@@ -232,7 +232,7 @@ namespace racc::registry {
                 }
 
 
-                auto path = uses.lookup(name);
+                auto path = uses.lookup(*name);
                 if (path) {
                     auto res = lookupTypeByPath(*path, arity);
                     if (res) {
@@ -305,13 +305,13 @@ namespace racc::registry {
         if (!t.isVar() && !t.isBuiltin()) { // type vars and builtins don't need to worry about accessibility
             auto declModulePath = t.declModulePath();
 
-            if (declModulePath.ends_with("::test") && !currentModuleName.ends_with("::test")) {
+            if (declModulePath->ends_with("::test") && !currentModuleName->ends_with("::test")) {
                 auto err = errors::CompilerError(errors::ErrorCode::InaccessibleType, signature.start());
                 err.setNote("types declared in test modules are only accessible from other test modules");
                 return std::unexpected(std::move(err));
             }
 
-            if (currentModuleName != declModulePath && currentModuleName != std::string(declModulePath) + "::test" && !t.isPublic()) {
+            if (currentModuleName != declModulePath && currentModuleName != declModulePath + "::test" && !t.isPublic()) {
                 auto err = errors::CompilerError(errors::ErrorCode::InaccessibleType, signature.start());
                 err.addLabel(std::format("{} is defined here", "<TODO: typename>"), t.declStart());
                 return std::unexpected(std::move(err));

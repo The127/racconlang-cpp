@@ -1,14 +1,15 @@
 #pragma once
 
+#include "Id.h"
 #include "TypeRef.h"
 #include "TypeBase.h"
 
 class racc::registry::BuiltinType : public TypeBase<BuiltinType> {
 public:
-    std::string name;
+    Id name;
     size_t size;
 
-    BuiltinType(std::string name, size_t size);
+    BuiltinType(Id name, size_t size);
 
     ~BuiltinType();
 

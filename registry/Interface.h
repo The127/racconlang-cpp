@@ -7,6 +7,7 @@
 
 #include "predeclare.h"
 
+#include "Id.h"
 #include "ModuleRegistry.h"
 #include "TypeBase.h"
 
@@ -17,21 +18,21 @@
 
 class racc::registry::Interface : public TypeBase<Interface> {
 public:
-    std::string name;
-    std::string_view modulePath;
+    Id name;
+    Id modulePath;
     uint8_t arity;
     bool isPublic;
-    std::map<std::string, InterfaceGetter, std::less<>> getters;
-    std::map<std::string, InterfaceSetter, std::less<>> setters;
-    std::map<std::string, InterfaceMethod, std::less<>> methods;
+    std::map<Id, InterfaceGetter, std::less<>> getters;
+    std::map<Id, InterfaceSetter, std::less<>> setters;
+    std::map<Id, InterfaceMethod, std::less<>> methods;
     ast::InterfaceDeclaration *declaration;
     std::shared_ptr<sourcemap::Source> source;
     std::shared_ptr<ast::UseMap> useMap;
     std::vector<TypeRef> genericParams;
-    std::map<std::string, TypeRef, std::less<>> genericParamsMap;
+    std::map<Id, TypeRef, std::less<>> genericParamsMap;
     std::optional<std::shared_ptr<Interface>> genericBase;
 
-    Interface(std::string name, std::string_view module, uint8_t arity, ast::InterfaceDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
+    Interface(Id name, Id module, uint8_t arity, ast::InterfaceDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
               std::shared_ptr<ast::UseMap> useMap);
 
     ~Interface();

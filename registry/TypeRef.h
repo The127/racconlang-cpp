@@ -32,9 +32,9 @@ public:
     TypeRef &operator=(TypeRef &&) noexcept;
     ~TypeRef();
 
-    [[nodiscard]] static TypeRef var(std::string name);
+    [[nodiscard]] static TypeRef var(Id name);
 
-    [[nodiscard]] static TypeRef makeBuiltin(std::string name, size_t size);
+    [[nodiscard]] static TypeRef makeBuiltin(Id name, size_t size);
 
     [[nodiscard]] static TypeRef unknown();
 
@@ -56,20 +56,20 @@ public:
 
     explicit operator bool() const;
 
-    [[nodiscard]] std::string_view declModulePath() const;
+    [[nodiscard]] Id declModulePath() const;
 
     [[nodiscard]] bool isPublic() const;
 
     [[nodiscard]] uint64_t declStart() const;
-    static std::pair<TypeRef, std::shared_ptr<Alias>> makeAlias(std::string name, std::string_view module, int arity, ast::AliasDeclaration *decl, std::shared_ptr<sourcemap::Source> source,
+    static std::pair<TypeRef, std::shared_ptr<Alias>> makeAlias(Id name, Id module, int arity, ast::AliasDeclaration *decl, std::shared_ptr<sourcemap::Source> source,
                              std::shared_ptr<ast::UseMap> useMap);
-    static std::pair<TypeRef, std::shared_ptr<Enum>> makeEnum(std::string name, std::string_view module, int arity, ast::EnumDeclaration *decl, std::shared_ptr<sourcemap::Source> source,
+    static std::pair<TypeRef, std::shared_ptr<Enum>> makeEnum(Id name, Id module, int arity, ast::EnumDeclaration *decl, std::shared_ptr<sourcemap::Source> source,
                             std::shared_ptr<ast::UseMap> useMap);
     static std::pair<TypeRef, std::shared_ptr<FunctionType>> makeFunction(std::vector<std::pair<ParameterMode, TypeRef>> params, TypeRef returnType, bool returnMut);
     static std::pair<TypeRef, std::shared_ptr<TupleType>> makeTuple(const std::vector<TypeRef> &types);
-    static std::pair<TypeRef, std::shared_ptr<Struct>> makeStruct(std::basic_string<char> name, std::string_view module, unsigned long arity, ast::StructDeclaration *decl,
+    static std::pair<TypeRef, std::shared_ptr<Struct>> makeStruct(Id name, Id module, unsigned long arity, ast::StructDeclaration *decl,
                               const std::shared_ptr<sourcemap::Source> &source, const std::shared_ptr<ast::UseMap> &useMap);
-    static std::pair<TypeRef, std::shared_ptr<Interface>> makeInterface(std::basic_string<char> name, std::string_view module, unsigned long arity, ast::InterfaceDeclaration *decl,
+    static std::pair<TypeRef, std::shared_ptr<Interface>> makeInterface(Id name, Id module, unsigned long arity, ast::InterfaceDeclaration *decl,
                                  const std::shared_ptr<sourcemap::Source> &source, const std::shared_ptr<ast::UseMap> &useMap);
     [[nodiscard]] bool isVar() const;
     [[nodiscard]] bool isBuiltin() const;

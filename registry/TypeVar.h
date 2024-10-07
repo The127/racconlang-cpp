@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Id.h"
 #include "TypeRef.h"
 #include "TypeBase.h"
 
@@ -8,9 +9,9 @@
 
 class racc::registry::TypeVar : public TypeBase<TypeVar> {
 public:
-    std::string name;
+    Id name;
 
-    explicit TypeVar(std::string name);
+    explicit TypeVar(Id name);
 
     ~TypeVar();
 

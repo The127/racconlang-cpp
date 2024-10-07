@@ -14,7 +14,7 @@
 
 namespace racc::registry {
 
-    Alias::Alias(std::string name, std::string_view module, uint8_t arity, ast::AliasDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
+    Alias::Alias(Id name, Id module, uint8_t arity, ast::AliasDeclaration *declaration, std::shared_ptr<sourcemap::Source> source,
                  std::shared_ptr<ast::UseMap> useMap)
             : name(std::move(name)),
               modulePath(module),
@@ -25,7 +25,7 @@ namespace racc::registry {
               useMap(std::move(useMap)) {
 
         for (const auto &item: declaration->genericParams) {
-            auto &t = genericParams.emplace_back(TypeRef::var(std::string(item.name)));
+            auto &t = genericParams.emplace_back(TypeRef::var(item.name));
             const auto &[_, success] = genericParamsMap.emplace(item.name, t);
             COMPILER_ASSERT(success, "insert into genericParamsMap failed");
         }

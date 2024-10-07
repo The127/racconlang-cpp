@@ -11,8 +11,4 @@ namespace racc::sourcemap {
                                                                                                       column(column) {
     }
 
-    std::string Location::toString() const {
-        return std::string(fileName) + ":" + std::to_string(line) + ":" + std::to_string(column);
-    }
-
 }
