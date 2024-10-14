@@ -54,6 +54,11 @@ public:
 
     [[nodiscard]] bool isUnknown() const;
 
+    [[nodiscard]] bool isInterface() const;
+
+    [[nodiscard]] const Interface& asInterface() const;
+    [[nodiscard]] Interface& asInterface();
+
     explicit operator bool() const;
 
     [[nodiscard]] Id declModulePath() const;

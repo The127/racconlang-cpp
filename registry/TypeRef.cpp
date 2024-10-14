@@ -226,6 +226,10 @@ namespace racc::registry {
         return _type == nullptr;
     }
 
+    bool TypeRef::isInterface() const {
+        return _type != nullptr && std::holds_alternative<Interface>(_type->val);
+    }
+
     TypeRef::operator bool() const {
         return _type != nullptr;
     }
@@ -239,5 +243,15 @@ namespace racc::registry {
     }
 
     TypeRef::TypeRef() : _type(nullptr) {}
+
+    const Interface& TypeRef::asInterface() const {
+        COMPILER_ASSERT(_type && std::holds_alternative<Interface>(_type->val), "not an interface");
+        return std::get<Interface>(_type->val);
+    }
+
+    Interface& TypeRef::asInterface() {
+        COMPILER_ASSERT(_type && std::holds_alternative<Interface>(_type->val), "not an interface");
+        return std::get<Interface>(_type->val);
+    }
 
 }
