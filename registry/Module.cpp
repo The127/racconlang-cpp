@@ -5,6 +5,7 @@
 #include "Module.h"
 
 #include <utility>
+#include <ast/ImplBlock.h>
 
 #include "TypeRef.h"
 #include "ast/EnumDeclaration.h"
@@ -79,6 +80,11 @@ namespace racc::registry {
         }
 
         types.emplace(std::make_pair(name, arity), TypeRef::makeInterface(name, path, arity, &decl, source, useMap).first);
+    }
+
+    void addImplBlock(const std::shared_ptr<sourcemap::Source> &source, ast::ImplBlock &decl, const std::shared_ptr<ast::UseMap> &useMap){
+        COMPILER_ASSERT(decl.structName.has_value(), "trued to add impl block without struct name");
+        //TODO: do the things
     }
 
     void Module::populate(ModuleRegistry &registry) {

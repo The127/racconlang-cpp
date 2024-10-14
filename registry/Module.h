@@ -43,6 +43,8 @@ public:
 
     void addInterface(const std::shared_ptr<sourcemap::Source> &source, ast::InterfaceDeclaration &decl, const std::shared_ptr<ast::UseMap> &useMap);
 
+    void addImplBlock(const std::shared_ptr<sourcemap::Source> &source, ast::ImplBlock &decl, const std::shared_ptr<ast::UseMap> &useMap);
+
     std::optional<TypeRef> getType(const Id &name, uint8_t arity);
 
     void populate(ModuleRegistry &registry);

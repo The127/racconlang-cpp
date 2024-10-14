@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ast/ImplBlock.h>
 
 #include "ast/AliasDeclaration.h"
 #include "ast/EnumDeclaration.h"
@@ -90,6 +91,21 @@ int main() {
     }
 
     moduleRegistry.populate();
+
+    for(auto &moduleDecl: modules) {
+        auto modulePath = moduleDecl.buildPathString();
+        auto &module = moduleRegistry.getModule(modulePath);
+
+        for (auto &implBlock: moduleDecl.implBlocks) {
+            if(!implBlock.structName)
+                continue;
+
+            module.addImplBlock(
+                source,
+                implBlock,
+                moduleDecl.uses);
+        }
+    }
 
     const std::unique_ptr<racc::errors::ErrorHandler> errorHandler = std::make_unique<racc::errors::ConsoleErrorHandler>();
     for (const auto &error: source->errors) {
