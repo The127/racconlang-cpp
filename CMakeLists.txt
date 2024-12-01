@@ -87,11 +87,6 @@ add_library(racc STATIC
 
 
 target_include_directories(racc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(racc PUBLIC ${LLVM_INCLUDE_DIRS})
-separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
-target_compile_definitions(racc PUBLIC ${LLVM_DEFINITIONS_LIST})
-llvm_map_components_to_libnames(LLVM_LIBS Support Core)
-target_link_libraries(racc PUBLIC ${LLVM_LIBS})
 
 target_compile_options(racc PRIVATE
         -Wall
@@ -103,7 +98,10 @@ target_compile_options(racc PRIVATE
         -Wno-unused-but-set-variable
         -Werror
 )
+
 target_link_libraries(racc PRIVATE stdc++exp)
+
+llvm_config(racc USE_SHARED core support)
 
 add_executable(racc_exe main.cpp)
 target_link_libraries(racc_exe PRIVATE racc)
