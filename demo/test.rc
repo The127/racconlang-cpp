@@ -8,8 +8,16 @@ mod std;
 
 pub struct map<TKey, TValue> {}
 
+pub struct foo {}
+
 
 mod foo::bar;
+
+struct foo {}
+
+struct bar {
+    f: foo;
+}
 
 fn asdf() {}
 

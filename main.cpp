@@ -1,6 +1,4 @@
-#include <iostream>
 #include <ast/ImplBlock.h>
-
 #include "ast/AliasDeclaration.h"
 #include "ast/EnumDeclaration.h"
 #include "ast/InterfaceDeclaration.h"
@@ -14,8 +12,19 @@
 #include "registry/Module.h"
 #include "sourceMap/SourceMap.h"
 
+#include <iostream>
+
+//#include <llvm/IR/LLVMContext.h>
+//#include <llvm/IR/IRBuilder.h>
+
 
 int main() {
+//    auto llvmCtx = std::make_unique<llvm::LLVMContext>();
+//    auto llvmBuilder = std::make_unique<llvm::IRBuilder<>>(*llvmCtx);
+//    auto llvmModule = std::make_unique<llvm::Module>("main", *llvmCtx);
+//    auto *treeType = llvm::StructType::create(*llvmCtx, "Tree");
+//    treeType->setBody({llvm::Type::getInt32Ty(*llvmCtx), treeType->getPointerTo(), treeType->getPointerTo()});
+
     auto directory = "demo";
 
 
