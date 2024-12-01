@@ -324,4 +324,16 @@ namespace racc::registry {
             return t.concretize(*this, genericArgTypes);
         }
     }
+
+    Module &ModuleRegistry::getModule(Id path) {
+        auto it = modules.find(path);
+        COMPILER_ASSERT(it != modules.end(), "unknown module");
+        return it->second;
+    }
+
+    const Module &ModuleRegistry::getModule(Id path) const {
+        auto it = modules.find(path);
+        COMPILER_ASSERT(it != modules.end(), "unknown module");
+        return it->second;
+    }
 }

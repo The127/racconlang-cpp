@@ -11,6 +11,7 @@
 #include "parser/Parser.h"
 #include "sourceMap/Source.h"
 #include "FunctionType.h"
+#include "Module.h"
 
 #include <map>
 
@@ -41,21 +42,11 @@ public:
 
     ~ModuleRegistry();
 
-    Module &addModule(Id path);
+    [[nodiscard]] Module &addModule(Id path);
 
-    template<typename T>
-    Module &getModule(T path) {
-        auto it = modules.find(path);
-        COMPILER_ASSERT(it != modules.end(), "unknown module");
-        return it->second;
-    }
+    [[nodiscard]] Module &getModule(Id path);
 
-    template<typename T>
-    const Module &getModule(T path) const {
-        auto it = modules.find(path);
-        COMPILER_ASSERT(it != modules.end(), "unknown module");
-        return it->second;
-    }
+    [[nodiscard]] const Module &getModule(Id path) const;
 
     std::expected<TypeRef, errors::CompilerError>
     lookupType(const ast::Signature &signature, const std::map<Id, TypeRef, std::less<>> &generics, Id moduleName,
