@@ -7,6 +7,8 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif ()
 
+find_package(LLVM REQUIRED CONFIG)
+
 add_library(racc STATIC
         lexer/Lexer.cpp
         lexer/TokenTree.cpp
@@ -85,6 +87,12 @@ add_library(racc STATIC
 
 
 target_include_directories(racc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(racc PUBLIC ${LLVM_INCLUDE_DIRS})
+separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
+target_compile_definitions(racc PUBLIC ${LLVM_DEFINITIONS_LIST})
+llvm_map_components_to_libnames(LLVM_LIBS Support Core)
+target_link_libraries(racc PUBLIC ${LLVM_LIBS})
+
 target_compile_options(racc PRIVATE
         -Wall
         -Wextra
@@ -100,4 +108,3 @@ target_link_libraries(racc PRIVATE stdc++exp)
 add_executable(racc_exe main.cpp)
 target_link_libraries(racc_exe PRIVATE racc)
 set_target_properties(racc_exe PROPERTIES OUTPUT_NAME racc)
-

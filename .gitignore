@@ -107,3 +107,5 @@ _deps
 *-prefix/
 
 # End of https://www.toptal.com/developers/gitignore/api/clion+all,cmake
+
+.direnv
